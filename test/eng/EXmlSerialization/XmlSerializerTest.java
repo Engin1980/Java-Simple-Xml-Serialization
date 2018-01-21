@@ -2,6 +2,7 @@ package eng.EXmlSerialization;
 
 import eng.EXmlSerialization.model.Address;
 import eng.EXmlSerialization.model.Person;
+import eng.EXmlSerialization.model.Phone;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -13,7 +14,9 @@ public class XmlSerializerTest {
   @Test
   public void fillObjectSimple() {
 
-    XmlSerializer ser = new XmlSerializer();
+    Settings settings = new Settings();
+    settings.getIgnoredFieldsRegex().add("phones");
+    XmlSerializer ser = new XmlSerializer(settings);
 
     Person p = new Person();
     ser.fillObject(PERSON_FILE_NAME, p);
@@ -25,7 +28,9 @@ public class XmlSerializerTest {
   @Test
   public void fillObjectWithAddress() {
 
-    XmlSerializer ser = new XmlSerializer();
+    Settings settings = new Settings();
+    settings.getIgnoredFieldsRegex().add("phones");
+    XmlSerializer ser = new XmlSerializer(settings);
 
     Person p = new Person();
     ser.fillObject(PERSON_FILE_NAME, p);
@@ -41,14 +46,27 @@ public class XmlSerializerTest {
   public void fillObjectIgnoreAddress() {
 
     Settings settings = new Settings();
-    settings.setVerbose(true);
     settings.getIgnoredFieldsRegex().add("addr");
+    settings.getIgnoredFieldsRegex().add("phones");
     XmlSerializer ser = new XmlSerializer(settings);
 
     Person p = new Person();
     ser.fillObject(PERSON_FILE_NAME, p);
 
     assertNull(p.getAddress());
+  }
+
+  @Test
+  public void fillObjectWithPhoneList(){
+    Settings settings = new Settings();
+    settings.getListItemMapping().add(
+        new XmlListItemMapping("phone", Phone.class));
+    XmlSerializer ser = new XmlSerializer(settings);
+
+    Person p = new Person();
+    ser.fillObject(PERSON_FILE_NAME, p);
+
+    assertEquals(3,p.getPhones().size());
   }
 
 

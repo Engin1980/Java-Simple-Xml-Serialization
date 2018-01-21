@@ -6,4 +6,9 @@
         <houseNumber>58</houseNumber>
         <used>true</used>
     </address>
+    <phones>
+        <phone number="1" />
+        <phone number="2" />
+        <phone number="3" />
+    </phones>
 </person>

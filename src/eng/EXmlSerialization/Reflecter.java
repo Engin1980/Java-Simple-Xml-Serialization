@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import static eng.EXmlSerialization.Shared.isRegexMatch;
+
 /**
  *
  * @author Marek
@@ -127,7 +129,6 @@ class Reflecter {
   private Object convertToType(String value, Class<?> type) {
     Object ret;
     if (type.isEnum()) {
-      //field.set(this, Enum.valueOf((Class<Enum>) field.getType(), value));
       ret = Enum.valueOf((Class<Enum>) type, value);
     } else {
       switch (type.getName()) {
@@ -150,9 +151,6 @@ class Reflecter {
         case "java.lang.String":
           ret = value;
           break;
-//        case "Color":
-//          ret = parseColor(value);
-//          break;
         default:
           throw new XmlSerializationException("Type " + type.getName() + " is not supported.");
       }
@@ -195,7 +193,7 @@ class Reflecter {
     // programuje se proti List, tak sem přijde požadavek na "List"
     // ale to je rozhraní, takže ho nahradím ArrayListem
     if (type.equals(List.class)) {
-      type = ArrayList.class;
+      type = settings.getDefaultListTypeImplementation();
     }
 
     try {
@@ -222,8 +220,8 @@ class Reflecter {
   }
 
   private void fillFieldList(Element el, List lst, String classFieldKey) {
-    List<Element> childs = getElements(el);
-    for (Element e : childs) {
+    List<Element> children = getElements(el);
+    for (Element e : children) {
       Class itemType = getItemType(classFieldKey, e.getNodeName());
       Object inn = createInstance(itemType);
       lst.add(inn);
@@ -257,7 +255,7 @@ class Reflecter {
     @SuppressWarnings("UnusedAssignment")
     Class ret = null;
 
-    ret = Mapping.getMappedType(classFieldKey, elementNameOrNull);
+    ret = getMappedType(classFieldKey, elementNameOrNull);
 
     if (ret == null) {
       throw new XmlSerializationException("No list-mapping found for " + classFieldKey + " and <" + elementNameOrNull + ">");
@@ -266,6 +264,19 @@ class Reflecter {
     return ret;
   }
 
-//
+  Class getMappedType(String key, String elementName) {
+    Class ret = null;
+    for (XmlListItemMapping mi : settings.getListItemMapping()){
+      if (isRegexMatch(mi.listPathRegex, key))
+        if (mi.itemPathRegexOrNull == null){
+          ret = mi.itemType;
+        } else if (
+            isRegexMatch(mi.itemPathRegexOrNull, elementName)){
+          ret = mi.itemType;
+        }
+    }
+
+    return ret;
+  }
 
 }

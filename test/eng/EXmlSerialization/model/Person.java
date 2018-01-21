@@ -1,9 +1,12 @@
 package eng.EXmlSerialization.model;
 
+import java.util.List;
+
 public class Person {
   private String name;
   public String surname;
   private Address address;
+  private List<Phone> phones;
 
   public String getName() {
     return name;
@@ -19,5 +22,13 @@ public class Person {
 
   public void setAddress(Address address) {
     this.address = address;
+  }
+
+  public List<Phone> getPhones() {
+    return phones;
+  }
+
+  public void setPhones(List<Phone> phones) {
+    this.phones = phones;
   }
 }

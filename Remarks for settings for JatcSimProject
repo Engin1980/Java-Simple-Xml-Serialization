@@ -1,2 +1,25 @@
 Fields with prefix "_" should be skipped - filled internally.
 Fields with name "parent" should be skipped - contains references to upper objects.
+
+/*
+
+! ! !  mappings are now as regex ! ! !
+    mapAdd("Area.airports", Airport.class);
+    mapAdd("Airport.runways", Runway.class);
+    mapAdd("Airport.atcTemplates", AtcTemplate.class);
+    mapAdd("Airport.holds", PublishedHold.class);
+    mapAdd("Airport.vfrPoints", VfrPoint.class);
+    mapAdd("Runway.thresholds", RunwayThreshold.class);
+    mapAdd("RunwayThreshold.approaches", Approach.class);
+    mapAdd("RunwayThreshold.routes", Route.class);
+    mapAdd("Area.navaids", Navaid.class);
+    mapAdd("Area.borders", Border.class);
+    mapAdd("Border.points", "point", BorderExactPoint.class);
+    mapAdd("Border.points", "arc", BorderArcPoint.class);
+
+    mapAdd("AirplaneTypes", AirplaneType.class);
+
+    mapAdd("Settings.dispItems", DispItem.class);
+    mapAdd("Settings.dispPlanes", DispPlane.class);
+    mapAdd("Settings.dispTexts", DispText.class);
+    */
