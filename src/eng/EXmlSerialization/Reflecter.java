@@ -270,9 +270,11 @@ class Reflecter {
       if (isRegexMatch(mi.listPathRegex, key))
         if (mi.itemPathRegexOrNull == null){
           ret = mi.itemType;
+          break;
         } else if (
             isRegexMatch(mi.itemPathRegexOrNull, elementName)){
           ret = mi.itemType;
+          break;
         }
     }
 

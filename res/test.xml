@@ -11,4 +11,9 @@
         <phone number="2" />
         <phone number="3" />
     </phones>
+    <phoneNumbers>
+        <number>25927</number>
+        <number>25927</number>
+        <number>25927</number>
+    </phoneNumbers>
 </person>

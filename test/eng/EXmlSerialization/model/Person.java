@@ -7,6 +7,7 @@ public class Person {
   public String surname;
   private Address address;
   private List<Phone> phones;
+  private List<String> phoneNumbers;
 
   public String getName() {
     return name;
@@ -30,5 +31,9 @@ public class Person {
 
   public void setPhones(List<Phone> phones) {
     this.phones = phones;
+  }
+
+  public List<String> getPhoneNumbers() {
+    return phoneNumbers;
   }
 }

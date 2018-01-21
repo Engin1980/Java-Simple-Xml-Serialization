@@ -15,7 +15,7 @@ public class XmlSerializerTest {
   public void fillObjectSimple() {
 
     Settings settings = new Settings();
-    settings.getIgnoredFieldsRegex().add("phones");
+    settings.getIgnoredFieldsRegex().add("phone.*");
     XmlSerializer ser = new XmlSerializer(settings);
 
     Person p = new Person();
@@ -29,7 +29,7 @@ public class XmlSerializerTest {
   public void fillObjectWithAddress() {
 
     Settings settings = new Settings();
-    settings.getIgnoredFieldsRegex().add("phones");
+    settings.getIgnoredFieldsRegex().add("phone.*");
     XmlSerializer ser = new XmlSerializer(settings);
 
     Person p = new Person();
@@ -47,7 +47,7 @@ public class XmlSerializerTest {
 
     Settings settings = new Settings();
     settings.getIgnoredFieldsRegex().add("addr");
-    settings.getIgnoredFieldsRegex().add("phones");
+    settings.getIgnoredFieldsRegex().add("phone.*");
     XmlSerializer ser = new XmlSerializer(settings);
 
     Person p = new Person();
@@ -60,7 +60,23 @@ public class XmlSerializerTest {
   public void fillObjectWithPhoneList(){
     Settings settings = new Settings();
     settings.getListItemMapping().add(
-        new XmlListItemMapping("phone", Phone.class));
+        new XmlListItemMapping("phones", Phone.class));
+    settings.getIgnoredFieldsRegex().add("phoneNumbers");
+    XmlSerializer ser = new XmlSerializer(settings);
+
+    Person p = new Person();
+    ser.fillObject(PERSON_FILE_NAME, p);
+
+    assertEquals(3,p.getPhones().size());
+  }
+
+  @Test
+  public void fillObjectWithPhoneNumbersList(){
+    Settings settings = new Settings();
+    settings.getListItemMapping().add(
+        new XmlListItemMapping("phones", Phone.class));
+    settings.getListItemMapping().add(
+        new XmlListItemMapping("phoneNumbers", String.class));
     XmlSerializer ser = new XmlSerializer(settings);
 
     Person p = new Person();
