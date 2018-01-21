@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<person name="Michal">
+    <surname>Volny</surname>
+    <address>
+        <street>Novicka</street>
+        <houseNumber>58</houseNumber>
+        <used>true</used>
+    </address>
+</person>
