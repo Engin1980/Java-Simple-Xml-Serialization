@@ -1,0 +1,2 @@
+Fields with prefix "_" should be skipped - filled internally.
+Fields with name "parent" should be skipped - contains references to upper objects.

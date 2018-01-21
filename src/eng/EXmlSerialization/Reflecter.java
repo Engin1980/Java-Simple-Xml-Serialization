@@ -9,11 +9,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.awt.*;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -22,10 +20,14 @@ import java.util.regex.Pattern;
  */
 class Reflecter {
 
-  private static final boolean VERBOSE = false;
+  private final Settings settings;
 
-  static <T> void fillObject(Element el, T targetObject) {
-    if (VERBOSE) {
+  Reflecter(Settings settings) {
+    this.settings = settings;
+  }
+
+  <T> void fillObject(Element el, T targetObject) {
+    if (settings.isVerbose()) {
       System.out.println("fillObject( <" + el.getNodeName() + "...>, " + targetObject.getClass().getSimpleName());
     }
     Class c = targetObject.getClass();
@@ -34,21 +36,41 @@ class Reflecter {
     for (Field f : fields) {
       if (java.lang.reflect.Modifier.isStatic(f.getModifiers())) {
         continue; // statické přeskakujem
-      } else if (f.getName().equals("parent")) {
+      } else if (isSkippedBySettings(f)) {
+        if (settings.isVerbose()){
+          System.out.println("  " + el.getNodeName() + "." + f.getName() + " field skipped due to settings-ignoredFieldsRegex list.");
+        }
         continue; // parent neplníme, ty jsou reference na nadřazené objekty a plní se sami
-      } else if (f.getName().startsWith("_")) {
-        continue; // pomocné dopočítávané hodnoty, neplníme, plní se samy
       }
       fillField(el, f, targetObject);
     }
   }
 
-  static void fillList(Element el, List lst) {
+  /**
+   * Returns true if field should be skipped according to regex ignore settings
+   * @param f
+   * @return
+   */
+  private boolean isSkippedBySettings(Field f) {
+    boolean ret = false;
+
+    for (String regex : this.settings.getIgnoredFieldsRegex()) {
+      Pattern p = Pattern.compile(regex);
+      if (p.matcher(f.getName()).find()){
+        ret = true;
+        break;
+      }
+    }
+
+    return ret;
+  }
+
+  void fillList(Element el, List lst) {
     fillFieldList(el, lst, lst.getClass().getSimpleName());
   }
 
-  private static <T> void fillField(Element el, Field f, T targetObject) {
-    if (VERBOSE) {
+  private <T> void fillField(Element el, Field f, T targetObject) {
+    if (settings.isVerbose()) {
       System.out.println("  fillField( <" + el.getNodeName() + "...>, " + targetObject.getClass().getSimpleName() + "." + f.getName());
     }
 
@@ -63,7 +85,7 @@ class Reflecter {
     }
   }
 
-  private static <T> void convertAndSetFieldValue(Element el, Field f, T targetObject) {
+  private <T> void convertAndSetFieldValue(Element el, Field f, T targetObject) {
     boolean required = f.getAnnotation(XmlOptional.class) == null;
     String tmpS = extractSimpleValueFromElement(el, f.getName(), required);
     if (tmpS == null) {
@@ -73,7 +95,7 @@ class Reflecter {
     setFieldValue(f, targetObject, tmpO);
   }
 
-  private static String extractSimpleValueFromElement(Element el, String key, boolean isRequired) {
+  private String extractSimpleValueFromElement(Element el, String key, boolean isRequired) {
     String ret = null;
     if (el.hasAttribute(key)) {
       ret = el.getAttribute(key);
@@ -91,7 +113,7 @@ class Reflecter {
     return ret;
   }
 
-  private static <T> void setFieldValue(Field f, T targetObject, Object value) throws SecurityException, XmlSerializationException {
+  private <T> void setFieldValue(Field f, T targetObject, Object value) throws SecurityException, XmlSerializationException {
     try {
       f.setAccessible(true);
       f.set(targetObject, value);
@@ -102,7 +124,7 @@ class Reflecter {
     }
   }
 
-  private static Object convertToType(String value, Class<?> type) {
+  private Object convertToType(String value, Class<?> type) {
     Object ret;
     if (type.isEnum()) {
       //field.set(this, Enum.valueOf((Class<Enum>) field.getType(), value));
@@ -139,7 +161,7 @@ class Reflecter {
     return ret;
   }
 
-  private static <T> void setFieldComplex(Element el, Field f, T ref) {
+  private <T> void setFieldComplex(Element el, Field f, T ref) {
     Object newInstance;
     try {
       newInstance = createInstance(f.getType());
@@ -167,7 +189,7 @@ class Reflecter {
     fillObject(subEl, newInstance);
   }
 
-  private static Object createInstance(Class<?> type) {
+  private Object createInstance(Class<?> type) {
     Object ret;
 
     // programuje se proti List, tak sem přijde požadavek na "List"
@@ -184,7 +206,7 @@ class Reflecter {
     return ret;
   }
 
-  private static void setFieldList(Element el, Field f, Object targetObject) {
+  private void setFieldList(Element el, Field f, Object targetObject) {
     List lst = (List) createInstance(f.getType());
     setFieldValue(f, targetObject, lst);
 
@@ -199,7 +221,7 @@ class Reflecter {
     fillFieldList(el, lst, key);
   }
 
-  private static void fillFieldList(Element el, List lst, String classFieldKey) {
+  private void fillFieldList(Element el, List lst, String classFieldKey) {
     List<Element> childs = getElements(el);
     for (Element e : childs) {
       Class itemType = getItemType(classFieldKey, e.getNodeName());
@@ -210,11 +232,11 @@ class Reflecter {
     }
   }
 
-  private static List<Element> getElements(Element el) {
+  private List<Element> getElements(Element el) {
     return getElements(el, null);
   }
 
-  private static List<Element> getElements(Element el, String subElementName) {
+  private List<Element> getElements(Element el, String subElementName) {
     List<Element> ret = new ArrayList();
     NodeList c = el.getChildNodes();
     for (int i = 0; i < c.getLength(); i++) {
@@ -231,7 +253,7 @@ class Reflecter {
     return ret;
   }
 
-  private static Class getItemType(String classFieldKey, String elementNameOrNull) {
+  private Class getItemType(String classFieldKey, String elementNameOrNull) {
     @SuppressWarnings("UnusedAssignment")
     Class ret = null;
 
@@ -244,29 +266,6 @@ class Reflecter {
     return ret;
   }
 
-  private static Color parseColor(String value) {
-    Color ret = null;
-    String ps = "(..)(..)(..)";
-    Pattern p = Pattern.compile(ps);
-
-    Matcher m = p.matcher(value);
-    if (m.find()) {
-      String r = m.group(1);
-      String g = m.group(2);
-      String b = m.group(3);
-      try {
-        int ri = Integer.parseInt(r, 16);
-        int gi = Integer.parseInt(g, 16);
-        int bi = Integer.parseInt(b, 16);
-        ret = new Color(ri, gi, bi);
-      } finally {
-      }
-    }
-    if (ret == null) {
-      throw new XmlSerializationException("Unable to parse \"" + value + "\" into color.");
-    }
-
-    return ret;
-  }
+//
 
 }

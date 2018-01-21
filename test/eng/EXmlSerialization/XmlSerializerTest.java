@@ -20,7 +20,6 @@ public class XmlSerializerTest {
 
     assertEquals("Michal", p.getName());
     assertEquals("Volny", p.surname);
-
   }
 
   @Test
@@ -37,6 +36,21 @@ public class XmlSerializerTest {
     assertEquals(true, act.isUsed());
 
   }
+
+  @Test
+  public void fillObjectIgnoreAddress() {
+
+    Settings settings = new Settings();
+    settings.setVerbose(true);
+    settings.getIgnoredFieldsRegex().add("addr");
+    XmlSerializer ser = new XmlSerializer(settings);
+
+    Person p = new Person();
+    ser.fillObject(PERSON_FILE_NAME, p);
+
+    assertNull(p.getAddress());
+  }
+
 
   @Test
   public void fillList() {

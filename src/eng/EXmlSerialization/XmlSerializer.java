@@ -22,10 +22,27 @@ import java.util.List;
  */
 public class XmlSerializer {
 
+  private final Settings settings;
+  private final Reflecter reflecter;
+
+  public XmlSerializer() {
+    settings = new Settings();
+    reflecter = new Reflecter(settings);
+  }
+
+  public XmlSerializer(Settings settings) {
+    if (settings == null) {
+        throw new IllegalArgumentException("Value of {settings} cannot not be null.");
+    }
+
+    this.settings = settings;
+    this.reflecter = new Reflecter(settings);
+  }
+
   public void fillObject (String xmlFileName, Object targetObject){
 
     Element el = loadXmlAndGetRootElement(xmlFileName);
-    Reflecter.fillObject(el, targetObject);
+    this.reflecter.fillObject(el, targetObject);
   }
 
   private Element loadXmlAndGetRootElement(String xmlFileName) {
@@ -36,7 +53,7 @@ public class XmlSerializer {
 
   public void fillList (String xmlFileName, List targetObject){
     Element el = loadXmlAndGetRootElement(xmlFileName);
-    Reflecter.fillList(el, targetObject);
+    this.reflecter.fillList(el, targetObject);
   }
 
   private Document readXmlDocument(String fileName){
