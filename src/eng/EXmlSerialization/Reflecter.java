@@ -187,6 +187,25 @@ class Reflecter {
   }
 
   private <T> void setFieldComplex(Element el, Field f, T ref) {
+
+    // first check if I have something to fill the object with
+    boolean required = f.getAnnotation(XmlOptional.class) == null;
+
+    Element subEl;
+    try {
+      subEl = getElements(el, f.getName()).get(0);
+    } catch (Exception e) {
+      if (required)
+      throw XmlInvalidDataException.createNoSuchElement(el, f.getName(), ref.getClass());
+      else
+        subEl = null;
+    }
+
+    // if is optional and element-data has not been found, skip
+    if (subEl == null)
+      return;
+
+    // then create instance and fill it
     Object newInstance;
     try {
       newInstance = createInstance(f.getType());
@@ -202,13 +221,6 @@ class Reflecter {
     } catch (IllegalArgumentException | IllegalAccessException ex) {
       throw new XmlSerializationException(
           "Failed to set value to field " + ref.getClass().getName() + "." + f.getName(), ex);
-    }
-    Element subEl;
-
-    try {
-      subEl = getElements(el, f.getName()).get(0);
-    } catch (Exception e) {
-      throw XmlInvalidDataException.createNoSuchElement(el, f.getName(), ref.getClass());
     }
 
     fillObject(subEl, newInstance);

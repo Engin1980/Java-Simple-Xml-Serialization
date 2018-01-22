@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="BookmarkManager">
-    <bookmark url="file://$PROJECT_DIR$/src/eng/EXmlSerialization/Reflecter.java" line="134" />
-    <bookmark url="file://$PROJECT_DIR$/src/eng/EXmlSerialization/Reflecter.java" line="279" />
-    <bookmark url="file://$PROJECT_DIR$/src/eng/EXmlSerialization/Reflecter.java" line="81" />
-  </component>
   <component name="ChangeListManager">
     <list default="true" id="4a241bf6-9281-43d3-8161-d0b266b8e05a" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
-      <change beforePath="$PROJECT_DIR$/test/eng/EXmlSerialization/XmlSerializerTest.java" afterPath="$PROJECT_DIR$/test/eng/EXmlSerialization/XmlSerializerTest.java" />
+      <change beforePath="$PROJECT_DIR$/res/colorTest.xml" afterPath="$PROJECT_DIR$/res/colorTest.xml" />
+      <change beforePath="$PROJECT_DIR$/src/eng/EXmlSerialization/Reflecter.java" afterPath="$PROJECT_DIR$/src/eng/EXmlSerialization/Reflecter.java" />
+      <change beforePath="$PROJECT_DIR$/test/eng/EXmlSerialization/model/NamedColor.java" afterPath="$PROJECT_DIR$/test/eng/EXmlSerialization/model/NamedColor.java" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -20,50 +16,26 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="XmlSerializer.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/eng/EXmlSerialization/XmlSerializer.java">
+      <file leaf-file-name="AwtFontElementParser.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/eng/EXmlSerialization/common/parsers/AwtFontElementParser.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="350">
-              <caret line="55" column="0" lean-forward="false" selection-start-line="55" selection-start-column="0" selection-end-line="55" selection-end-column="0" />
+            <state relative-caret-position="240">
+              <caret line="16" column="2" lean-forward="true" selection-start-line="16" selection-start-column="2" selection-end-line="16" selection-end-column="2" />
               <folding>
                 <element signature="imports" expanded="true" />
+                <element signature="e#261#262#0" expanded="true" />
+                <element signature="e#307#308#0" expanded="true" />
+                <element signature="e#380#381#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="XmlSerializerTest.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/test/eng/EXmlSerialization/XmlSerializerTest.java">
+      <file leaf-file-name="model2.xml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/res/model2.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="150">
-              <caret line="32" column="3" lean-forward="true" selection-start-line="32" selection-start-column="3" selection-end-line="32" selection-end-column="3" />
-              <folding>
-                <element signature="method#fillObjectSimple#0;class#XmlSerializerTest#0" expanded="false" />
-                <element signature="method#fillObjectWithAddress#0;class#XmlSerializerTest#0" expanded="false" />
-                <element signature="method#fillObjectIgnoreAddress#0;class#XmlSerializerTest#0" expanded="false" />
-                <element signature="method#fillObjectWithPhoneList#0;class#XmlSerializerTest#0" expanded="false" />
-                <element signature="method#fillObjectWithPhoneNumbersList#0;class#XmlSerializerTest#0" expanded="false" />
-                <element signature="method#fillListWithCustomCreatorAndCustomValueParser#0;class#XmlSerializerTest#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="README.md" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/README.md">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="165">
-              <caret line="11" column="34" lean-forward="false" selection-start-line="11" selection-start-column="34" selection-end-line="11" selection-end-column="34" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="HexToAwtColorValueParser.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/eng/EXmlSerialization/common/parsers/HexToAwtColorValueParser.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="105">
-              <caret line="12" column="31" lean-forward="false" selection-start-line="12" selection-start-column="31" selection-end-line="12" selection-end-column="31" />
+            <state relative-caret-position="330">
+              <caret line="22" column="0" lean-forward="false" selection-start-line="22" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -72,57 +44,38 @@
       <file leaf-file-name="colorTest.xml" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/res/colorTest.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="30">
-              <caret line="2" column="8" lean-forward="false" selection-start-line="2" selection-start-column="4" selection-end-line="2" selection-end-column="8" />
+            <state relative-caret-position="60">
+              <caret line="4" column="0" lean-forward="true" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Reflecter.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="NamedColor.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/test/eng/EXmlSerialization/model/NamedColor.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="135">
+              <caret line="9" column="14" lean-forward="false" selection-start-line="9" selection-start-column="14" selection-end-line="9" selection-end-column="14" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Reflecter.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/eng/EXmlSerialization/Reflecter.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="79" column="26" lean-forward="true" selection-start-line="79" selection-start-column="26" selection-end-line="79" selection-end-column="26" />
+            <state relative-caret-position="184">
+              <caret line="195" column="13" lean-forward="false" selection-start-line="195" selection-start-column="13" selection-end-line="195" selection-end-column="13" />
               <folding>
                 <element signature="e#629#630#0" expanded="true" />
                 <element signature="e#663#664#0" expanded="true" />
                 <element signature="e#1917#1918#0" expanded="true" />
                 <element signature="e#2002#2003#0" expanded="true" />
-                <element signature="e#8949#8950#0" expanded="true" />
-                <element signature="e#8987#8988#0" expanded="true" />
+                <element signature="e#9276#9277#0" expanded="true" />
+                <element signature="e#9314#9315#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Settings.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/eng/EXmlSerialization/Settings.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="401">
-              <caret line="64" column="47" lean-forward="false" selection-start-line="64" selection-start-column="47" selection-end-line="64" selection-end-column="47" />
-              <folding>
-                <element signature="docComment;field#verbose#0;class#Settings#0" expanded="false" />
-                <element signature="docComment;field#defaultListTypeImplementation#0;class#Settings#0" expanded="false" />
-                <element signature="docComment;field#ignoredFieldsRegex#0;class#Settings#0" expanded="false" />
-                <element signature="e#898#899#0" expanded="true" />
-                <element signature="e#930#931#0" expanded="true" />
-                <element signature="docComment;field#listItemMapping#0;class#Settings#0" expanded="false" />
-                <element signature="method#setDefaultListTypeImplementation#0;class#Settings#0" expanded="false" />
-                <element signature="e#1619#1620#0" expanded="true" />
-                <element signature="e#1652#1653#0" expanded="true" />
-                <element signature="e#1730#1731#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ReflectiveCallable.class" pinned="false" current-in-tab="false">
-        <entry file="jar://$APPLICATION_HOME_DIR$/lib/junit-4.12.jar!/org/junit/internal/runners/model/ReflectiveCallable.class">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="210">
-              <caret line="17" column="0" lean-forward="false" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -133,8 +86,8 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="JUnit4 Test Class" />
-        <option value="Class" />
         <option value="Interface" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -163,7 +116,6 @@
         <option value="$PROJECT_DIR$/src/eng/EXmlSerialization/IValueParser.java" />
         <option value="$PROJECT_DIR$/src/eng/EXmlSerialization/common/parsers/AwtColorParser.java" />
         <option value="$PROJECT_DIR$/src/eng/EXmlSerialization/XmlSerializer.java" />
-        <option value="$PROJECT_DIR$/test/eng/EXmlSerialization/model/NamedColor.java" />
         <option value="$PROJECT_DIR$/test/eng/EXmlSerialization/model/Phone.java" />
         <option value="$PROJECT_DIR$/src/eng/EXmlSerialization/Shared.java" />
         <option value="$PROJECT_DIR$/Remarks for settings for JatcSimProject" />
@@ -180,9 +132,14 @@
         <option value="$PROJECT_DIR$/src/eng/EXmlSerialization/common/parsers/HexToAwtColorParser.java" />
         <option value="$PROJECT_DIR$/src/eng/EXmlSerialization/common/parsers/HexToAwtColorValueParser.java" />
         <option value="$PROJECT_DIR$/src/eng/EXmlSerialization/IElementParser.java" />
-        <option value="$PROJECT_DIR$/src/eng/EXmlSerialization/Reflecter.java" />
         <option value="$PROJECT_DIR$/test/eng/EXmlSerialization/XmlSerializerTest.java" />
         <option value="$PROJECT_DIR$/README.md" />
+        <option value="$PROJECT_DIR$/res/model2.xml" />
+        <option value="$PROJECT_DIR$/src/eng/EXmlSerialization/common/parsers/AwtFontElementParser.java" />
+        <option value="$PROJECT_DIR$/res/colorTest.xml" />
+        <option value="$PROJECT_DIR$/src/eng/EXmlSerialization/common/instanceCreators/AwtFontCreator.java" />
+        <option value="$PROJECT_DIR$/test/eng/EXmlSerialization/model/NamedColor.java" />
+        <option value="$PROJECT_DIR$/src/eng/EXmlSerialization/Reflecter.java" />
       </list>
     </option>
   </component>
@@ -244,6 +201,14 @@
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="EXmlSerialization" type="462c0819:PsiDirectoryNode" />
               <item name="common" type="462c0819:PsiDirectoryNode" />
+              <item name="instanceCreators" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Java-Simple-Xml-Serialization" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Java-Simple-Xml-Serialization" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="EXmlSerialization" type="462c0819:PsiDirectoryNode" />
+              <item name="common" type="462c0819:PsiDirectoryNode" />
               <item name="parsers" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -278,6 +243,7 @@
     <property name="Repository.Attach.Sources" value="false" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary" value="JUnit4" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="settings.editor.selected.configurable" value="editor.preferences.completion" />
   </component>
   <component name="RecentsManager">
     <key name="CreateTestDialog.RecentsKey">
@@ -413,24 +379,6 @@
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="Test_run - 2018.01.22 at 15h 10m 31s.xml">
-      <configuration name="Test run" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="Test_run - 2018.01.22 at 15h 11m 21s.xml">
-      <configuration name="Test run" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="Test_run - 2018.01.22 at 15h 12m 22s.xml">
-      <configuration name="Test run" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="Test_run - 2018.01.22 at 15h 12m 29s.xml">
-      <configuration name="Test run" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="Test_run - 2018.01.22 at 15h 12m 53s.xml">
-      <configuration name="Test run" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="Test_run - 2018.01.22 at 15h 20m 22s.xml">
-      <configuration name="Test run" configurationId="JUnit" />
-    </history-entry>
     <history-entry file="Test_run - 2018.01.22 at 15h 48m 16s.xml">
       <configuration name="Test run" configurationId="JUnit" />
     </history-entry>
@@ -441,6 +389,24 @@
       <configuration name="Test run" configurationId="JUnit" />
     </history-entry>
     <history-entry file="Test_run - 2018.01.22 at 15h 55m 47s.xml">
+      <configuration name="Test run" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="Test_run - 2018.01.22 at 23h 21m 03s.xml">
+      <configuration name="Test run" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="Test_run - 2018.01.22 at 23h 27m 25s.xml">
+      <configuration name="Test run" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="Test_run - 2018.01.22 at 23h 29m 37s.xml">
+      <configuration name="Test run" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="Test_run - 2018.01.22 at 23h 39m 27s.xml">
+      <configuration name="Test run" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="Test_run - 2018.01.22 at 23h 40m 52s.xml">
+      <configuration name="Test run" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="Test_run - 2018.01.22 at 23h 42m 25s.xml">
       <configuration name="Test run" configurationId="JUnit" />
     </history-entry>
   </component>
@@ -515,44 +481,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/test/eng/EXmlSerialization/XmlSerializerTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="480">
-          <caret line="36" column="35" lean-forward="false" selection-start-line="34" selection-start-column="35" selection-end-line="36" selection-end-column="35" />
-          <folding>
-            <element signature="method#fillObjectSimple#0;class#XmlSerializerTest#0" expanded="false" />
-            <element signature="method#fillObjectWithAddress#0;class#XmlSerializerTest#0" expanded="false" />
-            <element signature="method#fillObjectIgnoreAddress#0;class#XmlSerializerTest#0" expanded="false" />
-            <element signature="method#fillObjectWithPhoneList#0;class#XmlSerializerTest#0" expanded="false" />
-            <element signature="method#fillObjectWithPhoneNumbersList#0;class#XmlSerializerTest#0" expanded="false" />
-            <element signature="method#fillListWithCustomCreatorAndCustomValueParser#0;class#XmlSerializerTest#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/LICENSE">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/eng/EXmlSerialization/Reflecter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1635">
-          <caret line="124" column="23" lean-forward="false" selection-start-line="124" selection-start-column="23" selection-end-line="124" selection-end-column="23" />
-          <folding>
-            <element signature="e#629#630#0" expanded="true" />
-            <element signature="e#663#664#0" expanded="true" />
-            <element signature="e#1917#1918#0" expanded="true" />
-            <element signature="e#2002#2003#0" expanded="true" />
-            <element signature="e#8949#8950#0" expanded="true" />
-            <element signature="e#8987#8988#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/eng/EXmlSerialization/XmlInvalidDataException.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="45">
@@ -622,8 +550,8 @@
             <element signature="e#663#664#0" expanded="true" />
             <element signature="e#1917#1918#0" expanded="true" />
             <element signature="e#2002#2003#0" expanded="true" />
-            <element signature="e#8949#8950#0" expanded="true" />
-            <element signature="e#8987#8988#0" expanded="true" />
+            <element signature="e#9276#9277#0" expanded="true" />
+            <element signature="e#9314#9315#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -704,8 +632,8 @@
             <element signature="e#663#664#0" expanded="true" />
             <element signature="e#1917#1918#0" expanded="true" />
             <element signature="e#2002#2003#0" expanded="true" />
-            <element signature="e#8949#8950#0" expanded="true" />
-            <element signature="e#8987#8988#0" expanded="true" />
+            <element signature="e#9276#9277#0" expanded="true" />
+            <element signature="e#9314#9315#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -854,29 +782,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/eng/EXmlSerialization/model/Person.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="364">
-          <caret line="35" column="3" lean-forward="false" selection-start-line="35" selection-start-column="3" selection-end-line="37" selection-end-column="3" />
-          <folding>
-            <element signature="e#508#509#0" expanded="true" />
-            <element signature="e#531#532#0" expanded="true" />
-            <element signature="e#578#579#0" expanded="true" />
-            <element signature="e#608#609#0" expanded="true" />
-            <element signature="e#651#652#0" expanded="true" />
-            <element signature="e#680#681#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/res/test.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="15" column="30" lean-forward="false" selection-start-line="15" selection-start-column="30" selection-end-line="15" selection-end-column="30" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/res/colorTest">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="60">
@@ -931,6 +836,45 @@
         </state>
       </provider>
     </entry>
+    <entry file="jar://C:/Program Files/Java/jdk1.8.0_60/src.zip!/org/w3c/dom/Element.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="315">
+          <caret line="60" column="17" lean-forward="false" selection-start-line="60" selection-start-column="17" selection-end-line="60" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/eng/EXmlSerialization/IElementParser.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="7" column="0" lean-forward="true" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/eng/EXmlSerialization/model/Person.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="165">
+          <caret line="11" column="23" lean-forward="false" selection-start-line="11" selection-start-column="23" selection-end-line="11" selection-end-column="23" />
+          <folding>
+            <element signature="e#508#509#0" expanded="true" />
+            <element signature="e#531#532#0" expanded="true" />
+            <element signature="e#578#579#0" expanded="true" />
+            <element signature="e#608#609#0" expanded="true" />
+            <element signature="e#651#652#0" expanded="true" />
+            <element signature="e#680#681#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$APPLICATION_HOME_DIR$/lib/junit-4.12.jar!/org/junit/internal/runners/model/ReflectiveCallable.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="17" column="0" lean-forward="false" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/eng/EXmlSerialization/Settings.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="401">
@@ -950,30 +894,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="jar://C:/Program Files/Java/jdk1.8.0_60/src.zip!/org/w3c/dom/Element.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="315">
-          <caret line="60" column="17" lean-forward="false" selection-start-line="60" selection-start-column="17" selection-end-line="60" selection-end-column="17" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/eng/EXmlSerialization/IElementParser.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
-          <caret line="7" column="0" lean-forward="true" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/eng/EXmlSerialization/model/NamedColor.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="8" column="25" lean-forward="false" selection-start-line="8" selection-start-column="25" selection-end-line="8" selection-end-column="25" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/eng/EXmlSerialization/common/parsers/HexToAwtColorValueParser.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="105">
@@ -982,44 +902,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/res/colorTest.xml">
+    <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="2" column="8" lean-forward="false" selection-start-line="2" selection-start-column="4" selection-end-line="2" selection-end-column="8" />
+        <state relative-caret-position="90">
+          <caret line="6" column="5" lean-forward="false" selection-start-line="6" selection-start-column="5" selection-end-line="6" selection-end-column="5" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$APPLICATION_HOME_DIR$/lib/junit-4.12.jar!/org/junit/internal/runners/model/ReflectiveCallable.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="17" column="0" lean-forward="false" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/eng/EXmlSerialization/XmlSerializer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="350">
-          <caret line="55" column="0" lean-forward="false" selection-start-line="55" selection-start-column="0" selection-end-line="55" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/eng/EXmlSerialization/Reflecter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="79" column="26" lean-forward="true" selection-start-line="79" selection-start-column="26" selection-end-line="79" selection-end-column="26" />
-          <folding>
-            <element signature="e#629#630#0" expanded="true" />
-            <element signature="e#663#664#0" expanded="true" />
-            <element signature="e#1917#1918#0" expanded="true" />
-            <element signature="e#2002#2003#0" expanded="true" />
-            <element signature="e#8949#8950#0" expanded="true" />
-            <element signature="e#8987#8988#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1038,11 +925,83 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/README.md">
+    <entry file="file://$PROJECT_DIR$/src/eng/EXmlSerialization/XmlSerializer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="11" column="34" lean-forward="false" selection-start-line="11" selection-start-column="34" selection-end-line="11" selection-end-column="34" />
+        <state relative-caret-position="350">
+          <caret line="55" column="0" lean-forward="false" selection-start-line="55" selection-start-column="0" selection-end-line="55" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/res/test.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="38" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/eng/EXmlSerialization/common/parsers/AwtFontElementParser.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="240">
+          <caret line="16" column="2" lean-forward="true" selection-start-line="16" selection-start-column="2" selection-end-line="16" selection-end-column="2" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#261#262#0" expanded="true" />
+            <element signature="e#307#308#0" expanded="true" />
+            <element signature="e#380#381#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/res/model2.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="330">
+          <caret line="22" column="0" lean-forward="false" selection-start-line="22" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/res/colorTest.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="4" column="0" lean-forward="true" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/eng/EXmlSerialization/common/instanceCreators/AwtFontCreator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="225">
+          <caret line="15" column="8" lean-forward="false" selection-start-line="15" selection-start-column="8" selection-end-line="15" selection-end-column="8" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/eng/EXmlSerialization/model/NamedColor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="9" column="14" lean-forward="false" selection-start-line="9" selection-start-column="14" selection-end-line="9" selection-end-column="14" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/eng/EXmlSerialization/Reflecter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="184">
+          <caret line="195" column="13" lean-forward="false" selection-start-line="195" selection-start-column="13" selection-end-line="195" selection-end-column="13" />
+          <folding>
+            <element signature="e#629#630#0" expanded="true" />
+            <element signature="e#663#664#0" expanded="true" />
+            <element signature="e#1917#1918#0" expanded="true" />
+            <element signature="e#2002#2003#0" expanded="true" />
+            <element signature="e#9276#9277#0" expanded="true" />
+            <element signature="e#9314#9315#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

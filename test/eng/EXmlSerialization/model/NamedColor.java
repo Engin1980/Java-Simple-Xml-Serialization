@@ -1,10 +1,14 @@
 package eng.EXmlSerialization.model;
 
+import eng.EXmlSerialization.XmlOptional;
+
 import java.awt.*;
 
 public class NamedColor {
   private String name;
   private Color color;
+  @XmlOptional
+  private Font font;
 
   public String getName() {
     return name;
