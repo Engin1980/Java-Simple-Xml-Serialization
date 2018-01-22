@@ -43,4 +43,18 @@ class XmlListItemMapping {
     this.itemPathRegexOrNull = null;
     this.itemType = itemType;
   }
+
+  @Override
+  public String toString() {
+    StringBuilder ret = new StringBuilder();
+    ret.append("XmlListItemMapping{");
+    ret.append(listPathRegex).append("\\");
+    if (itemPathRegexOrNull == null)
+      ret.append("*");
+    else
+      ret.append(itemPathRegexOrNull);
+    ret.append("-->");
+    ret.append(itemType.getName());
+    return ret.toString();
+  }
 }

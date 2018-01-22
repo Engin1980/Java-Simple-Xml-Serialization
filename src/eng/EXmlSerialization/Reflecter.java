@@ -9,6 +9,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import javax.swing.text.StyledEditorKit;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -68,7 +69,7 @@ class Reflecter {
   }
 
   void fillList(Element el, List lst) {
-    fillFieldList(el, lst, lst.getClass().getSimpleName());
+    fillFieldList(el, lst, el.getNodeName()); //lst.getClass().getSimpleName());
   }
 
   private <T> void fillField(Element el, Field f, T targetObject) {
@@ -77,7 +78,10 @@ class Reflecter {
     }
 
     Class c = f.getType();
-    if (Mapping.isSimpleTypeOrEnum(c)) {
+    IValueParser customParser = tryGetCustomValueParser(c);
+    if (customParser != null){
+      convertAndSetFieldValueByCustomParser(el,f,customParser,targetObject);
+    } else if (Mapping.isSimpleTypeOrEnum(c)) {
       // jednoduchý typ
       convertAndSetFieldValue(el, f, targetObject);
     } else if (List.class.isAssignableFrom(c)) {
@@ -85,6 +89,29 @@ class Reflecter {
     } else {
       setFieldComplex(el, f, targetObject);
     }
+  }
+
+  private IValueParser tryGetCustomValueParser(Class c) {
+    IValueParser ret = null;
+
+    for (IValueParser iValueParser : settings.getValueParsers()) {
+      if (iValueParser.getTypeName().equals(c.getName())){
+        ret = iValueParser;
+        break;
+      }
+    }
+
+    return ret;
+  }
+
+  private <T> void convertAndSetFieldValueByCustomParser(Element el, Field f, IValueParser parser, T targetObject) {
+    boolean required = f.getAnnotation(XmlOptional.class) == null;
+    String tmpS = extractSimpleValueFromElement(el, f.getName(), required);
+    if (tmpS == null) {
+      return;
+    }
+    Object tmpO = parser.parse(tmpS);
+    setFieldValue(f, targetObject, tmpO);
   }
 
   private <T> void convertAndSetFieldValue(Element el, Field f, T targetObject) {
@@ -196,11 +223,34 @@ class Reflecter {
       type = settings.getDefaultListTypeImplementation();
     }
 
+    // check if there is not an custom instance creator
+    IInstanceCreator creator = tryGetInstnaceCreator(type);
+
+    if (creator == null)
     try {
       ret = type.newInstance();
     } catch (InstantiationException | IllegalAccessException ex) {
-      throw new XmlSerializationException("Failed to create new instance of " + type.getName(), ex);
+      throw new XmlSerializationException("Failed to create new instance of " + type.getName() + ". Check if public parameter-less constructor exists.", ex);
+    } else {
+      try{
+        ret = creator.createInstance();
+      } catch (Exception ex){
+        throw new XmlSerializationException("Failed to create a new instance of " + type.getName() + " using creator " + creator.getClass().getName() + ".", ex);
+      }
     }
+    return ret;
+  }
+
+  private IInstanceCreator tryGetInstnaceCreator(Class<?> type) {
+    IInstanceCreator ret = null;
+
+    for (IInstanceCreator iInstanceCreator : settings.getInstanceCreators()) {
+      if (iInstanceCreator.getTypeName().equals(type.getName())){
+        ret = iInstanceCreator;
+        break;
+      }
+    }
+
     return ret;
   }
 
@@ -223,10 +273,19 @@ class Reflecter {
     List<Element> children = getElements(el);
     for (Element e : children) {
       Class itemType = getItemType(classFieldKey, e.getNodeName());
-      Object inn = createInstance(itemType);
-      lst.add(inn);
+      if (Mapping.isSimpleTypeOrEnum(itemType)){
+        // list item is a primitive type
+        // in this case it should be some like <xxx>value</xxx>
+        String value = e.getTextContent();
+        Object val = convertToType(value, itemType);
+        lst.add(val);
+      } else {
+        // list item is complex type
+        Object inn = createInstance(itemType);
+        lst.add(inn);
 
-      fillObject(e, inn);
+        fillObject(e, inn);
+      }
     }
   }
 

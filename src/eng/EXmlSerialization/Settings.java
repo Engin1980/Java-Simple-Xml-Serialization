@@ -19,6 +19,15 @@ public class Settings {
    */
   private final List<String> ignoredFieldsRegex = new ArrayList<>();
 
+  /**
+   * Contains objects doing custom class instance creation.
+   */
+  private final List<IInstanceCreator> instanceCreators = new ArrayList<>();
+
+  /**
+   * Contains custom parsers from XMl to specific type
+   */
+  private final List<IValueParser> valueParsers = new ArrayList<>();
 
   public List<XmlListItemMapping> getListItemMapping() {
     return listItemMapping;
@@ -47,5 +56,13 @@ public class Settings {
 
   public void setDefaultListTypeImplementation(Class defaultListTypeImplementation) {
     this.defaultListTypeImplementation = defaultListTypeImplementation;
+  }
+
+  public List<IInstanceCreator> getInstanceCreators() {
+    return instanceCreators;
+  }
+
+  public List<IValueParser> getValueParsers() {
+    return valueParsers;
   }
 }

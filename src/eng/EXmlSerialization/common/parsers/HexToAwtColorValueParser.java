@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 /**
  * Parses HEX color value to AWT color.
  */
-public class HexToAwtColorParser implements IValueParser<java.awt.Color> {
+public class HexToAwtColorValueParser implements IValueParser<java.awt.Color> {
   @Override
   public String getTypeName() {
     return java.awt.Color.class.getName();

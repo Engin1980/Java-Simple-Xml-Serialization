@@ -1,15 +1,22 @@
 package eng.EXmlSerialization;
 
+import eng.EXmlSerialization.common.parsers.HexToAwtColorValueParser;
 import eng.EXmlSerialization.model.Address;
+import eng.EXmlSerialization.model.NamedColor;
 import eng.EXmlSerialization.model.Person;
 import eng.EXmlSerialization.model.Phone;
 import org.junit.Test;
+
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
 public class XmlSerializerTest {
 
   private String PERSON_FILE_NAME = "C:\\Users\\Marek Vajgl\\Documents\\IdeaProjects\\Java-Simple-Xml-Serialization\\res\\test.xml";
+  private String COLOR_FILE_NAME = "C:\\Users\\Marek Vajgl\\Documents\\IdeaProjects\\Java-Simple-Xml-Serialization\\res\\colorTest.xml";
 
   @Test
   public void fillObjectSimple() {
@@ -83,6 +90,29 @@ public class XmlSerializerTest {
     ser.fillObject(PERSON_FILE_NAME, p);
 
     assertEquals(3,p.getPhones().size());
+  }
+
+  @Test
+  public void valueParser(){
+    Settings settings = new Settings();
+
+    settings.getInstanceCreators().add(
+        new eng.EXmlSerialization.common.instanceCreators.AwtColorCreator()
+    );
+
+    settings.getListItemMapping().add(
+        new XmlListItemMapping("colors", NamedColor.class)
+    );
+
+    settings.getValueParsers().add(
+        new HexToAwtColorValueParser()
+    );
+
+
+    XmlSerializer ser = new XmlSerializer(settings);
+
+    List<NamedColor> namedColors = new ArrayList();
+    ser.fillList(COLOR_FILE_NAME, namedColors);
   }
 
 
