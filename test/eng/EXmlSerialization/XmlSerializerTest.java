@@ -93,7 +93,7 @@ public class XmlSerializerTest {
   }
 
   @Test
-  public void valueParser(){
+  public void fillListWithCustomCreatorAndCustomValueParser(){
     Settings settings = new Settings();
 
     settings.getInstanceCreators().add(
