@@ -25,9 +25,14 @@ public class Settings {
   private final List<IInstanceCreator> instanceCreators = new ArrayList<>();
 
   /**
-   * Contains custom parsers from XMl to specific type
+   * Contains custom value parsers from XMl to specific type
    */
   private final List<IValueParser> valueParsers = new ArrayList<>();
+
+  /**
+   * Contains custom element parsers from XMl to specific type
+   */
+  private final List<IElementParser> elementParsers = new ArrayList<>();
 
   public List<XmlListItemMapping> getListItemMapping() {
     return listItemMapping;
@@ -64,5 +69,9 @@ public class Settings {
 
   public List<IValueParser> getValueParsers() {
     return valueParsers;
+  }
+
+  public List<IElementParser> getElementParsers() {
+    return elementParsers;
   }
 }

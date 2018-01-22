@@ -25,4 +25,8 @@ public class NamedColor {
   public void setColor(Color color) {
     this.color = color;
   }
+
+  public Font getFont() {
+    return font;
+  }
 }

@@ -9,7 +9,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import javax.swing.text.StyledEditorKit;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +17,6 @@ import java.util.regex.Pattern;
 import static eng.EXmlSerialization.Shared.isRegexMatch;
 
 /**
- *
  * @author Marek
  */
 class Reflecter {
@@ -40,7 +38,7 @@ class Reflecter {
       if (java.lang.reflect.Modifier.isStatic(f.getModifiers())) {
         continue; // statické přeskakujem
       } else if (isSkippedBySettings(f)) {
-        if (settings.isVerbose()){
+        if (settings.isVerbose()) {
           System.out.println("  " + el.getNodeName() + "." + f.getName() + " field skipped due to settings-ignoredFieldsRegex list.");
         }
         continue; // parent neplníme, ty jsou reference na nadřazené objekty a plní se sami
@@ -51,6 +49,7 @@ class Reflecter {
 
   /**
    * Returns true if field should be skipped according to regex ignore settings
+   *
    * @param f
    * @return
    */
@@ -59,7 +58,7 @@ class Reflecter {
 
     for (String regex : this.settings.getIgnoredFieldsRegex()) {
       Pattern p = Pattern.compile(regex);
-      if (p.matcher(f.getName()).find()){
+      if (p.matcher(f.getName()).find()) {
         ret = true;
         break;
       }
@@ -78,9 +77,12 @@ class Reflecter {
     }
 
     Class c = f.getType();
-    IValueParser customParser = tryGetCustomValueParser(c);
-    if (customParser != null){
-      convertAndSetFieldValueByCustomParser(el,f,customParser,targetObject);
+    IValueParser customValueParser = tryGetCustomValueParser(c);
+    IElementParser customElementParser = tryGetCustomElementParser(c);
+    if (customValueParser != null) {
+      convertAndSetFieldSimpleByCustomParser(el, f, customValueParser, targetObject);
+    } else if (customElementParser != null) {
+      convertAndSetFieldComplexByCustomParser(el, f, customElementParser, targetObject);
     } else if (Mapping.isSimpleTypeOrEnum(c)) {
       // jednoduchý typ
       convertAndSetFieldValue(el, f, targetObject);
@@ -91,11 +93,63 @@ class Reflecter {
     }
   }
 
+  private <T> void convertAndSetFieldComplexByCustomParser(Element el, Field f, IElementParser customElementParser, T ref) {
+
+    // first check if I have something to fill the object with
+    boolean required = f.getAnnotation(XmlOptional.class) == null;
+
+    Element subEl;
+    try {
+      subEl = getElements(el, f.getName()).get(0);
+    } catch (Exception e) {
+      if (required)
+        throw XmlInvalidDataException.createNoSuchElement(el, f.getName(), ref.getClass());
+      else
+        subEl = null;
+    }
+
+    // if is optional and element-data has not been found, skip
+    if (subEl == null)
+      return;
+
+    // then create instance and fill it
+    Object newInstance;
+    try {
+      newInstance = customElementParser.parse(subEl);
+    } catch (Exception ex) {
+      throw new XmlSerializationException(
+          "Failed to parse instance for " + ref.getClass().getSimpleName() + "." + f.getName() +
+              " using custom-element-parser " + customElementParser.getClass().getName() + ".",
+          ex);
+    }
+    try {
+      f.setAccessible(true);
+      f.set(ref, newInstance);
+      f.setAccessible(false);
+    } catch (IllegalArgumentException | IllegalAccessException ex) {
+      throw new XmlSerializationException(
+          "Failed to set value to field " + ref.getClass().getName() + "." + f.getName(), ex);
+    }
+  }
+
+  private IElementParser tryGetCustomElementParser(Class c) {
+    IElementParser ret = null;
+
+    for (IElementParser iElementParser : settings.getElementParsers()) {
+      if (iElementParser.getTypeName().equals(c.getName())) {
+        ret = iElementParser;
+        break;
+      }
+    }
+
+    return ret;
+  }
+
   private IValueParser tryGetCustomValueParser(Class c) {
     IValueParser ret = null;
 
     for (IValueParser iValueParser : settings.getValueParsers()) {
-      if (iValueParser.getTypeName().equals(c.getName())){
+      if (iValueParser.getTypeName().equals(c.getName())) {
         ret = iValueParser;
         break;
       }
@@ -104,7 +158,7 @@ class Reflecter {
     return ret;
   }
 
-  private <T> void convertAndSetFieldValueByCustomParser(Element el, Field f, IValueParser parser, T targetObject) {
+  private <T> void convertAndSetFieldSimpleByCustomParser(Element el, Field f, IValueParser parser, T targetObject) {
     boolean required = f.getAnnotation(XmlOptional.class) == null;
     String tmpS = extractSimpleValueFromElement(el, f.getName(), required);
     if (tmpS == null) {
@@ -196,7 +250,7 @@ class Reflecter {
       subEl = getElements(el, f.getName()).get(0);
     } catch (Exception e) {
       if (required)
-      throw XmlInvalidDataException.createNoSuchElement(el, f.getName(), ref.getClass());
+        throw XmlInvalidDataException.createNoSuchElement(el, f.getName(), ref.getClass());
       else
         subEl = null;
     }
@@ -239,14 +293,15 @@ class Reflecter {
     IInstanceCreator creator = tryGetInstnaceCreator(type);
 
     if (creator == null)
-    try {
-      ret = type.newInstance();
-    } catch (InstantiationException | IllegalAccessException ex) {
-      throw new XmlSerializationException("Failed to create new instance of " + type.getName() + ". Check if public parameter-less constructor exists.", ex);
-    } else {
-      try{
+      try {
+        ret = type.newInstance();
+      } catch (InstantiationException | IllegalAccessException ex) {
+        throw new XmlSerializationException("Failed to create new instance of " + type.getName() + ". Check if public parameter-less constructor exists.", ex);
+      }
+    else {
+      try {
         ret = creator.createInstance();
-      } catch (Exception ex){
+      } catch (Exception ex) {
         throw new XmlSerializationException("Failed to create a new instance of " + type.getName() + " using creator " + creator.getClass().getName() + ".", ex);
       }
     }
@@ -257,7 +312,7 @@ class Reflecter {
     IInstanceCreator ret = null;
 
     for (IInstanceCreator iInstanceCreator : settings.getInstanceCreators()) {
-      if (iInstanceCreator.getTypeName().equals(type.getName())){
+      if (iInstanceCreator.getTypeName().equals(type.getName())) {
         ret = iInstanceCreator;
         break;
       }
@@ -285,7 +340,7 @@ class Reflecter {
     List<Element> children = getElements(el);
     for (Element e : children) {
       Class itemType = getItemType(classFieldKey, e.getNodeName());
-      if (Mapping.isSimpleTypeOrEnum(itemType)){
+      if (Mapping.isSimpleTypeOrEnum(itemType)) {
         // list item is a primitive type
         // in this case it should be some like <xxx>value</xxx>
         String value = e.getTextContent();
@@ -337,13 +392,13 @@ class Reflecter {
 
   Class getMappedType(String key, String elementName) {
     Class ret = null;
-    for (XmlListItemMapping mi : settings.getListItemMapping()){
+    for (XmlListItemMapping mi : settings.getListItemMapping()) {
       if (isRegexMatch(mi.listPathRegex, key))
-        if (mi.itemPathRegexOrNull == null){
+        if (mi.itemPathRegexOrNull == null) {
           ret = mi.itemType;
           break;
         } else if (
-            isRegexMatch(mi.itemPathRegexOrNull, elementName)){
+            isRegexMatch(mi.itemPathRegexOrNull, elementName)) {
           ret = mi.itemType;
           break;
         }

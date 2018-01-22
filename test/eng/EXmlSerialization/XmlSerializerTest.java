@@ -1,10 +1,12 @@
 package eng.EXmlSerialization;
 
+import eng.EXmlSerialization.common.parsers.AwtFontElementParser;
 import eng.EXmlSerialization.common.parsers.HexToAwtColorValueParser;
 import eng.EXmlSerialization.model.Address;
 import eng.EXmlSerialization.model.NamedColor;
 import eng.EXmlSerialization.model.Person;
 import eng.EXmlSerialization.model.Phone;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.awt.*;
@@ -93,6 +95,7 @@ public class XmlSerializerTest {
   }
 
   @Test
+  @Ignore
   public void fillListWithCustomCreatorAndCustomValueParser(){
     Settings settings = new Settings();
 
@@ -113,6 +116,37 @@ public class XmlSerializerTest {
 
     List<NamedColor> namedColors = new ArrayList();
     ser.fillList(COLOR_FILE_NAME, namedColors);
+  }
+
+  @Test
+  public void fillListWithCustomElementParser(){
+    Settings settings = new Settings();
+
+    settings.getInstanceCreators().add(
+        new eng.EXmlSerialization.common.instanceCreators.AwtColorCreator()
+    );
+
+    settings.getListItemMapping().add(
+        new XmlListItemMapping("colors", NamedColor.class)
+    );
+
+    settings.getValueParsers().add(
+        new HexToAwtColorValueParser()
+    );
+
+    settings.getElementParsers().add(
+      new AwtFontElementParser()
+    );
+
+
+    XmlSerializer ser = new XmlSerializer(settings);
+
+    List<NamedColor> namedColors = new ArrayList();
+    ser.fillList(COLOR_FILE_NAME, namedColors);
+
+    assertEquals(3, namedColors.size());
+    assertNotNull(namedColors.get(2).getFont());
+    assertEquals("Verdana", namedColors.get(2).getFont().getName());
   }
 
 
