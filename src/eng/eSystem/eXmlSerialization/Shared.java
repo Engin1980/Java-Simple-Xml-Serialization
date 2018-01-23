@@ -15,13 +15,15 @@ class Shared {
     return ret;
   }
 
-  public static String getElementXPath(Element el, boolean appendAttributes){
+  public static String getElementXPath(Element el, boolean appendAttributes, boolean addBrackets){
     StringBuilder sb = new StringBuilder();
 
     if (el == null)
       return "null";
 
-    sb.append("<").append(el.getTagName());
+    if (addBrackets)
+    sb.append("<");
+    sb.append(el.getTagName());
     if (appendAttributes){
         sb.append(" ");
         NamedNodeMap nnm = el.getAttributes();
@@ -30,12 +32,18 @@ class Shared {
           sb.append(String.format("%s=\"%s\" ", n.getNodeName(), n.getNodeValue()));
         }
     }
-    sb.append(">");
+    if (addBrackets)
+      sb.append(">");
 
     Node n = el.getParentNode();
     while (n != null && n.getNodeType() != Node.DOCUMENT_NODE){
       sb.insert(0, "/");
-      sb.insert(0, "<" + n.getNodeName() + ">");
+      String tmp;
+      if (addBrackets)
+        tmp = "<" + n.getNodeName()+  ">";
+      else
+        tmp = n.getNodeName();
+      sb.insert(0, tmp);
       n = n.getParentNode();
     }
 

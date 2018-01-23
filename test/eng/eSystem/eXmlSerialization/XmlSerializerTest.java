@@ -2,10 +2,7 @@ package eng.eSystem.eXmlSerialization;
 
 import eng.eSystem.eXmlSerialization.common.parsers.AwtFontElementParser;
 import eng.eSystem.eXmlSerialization.common.parsers.HexToAwtColorValueParser;
-import eng.eSystem.eXmlSerialization.model.Address;
-import eng.eSystem.eXmlSerialization.model.NamedColor;
-import eng.eSystem.eXmlSerialization.model.Person;
-import eng.eSystem.eXmlSerialization.model.Phone;
+import eng.eSystem.eXmlSerialization.model.*;
 import eng.eSystem.eXmlSerialization.common.instanceCreators.AwtColorCreator;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -19,6 +16,7 @@ public class XmlSerializerTest {
 
   private String PERSON_FILE_NAME = "C:\\Users\\Marek Vajgl\\Documents\\IdeaProjects\\Java-Simple-Xml-Serialization\\res\\test.xml";
   private String COLOR_FILE_NAME = "C:\\Users\\Marek Vajgl\\Documents\\IdeaProjects\\Java-Simple-Xml-Serialization\\res\\colorTest.xml";
+  private String MULTILIST_FILE_NAME = "C:\\Users\\Marek Vajgl\\Documents\\IdeaProjects\\Java-Simple-Xml-Serialization\\res\\multiList.xml";
 
   @Test
   public void fillObjectSimple() {
@@ -147,6 +145,26 @@ public class XmlSerializerTest {
     assertEquals(3, namedColors.size());
     assertNotNull(namedColors.get(2).getFont());
     assertEquals("Verdana", namedColors.get(2).getFont().getName());
+  }
+
+  @Test
+  public void multiList(){
+    Settings settings = new Settings();
+
+    settings.getListItemMapping().add(
+        new XmlListItemMapping("aL.+", Integer.class)
+    );
+    settings.getListItemMapping().add(
+        new XmlListItemMapping("bL.+", String.class)
+    );
+
+    XmlSerializer ser = new XmlSerializer(settings);
+
+    MultiList o = new MultiList();
+    ser.fillObject(MULTILIST_FILE_NAME, o);
+
+    assertFalse(o.getaList().isEmpty());
+    assertFalse(o.getbList().isEmpty());
   }
 
 

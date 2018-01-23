@@ -22,9 +22,9 @@ public class XmlInvalidDataException extends XmlSerializationException {
     sb.append("Value for property not found in XML data. ");
     sb.append(
         String.format(
-            "Looking for '%s' xml-attribute or xml-element in '%s' to be put in field '%s' of object of '%s'.",
+            "Looking for '%s' xml-attribute or xml-element in '%s' to be put in field '%s' of object of '%s' failed.",
             fieldName,
-            Shared.getElementXPath(parentElement, true),
+            Shared.getElementXPath(parentElement, true, true),
             targetClass.getName(),
             fieldName));
 
@@ -41,7 +41,7 @@ public class XmlInvalidDataException extends XmlSerializationException {
         String.format(
             "Looking for '%s' xml-element in '%s' to be put in field '%s' of object of '%s', but only same-named attribute was found.",
             fieldName,
-            Shared.getElementXPath(parentElement, true),
+            Shared.getElementXPath(parentElement, true, true),
             targetClass.getName(),
             fieldName));
 

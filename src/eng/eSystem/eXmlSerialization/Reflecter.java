@@ -49,7 +49,7 @@ class Reflecter {
         throw new XmlSerializationException(ex,
             "Failed to fill field '%s' of object of type '%s' using element '%s'.",
             f.getName(), c.getName(),
-            getElementXPath(el,true));
+            getElementXPath(el,true, true));
       }
     }
   }
@@ -237,19 +237,19 @@ class Reflecter {
     } else {
       switch (type.getName()) {
         case "int":
-        case "Integer":
+        case "java.lang.Integer":
           ret = Integer.parseInt(value);
           break;
         case "double":
-        case "Double":
+        case "java.lang.Double":
           ret = Double.parseDouble(value);
           break;
         case "char":
-        case "Character":
+        case "java.lang.Character":
           ret = value.charAt(0);
           break;
         case "boolean":
-        case "Boolean":
+        case "java.lang.Boolean":
           ret = Boolean.parseBoolean(value);
           break;
         case "java.lang.String":
@@ -349,15 +349,22 @@ class Reflecter {
   }
 
   private void setFieldList(Element el, Field f, Object targetObject) {
-    List lst = (List) createInstance(f.getType());
-    setFieldValue(f, targetObject, lst);
+    // first check if I have something to fill the object with
+    boolean required = f.getAnnotation(XmlOptional.class) == null;
 
     // zanoření
     List<Element> tmp = getElements(el, f.getName());
     if (tmp.isEmpty()) {
-      return;
+      if (required)
+        throw XmlInvalidDataException.createNoSuchElement(el, f.getName(), targetObject.getClass());
+      else
+        return;
     }
+
     el = tmp.get(0);
+
+    List lst = (List) createInstance(f.getType());
+    setFieldValue(f, targetObject, lst);
 
     String key = targetObject.getClass().getSimpleName() + "." + f.getName();
     fillFieldList(el, lst, key);
@@ -365,8 +372,9 @@ class Reflecter {
 
   private void fillFieldList(Element el, List lst, String classFieldKey) {
     List<Element> children = getElements(el);
+    String xpath = Shared.getElementXPath(el, false, false);
     for (Element e : children) {
-      Class itemType = getItemType(classFieldKey, e);
+      Class itemType = getItemType(xpath, classFieldKey, e);
       if (Mapping.isSimpleTypeOrEnum(itemType)) {
         // list item is a primitive type
         // in this case it should be some like <xxx>value</xxx>
@@ -404,9 +412,8 @@ class Reflecter {
     return ret;
   }
 
-  private Class getItemType(String classFieldKey, Element elementOrNull) {
-    @SuppressWarnings("UnusedAssignment")
-    Class ret = null;
+  private Class getItemType(String listElementXPath, String classFieldKey, Element elementOrNull) {
+    Class ret;
 
     String elementName;
     if (elementOrNull != null)
@@ -418,17 +425,17 @@ class Reflecter {
 
     if (ret == null) {
       throw new XmlSerializationException("No list-mapping found for list-typed field '%s' using xml-element '%s'. Check settings.getListItemMapping().",
-          classFieldKey, getElementXPath(elementOrNull,true));
+          classFieldKey, getElementXPath(elementOrNull,true, true));
     }
 
     return ret;
   }
 
-  Class getMappedType(String key, String elementName) {
+  private Class getMappedType(String xpath, String elementName) {
     Class ret = null;
     // TODO this regex mapping takes not full element path, but only element name !!!
     for (XmlListItemMapping mi : settings.getListItemMapping()) {
-      if (isRegexMatch(mi.listPathRegex, key))
+      if (isRegexMatch(mi.listPathRegex, xpath))
         if (mi.itemPathRegexOrNull == null) {
           ret = mi.itemType;
           break;
