@@ -93,9 +93,10 @@ public class XmlSerializerTest {
   }
 
   @Test
-  @Ignore
   public void fillListWithCustomCreatorAndCustomValueParser(){
     Settings settings = new Settings();
+
+    settings.getIgnoredFieldsRegex().add("^font$");
 
     settings.getInstanceCreators().add(
         new AwtColorCreator()

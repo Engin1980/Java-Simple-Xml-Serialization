@@ -6,12 +6,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4a241bf6-9281-43d3-8161-d0b266b8e05a" name="Default" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/res/multiList.xml" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/model/MultiList.java" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/Reflecter.java" afterPath="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/Reflecter.java" />
-      <change beforePath="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/Shared.java" afterPath="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/Shared.java" />
-      <change beforePath="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/XmlInvalidDataException.java" afterPath="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/XmlInvalidDataException.java" />
+      <change beforePath="$PROJECT_DIR$/out/test/EXmlSerialization/multiList.xml" afterPath="$PROJECT_DIR$/out/test/EXmlSerialization/multiList.xml" />
+      <change beforePath="$PROJECT_DIR$/res/multiList.xml" afterPath="$PROJECT_DIR$/res/multiList.xml" />
       <change beforePath="$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/XmlSerializerTest.java" afterPath="$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/XmlSerializerTest.java" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -23,7 +20,36 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300" />
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="XmlSerializerTest.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/XmlSerializerTest.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="234">
+              <caret line="99" column="0" lean-forward="true" selection-start-line="99" selection-start-column="0" selection-end-line="99" selection-end-column="0" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="method#fillObjectSimple#0;class#XmlSerializerTest#0" expanded="false" />
+                <element signature="method#fillObjectWithAddress#0;class#XmlSerializerTest#0" expanded="false" />
+                <element signature="method#fillObjectIgnoreAddress#0;class#XmlSerializerTest#0" expanded="false" />
+                <element signature="method#fillObjectWithPhoneList#0;class#XmlSerializerTest#0" expanded="false" />
+                <element signature="method#fillObjectWithPhoneNumbersList#0;class#XmlSerializerTest#0" expanded="false" />
+                <element signature="method#multiList#0;class#XmlSerializerTest#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="multiList.xml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/res/multiList.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="60">
+              <caret line="4" column="7" lean-forward="false" selection-start-line="4" selection-start-column="7" selection-end-line="4" selection-end-column="7" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -101,11 +127,11 @@
         <option value="$PROJECT_DIR$/test/eng/EXmlSerialization/Model2Test.java" />
         <option value="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/common/parsers/JavaTimeLocalDateValueParser.java" />
         <option value="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/Shared.java" />
-        <option value="$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/XmlSerializerTest.java" />
         <option value="$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/model/MultiList.java" />
-        <option value="$PROJECT_DIR$/res/multiList.xml" />
         <option value="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/Reflecter.java" />
         <option value="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/XmlInvalidDataException.java" />
+        <option value="$PROJECT_DIR$/res/multiList.xml" />
+        <option value="$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/XmlSerializerTest.java" />
       </list>
     </option>
   </component>
@@ -345,18 +371,6 @@
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="Test_run - 2018.01.23 at 15h 18m 54s.xml">
-      <configuration name="Test run" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="Test_run - 2018.01.23 at 15h 19m 53s.xml">
-      <configuration name="Test run" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="Test_run - 2018.01.23 at 15h 20m 24s.xml">
-      <configuration name="Test run" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="Test_run - 2018.01.23 at 15h 21m 11s.xml">
-      <configuration name="Test run" configurationId="JUnit" />
-    </history-entry>
     <history-entry file="Test_run - 2018.01.23 at 15h 21m 32s.xml">
       <configuration name="Test run" configurationId="JUnit" />
     </history-entry>
@@ -375,9 +389,22 @@
     <history-entry file="Test_run - 2018.01.23 at 15h 27m 53s.xml">
       <configuration name="Test run" configurationId="JUnit" />
     </history-entry>
+    <history-entry file="Test_run - 2018.01.23 at 15h 29m 30s.xml">
+      <configuration name="Test run" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="Test_run - 2018.01.23 at 15h 29m 52s.xml">
+      <configuration name="Test run" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="Test_run - 2018.01.23 at 15h 30m 09s.xml">
+      <configuration name="Test run" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="Test_run - 2018.01.23 at 15h 31m 37s.xml">
+      <configuration name="Test run" configurationId="JUnit" />
+    </history-entry>
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1554" height="916" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -411,15 +438,9 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/XmlSerializerTest.java</url>
-          <line>115</line>
+          <line>116</line>
           <properties />
           <option name="timeStamp" value="12" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/XmlSerializerTest.java</url>
-          <line>163</line>
-          <properties />
-          <option name="timeStamp" value="22" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <condition expression="f.getName().equals(&quot;aList&quot;)" language="JAVA" />
@@ -571,7 +592,7 @@
             <element signature="method#fillObjectIgnoreAddress#0;class#XmlSerializerTest#0" expanded="false" />
             <element signature="method#fillObjectWithPhoneList#0;class#XmlSerializerTest#0" expanded="false" />
             <element signature="method#fillObjectWithPhoneNumbersList#0;class#XmlSerializerTest#0" expanded="false" />
-            <element signature="method#fillListWithCustomCreatorAndCustomValueParser#0;class#XmlSerializerTest#0" expanded="false" />
+            <element signature="method#multiList#0;class#XmlSerializerTest#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -938,14 +959,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/res/multiList.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
-          <caret line="3" column="7" lean-forward="false" selection-start-line="3" selection-start-column="7" selection-end-line="3" selection-end-column="7" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/model/MultiList.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="255">
@@ -960,10 +973,18 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/res/multiList.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="4" column="7" lean-forward="false" selection-start-line="4" selection-start-column="7" selection-end-line="4" selection-end-column="7" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/XmlSerializerTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="425">
-          <caret line="163" column="0" lean-forward="false" selection-start-line="163" selection-start-column="0" selection-end-line="163" selection-end-column="0" />
+        <state relative-caret-position="234">
+          <caret line="99" column="0" lean-forward="true" selection-start-line="99" selection-start-column="0" selection-end-line="99" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="method#fillObjectSimple#0;class#XmlSerializerTest#0" expanded="false" />
@@ -971,7 +992,7 @@
             <element signature="method#fillObjectIgnoreAddress#0;class#XmlSerializerTest#0" expanded="false" />
             <element signature="method#fillObjectWithPhoneList#0;class#XmlSerializerTest#0" expanded="false" />
             <element signature="method#fillObjectWithPhoneNumbersList#0;class#XmlSerializerTest#0" expanded="false" />
-            <element signature="method#fillListWithCustomCreatorAndCustomValueParser#0;class#XmlSerializerTest#0" expanded="false" />
+            <element signature="method#multiList#0;class#XmlSerializerTest#0" expanded="false" />
           </folding>
         </state>
       </provider>

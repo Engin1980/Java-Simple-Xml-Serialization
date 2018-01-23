@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <data>
     <cList>true</cList>
-    <alist>
+    <aList>
         <a>5</a>
         <a>6</a>
         <a>7</a>
-    </alist>
+    </aList>
     <bList>
         <a>xuxu</a>
         <a>yuyu</a>
