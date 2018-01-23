@@ -9,12 +9,13 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import javax.swing.text.StyledEditorKit;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import static eng.EXmlSerialization.Shared.isRegexMatch;
+import static eng.EXmlSerialization.Shared.*;
 
 /**
  * @author Marek
@@ -32,7 +33,7 @@ class Reflecter {
       System.out.println("fillObject( <" + el.getNodeName() + "...>, " + targetObject.getClass().getSimpleName());
     }
     Class c = targetObject.getClass();
-    Field[] fields = c.getDeclaredFields();
+    Field[] fields = getDeclaredFields(c);
 
     for (Field f : fields) {
       if (java.lang.reflect.Modifier.isStatic(f.getModifiers())) {
@@ -43,8 +44,31 @@ class Reflecter {
         }
         continue; // parent neplníme, ty jsou reference na nadřazené objekty a plní se sami
       }
-      fillField(el, f, targetObject);
+      try {
+        fillField(el, f, targetObject);
+      } catch (Exception ex){
+        throw new XmlSerializationException(ex,
+            "Failed to fill field '%s' of object of type '%s' using element '%s'.",
+            f.getName(), c.getName(),
+            getElementXPath(el,true));
+      }
     }
+  }
+
+  private Field[] getDeclaredFields(Class c){
+    List<Field> lst = new ArrayList<>();
+    Field[] fs;
+
+    while (c != null){
+      fs = c.getDeclaredFields();
+      for (Field f : fs) {
+        lst.add(f);
+      }
+      c = c.getSuperclass();
+    }
+
+    Field[] ret = lst.toArray(new Field[0]);
+    return ret;
   }
 
   /**
@@ -249,8 +273,12 @@ class Reflecter {
     try {
       subEl = getElements(el, f.getName()).get(0);
     } catch (Exception e) {
-      if (required)
+      if (el.getAttribute(f.getName()).isEmpty() == false){
+        throw XmlInvalidDataException.createAttributeInsteadOfElementFound(el, f.getName(), ref.getClass());
+      }
+      if (required) {
         throw XmlInvalidDataException.createNoSuchElement(el, f.getName(), ref.getClass());
+      }
       else
         subEl = null;
     }
@@ -339,7 +367,7 @@ class Reflecter {
   private void fillFieldList(Element el, List lst, String classFieldKey) {
     List<Element> children = getElements(el);
     for (Element e : children) {
-      Class itemType = getItemType(classFieldKey, e.getNodeName());
+      Class itemType = getItemType(classFieldKey, e);
       if (Mapping.isSimpleTypeOrEnum(itemType)) {
         // list item is a primitive type
         // in this case it should be some like <xxx>value</xxx>
@@ -377,14 +405,21 @@ class Reflecter {
     return ret;
   }
 
-  private Class getItemType(String classFieldKey, String elementNameOrNull) {
+  private Class getItemType(String classFieldKey, Element elementOrNull) {
     @SuppressWarnings("UnusedAssignment")
     Class ret = null;
 
-    ret = getMappedType(classFieldKey, elementNameOrNull);
+    String elementName;
+    if (elementOrNull != null)
+      elementName = elementOrNull.getNodeName();
+    else
+      elementName = null;
+
+    ret = getMappedType(classFieldKey, elementName);
 
     if (ret == null) {
-      throw new XmlSerializationException("No list-mapping found for " + classFieldKey + " and <" + elementNameOrNull + ">");
+      throw new XmlSerializationException("No list-mapping found for list-typed field '%s' using xml-element '%s'. Check settings.getListItemMapping().",
+          classFieldKey, getElementXPath(elementOrNull,true));
     }
 
     return ret;
@@ -392,6 +427,7 @@ class Reflecter {
 
   Class getMappedType(String key, String elementName) {
     Class ret = null;
+    // TODO this regex mapping takes not full element path, but only element name !!!
     for (XmlListItemMapping mi : settings.getListItemMapping()) {
       if (isRegexMatch(mi.listPathRegex, key))
         if (mi.itemPathRegexOrNull == null) {

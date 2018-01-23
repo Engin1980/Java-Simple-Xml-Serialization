@@ -10,50 +10,43 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 /**
- *
  * @author Marek
  */
-public class XmlInvalidDataException extends XmlSerializationException{
-
-  public static XmlInvalidDataException createNoSuchElement(Element parentElement, String fieldName, Class<? extends Object> targetClass) {
-    StringBuilder sb = new StringBuilder();
-
-    sb.append("Failed to find subelement in tree. ");
-    sb.append(
-        String.format(
-        "Looking for \"%s\" in \"%s\" to be put in object \"%s\". [[Node info: %s]]",
-        fieldName,
-        getXPath(parentElement),
-        targetClass.getSimpleName(),
-        getAllAttributes(parentElement)));
-
-    return new XmlInvalidDataException(sb.toString());
-  }
+public class XmlInvalidDataException extends XmlSerializationException {
 
   private XmlInvalidDataException(String message) {
     super(message);
   }
 
-  private static String getXPath(Element elm) {
-    String ret = "";
-    Node parentNode = elm.getParentNode();
-    if (parentNode instanceof Element) {
-      ret = getXPath((Element) parentNode);
-    }
-
-    ret = ret + "/" + elm.getTagName();
-
-    return ret;
-  }
-
-  private static String getAllAttributes(Element elm){
+  public static XmlInvalidDataException createNoSuchElement(Element parentElement, String fieldName, Class<? extends Object> targetClass) {
     StringBuilder sb = new StringBuilder();
 
-    NamedNodeMap nnm = elm.getAttributes();
-    for (int i = 0; i < nnm.getLength(); i++) {
-      Node n = nnm.item(i);
-      sb.append(String.format("%s=%s;", n.getNodeName(), n.getNodeValue()));
-    }
-    return sb.toString();
+    sb.append("Value for property not found in XML data. ");
+    sb.append(
+        String.format(
+            "Looking for '%s' xml-attribute or xml-element in '%s' to be put in field '%s' of object of '%s'.",
+            fieldName,
+            Shared.getElementXPath(parentElement, true),
+            targetClass.getName(),
+            fieldName));
+
+    return new XmlInvalidDataException(sb.toString());
+  }
+
+
+  public static XmlInvalidDataException createAttributeInsteadOfElementFound(
+      Element parentElement, String fieldName, Class<? extends Object> targetClass) {
+    StringBuilder sb = new StringBuilder();
+
+    sb.append("Value of type found as attribute, however an sub-element was expected. Probably missing custom parser? ");
+    sb.append(
+        String.format(
+            "Looking for '%s' xml-element in '%s' to be put in field '%s' of object of '%s', but only same-named attribute was found.",
+            fieldName,
+            Shared.getElementXPath(parentElement, true),
+            targetClass.getName(),
+            fieldName));
+
+    return new XmlInvalidDataException(sb.toString());
   }
 }

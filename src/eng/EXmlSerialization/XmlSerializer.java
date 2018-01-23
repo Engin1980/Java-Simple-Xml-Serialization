@@ -68,7 +68,7 @@ public class XmlSerializer {
       //read this - http://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
       doc.getDocumentElement().normalize();
     } catch (ParserConfigurationException | SAXException | IOException ex) {
-      throw new XmlSerializationException("Failed to load XML file " + fileName, ex);
+      throw new XmlSerializationException(ex, "Failed to load XML file '%s'.", fileName);
     }
 
     return doc;
