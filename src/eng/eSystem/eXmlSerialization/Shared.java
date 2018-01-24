@@ -4,6 +4,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -50,5 +53,21 @@ class Shared {
     }
 
     return sb.toString();
+  }
+
+  public static Field[] getDeclaredFields(Class c){
+    List<Field> lst = new ArrayList<>();
+    Field[] fs;
+
+    while (c != null){
+      fs = c.getDeclaredFields();
+      for (Field f : fs) {
+        lst.add(f);
+      }
+      c = c.getSuperclass();
+    }
+
+    Field[] ret = lst.toArray(new Field[0]);
+    return ret;
   }
 }

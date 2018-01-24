@@ -54,22 +54,6 @@ class Reflecter {
     }
   }
 
-  private Field[] getDeclaredFields(Class c){
-    List<Field> lst = new ArrayList<>();
-    Field[] fs;
-
-    while (c != null){
-      fs = c.getDeclaredFields();
-      for (Field f : fs) {
-        lst.add(f);
-      }
-      c = c.getSuperclass();
-    }
-
-    Field[] ret = lst.toArray(new Field[0]);
-    return ret;
-  }
-
   /**
    * Returns true if field should be skipped according to regex ignore settings
    *
