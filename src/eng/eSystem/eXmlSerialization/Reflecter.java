@@ -138,7 +138,10 @@ class Reflecter {
     // then create instance and fill it
     Object newInstance;
     try {
-      newInstance = customElementParser.parse(subEl);
+      if (isNullValued(subEl))
+        newInstance = null;
+      else
+        newInstance = customElementParser.parse(subEl);
     } catch (Exception ex) {
       throw new XmlSerializationException(
           "Failed to parse instance for " + ref.getClass().getSimpleName() + "." + f.getName() +
@@ -187,7 +190,11 @@ class Reflecter {
     if (tmpS == null) {
       return;
     }
-    Object tmpO = parser.parse(tmpS);
+    Object tmpO;
+    if (tmpS.equals(settings.getNullString()))
+      tmpO = null;
+    else
+      tmpO = parser.parse(tmpS);
     setFieldValue(f, targetObject, tmpO);
   }
 
@@ -197,7 +204,12 @@ class Reflecter {
     if (tmpS == null) {
       return;
     }
-    Object tmpO = convertToType(tmpS, f.getType());
+    Object tmpO;
+    if (tmpS.equals(settings.getNullString())){
+      tmpO = null;
+    } else {
+      tmpO = convertToType(tmpS, f.getType());
+    }
     setFieldValue(f, targetObject, tmpO);
   }
 
@@ -213,7 +225,8 @@ class Reflecter {
     }
 
     if (ret == null && isRequired) {
-      throw new XmlSerializationException("Unable to find key \"" + key + "\" in element \"" + el.getNodeName() + "\"");
+      throw new XmlSerializationException("Unable to find key \"" + key + "\" in element \"" +
+          Shared.getElementXPath(el, true, true) + "\"");
     }
 
     return ret;
@@ -286,10 +299,17 @@ class Reflecter {
     if (subEl == null)
       return;
 
+
+
     // then create instance and fill it
     Object newInstance;
     try {
-      newInstance = createInstance(f.getType());
+      if (isNullValued(subEl)){
+        newInstance = null;
+      }
+      else {
+        newInstance = createInstance(f.getType());
+      }
     } catch (Exception ex) {
       throw new XmlSerializationException(
           "Failed to create instance for " + ref.getClass().getSimpleName() + "." + f.getName() + ".",
@@ -304,7 +324,15 @@ class Reflecter {
           "Failed to set value to field " + ref.getClass().getName() + "." + f.getName(), ex);
     }
 
-    fillObject(subEl, newInstance);
+    if (newInstance != null)
+      fillObject(subEl, newInstance);
+  }
+
+  private boolean isNullValued(Element el) {
+    if (el.getTextContent().equals(settings.getNullString()))
+      return true;
+    else
+      return false;
   }
 
   private Object createInstance(Class<?> type) {

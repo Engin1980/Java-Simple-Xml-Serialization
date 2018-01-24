@@ -4,7 +4,6 @@ import eng.eSystem.eXmlSerialization.common.parsers.AwtFontElementParser;
 import eng.eSystem.eXmlSerialization.common.parsers.HexToAwtColorValueParser;
 import eng.eSystem.eXmlSerialization.model.*;
 import eng.eSystem.eXmlSerialization.common.instanceCreators.AwtColorCreator;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -30,6 +29,10 @@ public class XmlSerializerTest {
 
     assertEquals("Michal", p.getName());
     assertEquals("Volny", p.surname);
+
+    assertNull(p.getBackupAddress());
+    assertNotNull(p.getPrivateIdA());
+    assertNull(p.getPrivateIdB());
   }
 
   @Test

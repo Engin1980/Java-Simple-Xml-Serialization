@@ -32,6 +32,8 @@ class Shared {
           sb.append(String.format("%s=\"%s\" ", n.getNodeName(), n.getNodeValue()));
         }
     }
+    if (sb.charAt(sb.length()-1) == ' ')
+      sb.deleteCharAt(sb.length()-1);
     if (addBrackets)
       sb.append(">");
 

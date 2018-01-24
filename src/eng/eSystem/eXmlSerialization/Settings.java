@@ -10,6 +10,11 @@ public class Settings {
   private boolean verbose = false;
 
   /**
+   * How NULL value is stored in XMl file.
+   */
+  private String nullString = "(null)";
+
+  /**
    * Gets the default list implementation used when an implementation of list must be created.
    */
   private Class defaultListTypeImplementation = ArrayList.class;
@@ -73,5 +78,13 @@ public class Settings {
 
   public List<IElementParser> getElementParsers() {
     return elementParsers;
+  }
+
+  public String getNullString() {
+    return nullString;
+  }
+
+  public void setNullString(String nullString) {
+    this.nullString = nullString;
   }
 }

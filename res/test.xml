@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<person name="Michal">
+<person name="Michal" privateIdA="1021" privateIdB="(null)">
     <surname>Volny</surname>
+    <backupAddress>(null)</backupAddress>
     <address>
         <street>Novicka</street>
         <houseNumber>58</houseNumber>
