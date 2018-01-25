@@ -8,7 +8,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Parses HEX color value to AWT color.
+ * Parses HEX color value to AWT color. Only R-G-B channels, ignores alpha channel.
+ * @see java.awt.Color
+ * @see IValueParser
  */
 public class HexToAwtColorValueParser implements IValueParser<java.awt.Color> {
   @Override
@@ -39,6 +41,12 @@ public class HexToAwtColorValueParser implements IValueParser<java.awt.Color> {
       throw new XmlSerializationException("Unable to parse \"" + value + "\" into color.");
     }
 
+    return ret;
+  }
+
+  @Override
+  public String format(Color value) {
+    String ret = String.format("#%02X%02X%02X", value.getRed(), value.getGreen(), value.getBlue());
     return ret;
   }
 }

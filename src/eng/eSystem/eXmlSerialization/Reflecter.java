@@ -37,7 +37,7 @@ class Reflecter {
     for (Field f : fields) {
       if (java.lang.reflect.Modifier.isStatic(f.getModifiers())) {
         continue; // statické přeskakujem
-      } else if (isSkippedBySettings(f)) {
+      } else if (Shared.isSkippedBySettings(f, settings)) {
         if (settings.isVerbose()) {
           System.out.println("  " + el.getNodeName() + "." + f.getName() + " field skipped due to settings-ignoredFieldsRegex list.");
         }
@@ -54,26 +54,6 @@ class Reflecter {
     }
   }
 
-  /**
-   * Returns true if field should be skipped according to regex ignore settings
-   *
-   * @param f
-   * @return
-   */
-  private boolean isSkippedBySettings(Field f) {
-    boolean ret = false;
-
-    for (String regex : this.settings.getIgnoredFieldsRegex()) {
-      Pattern p = Pattern.compile(regex);
-      if (p.matcher(f.getName()).find()) {
-        ret = true;
-        break;
-      }
-    }
-
-    return ret;
-  }
-
   void fillList(Element el, List lst) {
     fillFieldList(el, lst, el.getNodeName()); //lst.getClass().getSimpleName());
   }
@@ -84,8 +64,8 @@ class Reflecter {
     }
 
     Class c = f.getType();
-    IValueParser customValueParser = tryGetCustomValueParser(c);
-    IElementParser customElementParser = tryGetCustomElementParser(c);
+    IValueParser customValueParser = Shared.tryGetCustomValueParser(c, settings);
+    IElementParser customElementParser = Shared.tryGetCustomElementParser(c, settings);
     if (customValueParser != null) {
       convertAndSetFieldSimpleByCustomParser(el, f, customValueParser, targetObject);
     } else if (customElementParser != null) {
@@ -140,32 +120,6 @@ class Reflecter {
       throw new XmlSerializationException(
           "Failed to set value to field " + ref.getClass().getName() + "." + f.getName(), ex);
     }
-  }
-
-  private IElementParser tryGetCustomElementParser(Class c) {
-    IElementParser ret = null;
-
-    for (IElementParser iElementParser : settings.getElementParsers()) {
-      if (iElementParser.getTypeName().equals(c.getName())) {
-        ret = iElementParser;
-        break;
-      }
-    }
-
-    return ret;
-  }
-
-  private IValueParser tryGetCustomValueParser(Class c) {
-    IValueParser ret = null;
-
-    for (IValueParser iValueParser : settings.getValueParsers()) {
-      if (iValueParser.getTypeName().equals(c.getName())) {
-        ret = iValueParser;
-        break;
-      }
-    }
-
-    return ret;
   }
 
   private <T> void convertAndSetFieldSimpleByCustomParser(Element el, Field f, IValueParser parser, T targetObject) {

@@ -70,4 +70,51 @@ class Shared {
     Field[] ret = lst.toArray(new Field[0]);
     return ret;
   }
+
+  /**
+   * Returns true if field should be skipped according to regex ignore settings
+   *
+   * @param f
+   * @return
+   */
+  public static boolean isSkippedBySettings(Field f, Settings settings) {
+    boolean ret = false;
+
+    for (String regex : settings.getIgnoredFieldsRegex()) {
+      Pattern p = Pattern.compile(regex);
+      if (p.matcher(f.getName()).find()) {
+        ret = true;
+        break;
+      }
+    }
+
+    return ret;
+  }
+
+
+  public static IElementParser tryGetCustomElementParser(Class c, Settings settings) {
+    IElementParser ret = null;
+
+    for (IElementParser iElementParser : settings.getElementParsers()) {
+      if (iElementParser.getTypeName().equals(c.getName())) {
+        ret = iElementParser;
+        break;
+      }
+    }
+
+    return ret;
+  }
+
+  public static IValueParser tryGetCustomValueParser(Class c, Settings settings) {
+    IValueParser ret = null;
+
+    for (IValueParser iValueParser : settings.getValueParsers()) {
+      if (iValueParser.getTypeName().equals(c.getName())) {
+        ret = iValueParser;
+        break;
+      }
+    }
+
+    return ret;
+  }
 }

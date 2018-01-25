@@ -36,6 +36,13 @@ public class AwtFontElementParser implements IElementParser<Font> {
     return ret;
   }
 
+  @Override
+  public void format(Font value, Element element) {
+    element.setAttribute(ATTR_FAMILY, value.getName());
+    element.setAttribute(ATTR_STYLE, Integer.toString(value.getStyle()));
+    element.setAttribute(ATTR_SIZE, Integer.toString(value.getSize()));
+  }
+
   private int toInt(String value, String key) {
     int ret;
     try{

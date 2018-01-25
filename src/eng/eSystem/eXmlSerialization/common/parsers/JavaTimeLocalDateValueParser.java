@@ -56,7 +56,7 @@ public class JavaTimeLocalDateValueParser implements IValueParser<java.time.Loca
       ret =
           LocalDate.parse(value, formatter);
     } catch (Exception ex){
-      throw new XmlSerializationException("Failed to parse value '%s' using formatter type '%s' ('%s').",
+      throw new XmlSerializationException(ex, "Failed to parse value '%s' using formatter type '%s' ('%s').",
           value,
           this.formatter.getClass().getName(),
           this.formatter.toString()
@@ -65,5 +65,20 @@ public class JavaTimeLocalDateValueParser implements IValueParser<java.time.Loca
     
     return ret;
     
+  }
+
+  @Override
+  public String format(LocalDate value) {
+    String ret;
+    try {
+      ret = value.format(this.formatter);
+    } catch (Exception ex){
+      throw new XmlSerializationException(ex, "Failed to format value '%s' using formatter type '%s' ('%s').",
+          value.toString(),
+          this.formatter.getClass().getName(),
+          this.formatter.toString()
+      );
+    }
+    return ret;
   }
 }
