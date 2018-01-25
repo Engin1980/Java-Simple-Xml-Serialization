@@ -318,7 +318,6 @@ class Reflecter {
     // first check if I have something to fill the object with
     boolean required = f.getAnnotation(XmlOptional.class) == null;
 
-    // zanoření
     List<Element> tmp = getElements(el, f.getName());
     if (tmp.isEmpty()) {
       if (required)
@@ -329,11 +328,16 @@ class Reflecter {
 
     el = tmp.get(0);
 
-    List lst = (List) createInstance(f.getType());
-    setFieldValue(f, targetObject, lst);
+    if (el.getTextContent().equals(settings.getNullString())){
+      // list, but null, no instance
+      setFieldValue(f, targetObject, null);
+    } else {
+      List lst = (List) createInstance(f.getType());
+      setFieldValue(f, targetObject, lst);
 
-    String key = targetObject.getClass().getSimpleName() + "." + f.getName();
-    fillFieldList(el, lst, key);
+      String key = targetObject.getClass().getSimpleName() + "." + f.getName();
+      fillFieldList(el, lst, key);
+    }
   }
 
   private void fillFieldList(Element el, List lst, String classFieldKey) {
