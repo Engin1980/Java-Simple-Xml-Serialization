@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="BookmarkManager">
-    <bookmark url="file://$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/Reflecter.java" line="67" />
+    <bookmark url="file://$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/Parser.java" line="67" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4a241bf6-9281-43d3-8161-d0b266b8e05a" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/Reflecter.java" afterPath="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/Reflecter.java" />
+      <change beforePath="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/Reflecter.java" afterPath="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/Parser.java" />
+      <change beforePath="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/XmlSerializer.java" afterPath="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/XmlSerializer.java" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -17,11 +18,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="XmlSerializer.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="XmlSerializer.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/XmlSerializer.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="305">
-              <caret line="60" column="0" lean-forward="false" selection-start-line="60" selection-start-column="0" selection-end-line="60" selection-end-column="0" />
+            <state relative-caret-position="230">
+              <caret line="36" column="3" lean-forward="true" selection-start-line="36" selection-start-column="3" selection-end-line="36" selection-end-column="3" />
               <folding>
                 <element signature="docComment;class#XmlSerializer#0" expanded="false" />
                 <element signature="method#XmlSerializer#1;class#XmlSerializer#0" expanded="false" />
@@ -52,30 +53,30 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Reflecter.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/Reflecter.java">
+      <file leaf-file-name="Parser.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/Parser.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="328">
-              <caret line="338" column="34" lean-forward="true" selection-start-line="338" selection-start-column="34" selection-end-line="338" selection-end-column="34" />
+            <state relative-caret-position="508">
+              <caret line="340" column="3" lean-forward="false" selection-start-line="340" selection-start-column="3" selection-end-line="340" selection-end-column="3" />
               <folding>
-                <element signature="docComment;class#Reflecter#0" expanded="false" />
-                <element signature="method#convertAndSetFieldComplexByCustomParser#0;class#Reflecter#0" expanded="false" />
-                <element signature="method#convertAndSetFieldSimpleByCustomParser#0;class#Reflecter#0" expanded="false" />
-                <element signature="method#convertAndSetFieldValue#0;class#Reflecter#0" expanded="false" />
-                <element signature="method#extractSimpleValueFromElement#0;class#Reflecter#0" expanded="false" />
-                <element signature="method#setFieldValue#0;class#Reflecter#0" expanded="false" />
-                <element signature="method#convertToType#0;class#Reflecter#0" expanded="false" />
-                <element signature="method#setFieldComplex#0;class#Reflecter#0" expanded="false" />
-                <element signature="method#isNullValued#0;class#Reflecter#0" expanded="false" />
-                <element signature="method#createInstance#0;class#Reflecter#0" expanded="false" />
-                <element signature="e#8850#8913#0" expanded="false" />
-                <element signature="method#tryGetInstnaceCreator#0;class#Reflecter#0" expanded="false" />
-                <element signature="e#11289#11321#0" expanded="false" />
-                <element signature="e#11721#11722#0" expanded="true" />
-                <element signature="e#11759#11760#0" expanded="true" />
-                <element signature="method#getElements#1;class#Reflecter#0" expanded="false" />
-                <element signature="method#getItemType#0;class#Reflecter#0" expanded="false" />
-                <element signature="method#getMappedType#0;class#Reflecter#0" expanded="false" />
+                <element signature="docComment;class#Parser#0" expanded="false" />
+                <element signature="method#convertAndSetFieldComplexByCustomParser#0;class#Parser#0" expanded="false" />
+                <element signature="method#convertAndSetFieldSimpleByCustomParser#0;class#Parser#0" expanded="false" />
+                <element signature="method#convertAndSetFieldValue#0;class#Parser#0" expanded="false" />
+                <element signature="method#extractSimpleValueFromElement#0;class#Parser#0" expanded="false" />
+                <element signature="method#setFieldValue#0;class#Parser#0" expanded="false" />
+                <element signature="method#convertToType#0;class#Parser#0" expanded="false" />
+                <element signature="method#setFieldComplex#0;class#Parser#0" expanded="false" />
+                <element signature="method#isNullValued#0;class#Parser#0" expanded="false" />
+                <element signature="method#createInstance#0;class#Parser#0" expanded="false" />
+                <element signature="e#8844#8907#0" expanded="false" />
+                <element signature="method#tryGetInstnaceCreator#0;class#Parser#0" expanded="false" />
+                <element signature="e#11283#11315#0" expanded="false" />
+                <element signature="e#11715#11716#0" expanded="true" />
+                <element signature="e#11753#11754#0" expanded="true" />
+                <element signature="method#getElements#1;class#Parser#0" expanded="false" />
+                <element signature="method#getItemType#0;class#Parser#0" expanded="false" />
+                <element signature="method#getMappedType#0;class#Parser#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -118,7 +119,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/eng/EXmlSerialization/Mapping.java" />
         <option value="$PROJECT_DIR$/test/eng/EXmlSerialization/model/Person.java" />
         <option value="$PROJECT_DIR$/res/colorTest" />
         <option value="$PROJECT_DIR$/src/eng/EXmlSerialization/XmlListItemMapping.java" />
@@ -158,7 +158,6 @@
         <option value="$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/XmlSerializerTest.java" />
         <option value="$PROJECT_DIR$/res/test.xml" />
         <option value="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/XmlListItemMapping.java" />
-        <option value="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/XmlSerializer.java" />
         <option value="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/Settings.java" />
         <option value="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/IElementParser.java" />
         <option value="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/IValueParser.java" />
@@ -169,6 +168,8 @@
         <option value="$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/SerializationTest.java" />
         <option value="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/Formatter.java" />
         <option value="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/Reflecter.java" />
+        <option value="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/Parser.java" />
+        <option value="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/XmlSerializer.java" />
       </list>
     </option>
   </component>
@@ -628,6 +629,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -894,22 +898,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/XmlSerializer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="305">
-          <caret line="60" column="0" lean-forward="false" selection-start-line="60" selection-start-column="0" selection-end-line="60" selection-end-column="0" />
-          <folding>
-            <element signature="docComment;class#XmlSerializer#0" expanded="false" />
-            <element signature="method#XmlSerializer#1;class#XmlSerializer#0" expanded="false" />
-            <element signature="method#fillObject#0;class#XmlSerializer#0" expanded="false" />
-            <element signature="method#saveXmlDocument#0;class#XmlSerializer#0" expanded="false" />
-            <element signature="method#loadXmlAndGetRootElement#0;class#XmlSerializer#0" expanded="false" />
-            <element signature="method#fillList#0;class#XmlSerializer#0" expanded="false" />
-            <element signature="method#readXmlDocument#0;class#XmlSerializer#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$APPLICATION_HOME_DIR$/lib/junit-4.12.jar!/org/junit/runners/model/FrameworkMethod.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="68">
@@ -1007,29 +995,45 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/Reflecter.java">
+    <entry file="file://$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/Parser.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="328">
-          <caret line="338" column="34" lean-forward="true" selection-start-line="338" selection-start-column="34" selection-end-line="338" selection-end-column="34" />
+        <state relative-caret-position="508">
+          <caret line="340" column="3" lean-forward="false" selection-start-line="340" selection-start-column="3" selection-end-line="340" selection-end-column="3" />
           <folding>
-            <element signature="docComment;class#Reflecter#0" expanded="false" />
-            <element signature="method#convertAndSetFieldComplexByCustomParser#0;class#Reflecter#0" expanded="false" />
-            <element signature="method#convertAndSetFieldSimpleByCustomParser#0;class#Reflecter#0" expanded="false" />
-            <element signature="method#convertAndSetFieldValue#0;class#Reflecter#0" expanded="false" />
-            <element signature="method#extractSimpleValueFromElement#0;class#Reflecter#0" expanded="false" />
-            <element signature="method#setFieldValue#0;class#Reflecter#0" expanded="false" />
-            <element signature="method#convertToType#0;class#Reflecter#0" expanded="false" />
-            <element signature="method#setFieldComplex#0;class#Reflecter#0" expanded="false" />
-            <element signature="method#isNullValued#0;class#Reflecter#0" expanded="false" />
-            <element signature="method#createInstance#0;class#Reflecter#0" expanded="false" />
-            <element signature="e#8850#8913#0" expanded="false" />
-            <element signature="method#tryGetInstnaceCreator#0;class#Reflecter#0" expanded="false" />
-            <element signature="e#11289#11321#0" expanded="false" />
-            <element signature="e#11721#11722#0" expanded="true" />
-            <element signature="e#11759#11760#0" expanded="true" />
-            <element signature="method#getElements#1;class#Reflecter#0" expanded="false" />
-            <element signature="method#getItemType#0;class#Reflecter#0" expanded="false" />
-            <element signature="method#getMappedType#0;class#Reflecter#0" expanded="false" />
+            <element signature="docComment;class#Parser#0" expanded="false" />
+            <element signature="method#convertAndSetFieldComplexByCustomParser#0;class#Parser#0" expanded="false" />
+            <element signature="method#convertAndSetFieldSimpleByCustomParser#0;class#Parser#0" expanded="false" />
+            <element signature="method#convertAndSetFieldValue#0;class#Parser#0" expanded="false" />
+            <element signature="method#extractSimpleValueFromElement#0;class#Parser#0" expanded="false" />
+            <element signature="method#setFieldValue#0;class#Parser#0" expanded="false" />
+            <element signature="method#convertToType#0;class#Parser#0" expanded="false" />
+            <element signature="method#setFieldComplex#0;class#Parser#0" expanded="false" />
+            <element signature="method#isNullValued#0;class#Parser#0" expanded="false" />
+            <element signature="method#createInstance#0;class#Parser#0" expanded="false" />
+            <element signature="e#8844#8907#0" expanded="false" />
+            <element signature="method#tryGetInstnaceCreator#0;class#Parser#0" expanded="false" />
+            <element signature="e#11283#11315#0" expanded="false" />
+            <element signature="e#11715#11716#0" expanded="true" />
+            <element signature="e#11753#11754#0" expanded="true" />
+            <element signature="method#getElements#1;class#Parser#0" expanded="false" />
+            <element signature="method#getItemType#0;class#Parser#0" expanded="false" />
+            <element signature="method#getMappedType#0;class#Parser#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/XmlSerializer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="230">
+          <caret line="36" column="3" lean-forward="true" selection-start-line="36" selection-start-column="3" selection-end-line="36" selection-end-column="3" />
+          <folding>
+            <element signature="docComment;class#XmlSerializer#0" expanded="false" />
+            <element signature="method#XmlSerializer#1;class#XmlSerializer#0" expanded="false" />
+            <element signature="method#fillObject#0;class#XmlSerializer#0" expanded="false" />
+            <element signature="method#saveXmlDocument#0;class#XmlSerializer#0" expanded="false" />
+            <element signature="method#loadXmlAndGetRootElement#0;class#XmlSerializer#0" expanded="false" />
+            <element signature="method#fillList#0;class#XmlSerializer#0" expanded="false" />
+            <element signature="method#readXmlDocument#0;class#XmlSerializer#0" expanded="false" />
           </folding>
         </state>
       </provider>

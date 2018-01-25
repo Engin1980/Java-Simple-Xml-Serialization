@@ -13,7 +13,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -28,12 +27,12 @@ import java.util.List;
 public class XmlSerializer {
 
   private final Settings settings;
-  private final Reflecter reflecter;
+  private final Parser parser;
   private final Formatter formatter;
 
   public XmlSerializer() {
     settings = new Settings();
-    reflecter = new Reflecter(settings);
+    parser = new Parser(settings);
     formatter = new Formatter(settings);
   }
 
@@ -43,14 +42,14 @@ public class XmlSerializer {
     }
 
     this.settings = settings;
-    this.reflecter = new Reflecter(settings);
+    this.parser = new Parser(settings);
     this.formatter = new Formatter(settings);
   }
 
   public void fillObject (String xmlFileName, Object targetObject){
 
     Element el = loadXmlAndGetRootElement(xmlFileName);
-    this.reflecter.fillObject(el, targetObject);
+    this.parser.fillObject(el, targetObject);
   }
 
   public void saveObject(String xmlFileName, Object sourceObject){
@@ -85,7 +84,7 @@ public class XmlSerializer {
 
   public void fillList (String xmlFileName, List targetObject){
     Element el = loadXmlAndGetRootElement(xmlFileName);
-    this.reflecter.fillList(el, targetObject);
+    this.parser.fillList(el, targetObject);
   }
 
   private Document readXmlDocument(String fileName){

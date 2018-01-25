@@ -19,11 +19,11 @@ import static eng.eSystem.eXmlSerialization.Shared.*;
 /**
  * @author Marek
  */
-class Reflecter {
+class Parser {
 
   private final Settings settings;
 
-  Reflecter(Settings settings) {
+  Parser(Settings settings) {
     this.settings = settings;
   }
 
