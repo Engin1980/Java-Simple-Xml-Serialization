@@ -5,6 +5,7 @@
  */
 package eng.eSystem.eXmlSerialization;
 
+import com.sun.istack.internal.NotNull;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -22,7 +23,24 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- *
+ * Instance used to serialize and deserialize objects from/to xml.
+ * <p>
+ *   For parsing object from XML, use:
+ *   <ul>
+ *     <li>
+ *       For Arrays use method {@linkplain #fillArray(String, Class)}
+ *     </li>
+ *     <li>
+ *       For implementation of java.util.List use method {@linkplain #fillList(String, List)}
+ *     </li>
+ *     <li>
+ *       For common class use method {@linkplain #fillObject(String, Object)}
+ *     </li>
+ *   </ul>
+ * </p>
+ * <p>
+ *   For formatting object to XML, use {@linkplain #saveObject(String, Object)}.
+ * </p>
  * @author Marek
  */
 public class XmlSerializer {
@@ -31,12 +49,22 @@ public class XmlSerializer {
   private final Parser parser;
   private final Formatter formatter;
 
+  /**
+   * Creates default instance with default settings.
+   * @see #XmlSerializer(Settings)
+   */
   public XmlSerializer() {
     settings = new Settings();
     parser = new Parser(settings);
     formatter = new Formatter(settings);
   }
 
+  /**
+   * Creates instance with custom {@linkplain Settings}.
+   * @param settings Settings to be used
+   * @see Settings
+   * @see #XmlSerializer()
+   */
   public XmlSerializer(Settings settings) {
     if (settings == null) {
         throw new IllegalArgumentException("Value of {settings} cannot not be null.");
@@ -47,12 +75,27 @@ public class XmlSerializer {
     this.formatter = new Formatter(settings);
   }
 
-  public void fillObject (String xmlFileName, Object targetObject){
+  /**
+   * Fills the specified object with the data from XMl file. Don't use this method for Lists and Arrays !!!
+   * @param xmlFileName XML file to be used as a source. Must exist and be accessible.
+   * @param targetObject Object which will be filled. Cannot be null.
+   * @see #fillList(String, List)
+   * @see #fillArray(String, Class)
+   */
+  public void fillObject (@NotNull String xmlFileName, @NotNull Object targetObject){
 
     Element el = loadXmlAndGetRootElement(xmlFileName);
     this.parser.fillObject(el, targetObject);
   }
 
+  /**
+   * Saves an object into specified XMl file.
+   * <p>
+   *   Object should not be null. If XMl file exists, it will be overwritten.
+   * </p>
+   * @param xmlFileName Target XML file name. If exists, will be overwritten.
+   * @param sourceObject Object to be stored.
+   */
   public void saveObject(String xmlFileName, Object sourceObject){
     Document doc;
 
@@ -85,9 +128,30 @@ public class XmlSerializer {
     return el;
   }
 
-  public void fillList (String xmlFileName, List targetObject){
+  /**
+   * Fills the specified list with the data from XMl file. Don't use this method for common classes and Arrays !!!
+   * @param xmlFileName XML file to be used as a source. Must exist and be accessible.
+   * @param targetObject List which will be filled. Cannot be null.
+   * @see #fillObject(String, Object)
+   * @see #fillArray(String, Class)
+   */
+  public void fillList (@NotNull String xmlFileName, @NotNull List targetObject){
     Element el = loadXmlAndGetRootElement(xmlFileName);
     this.parser.fillList(el, targetObject);
+  }
+
+  /**
+   * Returns an array of specified type filled with the data from XMl file. Don't use this method for common classes and lists!!!
+   * @param xmlFileName XML file to be used as a source. Must exist and be accessible.
+   * @param arrayItemType A data type to which the array element should be typed to.
+   * @return An instance of array of specified type with the size according to the data read from xml file.
+   * @see #fillObject(String, Object)
+   * @see #fillList(String, List)
+   */
+  public Object fillArray(String xmlFileName, Class arrayItemType){
+    Element el = loadXmlAndGetRootElement(xmlFileName);
+    Object ret = this.parser.fillArray(el, arrayItemType);
+    return ret;
   }
 
   private Document readXmlDocument(String fileName){
