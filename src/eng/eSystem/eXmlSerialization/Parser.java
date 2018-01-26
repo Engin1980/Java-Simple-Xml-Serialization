@@ -9,10 +9,10 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import static eng.eSystem.eXmlSerialization.Shared.*;
 
@@ -45,11 +45,11 @@ class Parser {
       }
       try {
         fillField(el, f, targetObject);
-      } catch (Exception ex){
+      } catch (Exception ex) {
         throw new XmlSerializationException(ex,
             "Failed to fill field '%s' of object of type '%s' using element '%s'.",
             f.getName(), c.getName(),
-            getElementXPath(el,true, true));
+            getElementXPath(el, true, true));
       }
     }
   }
@@ -75,6 +75,8 @@ class Parser {
       convertAndSetFieldValue(el, f, targetObject);
     } else if (List.class.isAssignableFrom(c)) {
       setFieldList(el, f, targetObject);
+    } else if (c.isArray()) {
+      setFieldArray(el, f, targetObject);
     } else {
       setFieldComplex(el, f, targetObject);
     }
@@ -143,7 +145,7 @@ class Parser {
       return;
     }
     Object tmpO;
-    if (tmpS.equals(settings.getNullString())){
+    if (tmpS.equals(settings.getNullString())) {
       tmpO = null;
     } else {
       tmpO = convertToType(tmpS, f.getType());
@@ -223,13 +225,12 @@ class Parser {
     try {
       subEl = getElements(el, f.getName()).get(0);
     } catch (Exception e) {
-      if (el.getAttribute(f.getName()).isEmpty() == false){
+      if (el.getAttribute(f.getName()).isEmpty() == false) {
         throw XmlInvalidDataException.createAttributeInsteadOfElementFound(el, f.getName(), ref.getClass());
       }
       if (required) {
         throw XmlInvalidDataException.createNoSuchElement(el, f.getName(), ref.getClass());
-      }
-      else
+      } else
         subEl = null;
     }
 
@@ -237,15 +238,12 @@ class Parser {
     if (subEl == null)
       return;
 
-
-
     // then create instance and fill it
     Object newInstance;
     try {
-      if (isNullValued(subEl)){
+      if (isNullValued(subEl)) {
         newInstance = null;
-      }
-      else {
+      } else {
         newInstance = createInstance(f.getType());
       }
     } catch (Exception ex) {
@@ -283,7 +281,7 @@ class Parser {
     }
 
     // check if there is not an custom instance creator
-    IInstanceCreator creator = tryGetInstnaceCreator(type);
+    IInstanceCreator creator = tryGetInstanceCreator(type);
 
     if (creator == null)
       try {
@@ -301,7 +299,7 @@ class Parser {
     return ret;
   }
 
-  private IInstanceCreator tryGetInstnaceCreator(Class<?> type) {
+  private IInstanceCreator tryGetInstanceCreator(Class<?> type) {
     IInstanceCreator ret = null;
 
     for (IInstanceCreator iInstanceCreator : settings.getInstanceCreators()) {
@@ -328,7 +326,7 @@ class Parser {
 
     el = tmp.get(0);
 
-    if (el.getTextContent().equals(settings.getNullString())){
+    if (el.getTextContent().equals(settings.getNullString())) {
       // list, but null, no instance
       setFieldValue(f, targetObject, null);
     } else {
@@ -342,9 +340,13 @@ class Parser {
 
   private void fillFieldList(Element el, List lst, String classFieldKey) {
     List<Element> children = getElements(el);
-    String xpath = Shared.getElementXPath(el, false, false);
     for (Element e : children) {
-      Class itemType = getItemType(xpath, classFieldKey, e);
+      if (isNullValued(e)) {
+        lst.add(null);
+        continue;
+      }
+
+      Class itemType = getItemType(classFieldKey, e, true);
       if (Mapping.isSimpleTypeOrEnum(itemType)) {
         // list item is a primitive type
         // in this case it should be some like <xxx>value</xxx>
@@ -360,6 +362,61 @@ class Parser {
       }
     }
   }
+
+  private void setFieldArray(Element el, Field f, Object targetObject) {
+    // first check if I have something to fill the object with
+    boolean required = f.getAnnotation(XmlOptional.class) == null;
+
+    List<Element> tmp = getElements(el, f.getName());
+    if (tmp.isEmpty()) {
+      if (required)
+        throw XmlInvalidDataException.createNoSuchElement(el, f.getName(), targetObject.getClass());
+      else
+        return;
+    }
+
+    el = tmp.get(0);
+
+    if (el.getTextContent().equals(settings.getNullString())) {
+      // list, but null, no instance
+      setFieldValue(f, targetObject, null);
+    } else {
+      int cnt = getElements(el).size();
+      Class itemClass = f.getType().getComponentType();
+      Object arr = Array.newInstance(itemClass, cnt);
+      String key = targetObject.getClass().getSimpleName() + "." + f.getName();
+
+      setFieldValue(f, targetObject, arr);
+
+      fillFieldArray(el, arr, key, itemClass);
+    }
+  }
+
+  private void fillFieldArray(Element el, Object arr, String classFieldKey, Class itemClass) {
+    List<Element> children = getElements(el);
+    for (int i = 0; i < children.size(); i++) {
+      Element e = children.get(i);
+      if (isNullValued(e)) {
+        Array.set(arr, i, null);
+        continue;
+      }
+
+      Class itemType = getItemType(classFieldKey, e, false);
+      if (itemType == null) itemType = itemClass;
+      if (Mapping.isSimpleTypeOrEnum(itemType)) {
+        String value = e.getTextContent();
+        Object val = convertToType(value, itemType);
+        Array.set(arr, i, val);
+      } else {
+        // list item is complex type
+        Object inn = createInstance(itemType);
+        Array.set(arr, i, inn);
+
+        fillObject(e, inn);
+      }
+    }
+  }
+
 
   private List<Element> getElements(Element el) {
     return getElements(el, null);
@@ -382,7 +439,7 @@ class Parser {
     return ret;
   }
 
-  private Class getItemType(String listElementXPath, String classFieldKey, Element elementOrNull) {
+  private Class getItemType(String classFieldKey, Element elementOrNull, boolean mustExist) {
     Class ret;
 
     String elementName;
@@ -393,9 +450,9 @@ class Parser {
 
     ret = getMappedType(classFieldKey, elementName);
 
-    if (ret == null) {
+    if (ret == null && mustExist) {
       throw new XmlSerializationException("No list-mapping found for list-typed field '%s' using xml-element '%s'. Check settings.getListItemMapping().",
-          classFieldKey, getElementXPath(elementOrNull,true, true));
+          classFieldKey, getElementXPath(elementOrNull, true, true));
     }
 
     return ret;

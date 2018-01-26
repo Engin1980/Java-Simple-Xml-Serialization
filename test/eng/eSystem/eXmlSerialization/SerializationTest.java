@@ -1,6 +1,7 @@
 package eng.eSystem.eXmlSerialization;
 
 import eng.eSystem.eXmlSerialization.model.Address;
+import eng.eSystem.eXmlSerialization.model.Friend;
 import eng.eSystem.eXmlSerialization.model.Person;
 import eng.eSystem.eXmlSerialization.model.Phone;
 import org.junit.Ignore;
@@ -54,6 +55,21 @@ public class SerializationTest {
     h = new Phone();
     h.number="789";
     lst.add(h);
+
+    lst.add(null);
+
+    p.setFriends(new Friend[3]);
+    Friend f;
+
+    f = new Friend();
+    f.setName("Amy");
+    f.setSurname("Doe");
+    p.getFriends()[0] = f;
+
+    f = new Friend();
+    f.setName("Melany");
+    f.setSurname("Doe");
+    p.getFriends()[1] = f;
 
     ser.saveObject("R:\\testPerson.xml", p);
 

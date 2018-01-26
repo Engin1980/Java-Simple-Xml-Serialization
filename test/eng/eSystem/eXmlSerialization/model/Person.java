@@ -1,5 +1,7 @@
 package eng.eSystem.eXmlSerialization.model;
 
+import eng.eSystem.eXmlSerialization.XmlOptional;
+
 import java.util.List;
 
 public class Person {
@@ -11,6 +13,8 @@ public class Person {
   private Address backupAddress;
   private List<Phone> phones;
   private List<String> phoneNumbers;
+  @XmlOptional
+  private Friend[] friends;
 
   public String getName() {
     return name;
@@ -50,5 +54,13 @@ public class Person {
 
   public Address getBackupAddress() {
     return backupAddress;
+  }
+
+  public Friend[] getFriends() {
+    return friends;
+  }
+
+  public void setFriends(Friend[] friends) {
+    this.friends = friends;
   }
 }

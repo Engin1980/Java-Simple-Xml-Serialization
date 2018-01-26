@@ -11,7 +11,7 @@ import static org.junit.Assert.*;
 public class Model2Test {
 
   @Test
-  public void model2Test(){
+  public void model2DeserTest(){
 
     // input file name
     String FILE_NAME = "C:\\Users\\Marek Vajgl\\Documents\\IdeaProjects\\Java-Simple-Xml-Serialization\\res\\model2.xml";
@@ -54,5 +54,10 @@ public class Model2Test {
     assertEquals("+420", db.getPersons().get(0).getPhones().get(0).getPrefix());
     assertNull(db.getPersons().get(0).getAddress().getGps());
     assertEquals(49.9891146, db.getPersons().get(1).getAddress().getGps().getLatitude(), 0.0);
+  }
+
+  @Test
+  public void model2SerTest(){
+
   }
 }

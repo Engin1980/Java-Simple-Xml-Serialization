@@ -8,6 +8,7 @@ import org.w3c.dom.Element;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.List;
 
@@ -20,7 +21,7 @@ class Formatter {
     this.settings = settings;
   }
 
-  public Document saveObject(Object source){
+  public Document saveObject(Object source) {
     Document doc;
     try {
       DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -39,8 +40,8 @@ class Formatter {
   }
 
   private void storeObject(Object sourceObject, Element el) {
-    if (sourceObject == null){
-      el.setNodeValue(settings.getNullString());
+    if (sourceObject == null) {
+      el.setTextContent(settings.getNullString());
       return;
     }
 
@@ -58,11 +59,11 @@ class Formatter {
       }
       try {
         storeField(el, f, sourceObject);
-      } catch (Exception ex){
+      } catch (Exception ex) {
         throw new XmlSerializationException(ex,
             "Failed to store field '%s' of object of type '%s' into the element '%s'.",
             f.getName(), c.getName(),
-            getElementXPath(el,true, true));
+            getElementXPath(el, true, true));
       }
     }
   }
@@ -84,13 +85,15 @@ class Formatter {
       convertAndStoreFieldValue(el, f, sourceObject);
     } else if (List.class.isAssignableFrom(c)) {
       storeFieldList(el, f, sourceObject);
+    } else if (c.isArray()) {
+      storeFieldArray(el, f, sourceObject);
     } else {
       storeFieldComplex(el, f, sourceObject);
     }
   }
 
   @Nullable
-  private Object getFieldValue(@NotNull Object sourceObject, @NotNull Field f){
+  private Object getFieldValue(@NotNull Object sourceObject, @NotNull Field f) {
     Object value;
     try {
       f.setAccessible(true);
@@ -109,12 +112,12 @@ class Formatter {
 
     Object value = getFieldValue(sourceObject, f);
 
-    if (value == null){
+    if (value == null) {
       el.setTextContent(settings.getNullString());
     } else {
       try {
         parser.format(value, el);
-      } catch (Exception ex){
+      } catch (Exception ex) {
         throw new XmlSerializationException(ex,
             "Failed to format value '%s' obtained from field '%s' of object type '%s' using parser '%s'.",
             value.toString(),
@@ -144,7 +147,7 @@ class Formatter {
             parser.getClass().getName());
       }
 
-      el.setAttribute(f.getName(), s);
+    el.setAttribute(f.getName(), s);
   }
 
   private <T> void convertAndStoreFieldValue(Element el, Field f, T sourceObject) {
@@ -172,7 +175,7 @@ class Formatter {
 
     Object value = getFieldValue(sourceObject, f);
 
-    if (value == null){
+    if (value == null) {
       Element subEl = el.getOwnerDocument().createElement(f.getName());
       el.appendChild(subEl);
       subEl.setTextContent(settings.getNullString());
@@ -181,7 +184,7 @@ class Formatter {
         Element subEl = el.getOwnerDocument().createElement(f.getName());
         el.appendChild(subEl);
         storeObject(value, subEl);
-      } catch (Exception ex){
+      } catch (Exception ex) {
         throw new XmlSerializationException(ex,
             "Failed to store value '%s' obtained from field '%s' of object type '%s'.",
             value.toString(),
@@ -195,7 +198,7 @@ class Formatter {
 
     Object value = getFieldValue(sourceObject, f);
 
-    if (value == null){
+    if (value == null) {
       Element subEl = el.getOwnerDocument().createElement(f.getName());
       el.appendChild(subEl);
       subEl.setTextContent(settings.getNullString());
@@ -207,12 +210,57 @@ class Formatter {
 
         for (Object item : lst) {
           // TODO update element name
-          Element itemElement = listEl.getOwnerDocument().createElement("item");
+          String tagName;
+          if (item == null)
+            tagName = "item";
+          else
+            tagName = item.getClass().getSimpleName();
+          Element itemElement = listEl.getOwnerDocument().createElement(tagName);
           listEl.appendChild(itemElement);
           storeObject(item, itemElement);
         }
 
-      } catch (Exception ex){
+      } catch (Exception ex) {
+        throw new XmlSerializationException(ex,
+            "Failed to store value '%s' obtained from field '%s' of object type '%s'.",
+            value.toString(),
+            f.getName(),
+            sourceObject.getClass().getName());
+      }
+    }
+  }
+
+  private void storeFieldArray(Element el, Field f, Object sourceObject) {
+
+    Object value = getFieldValue(sourceObject, f);
+
+    if (value == null) {
+      Element subEl = el.getOwnerDocument().createElement(f.getName());
+      el.appendChild(subEl);
+      subEl.setTextContent(settings.getNullString());
+    } else {
+      try {
+        Object arr = value;
+
+        Element listEl = el.getOwnerDocument().createElement(f.getName());
+        el.appendChild(listEl);
+
+        int cnt = Array.getLength(arr);
+        for (int i = 0; i < cnt; i++) {
+          Object item = Array.get(arr, i);
+
+          // TODO update element name
+          String tagName;
+          if (item == null)
+            tagName = f.getType().getComponentType().getSimpleName();
+          else
+            tagName = item.getClass().getSimpleName();
+          Element itemElement = listEl.getOwnerDocument().createElement(tagName);
+          listEl.appendChild(itemElement);
+          storeObject(item, itemElement);
+        }
+
+      } catch (Exception ex) {
         throw new XmlSerializationException(ex,
             "Failed to store value '%s' obtained from field '%s' of object type '%s'.",
             value.toString(),

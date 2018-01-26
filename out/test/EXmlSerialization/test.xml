@@ -17,4 +17,9 @@
         <number>25927</number>
         <number>25927</number>
     </phoneNumbers>
+    <friends>
+        <friend name="Jane" surname="Doe" />
+        <friend name="Jane" surname="Doe" />
+        <friend name="Jane" surname="Doe" />
+    </friends>
 </person>
