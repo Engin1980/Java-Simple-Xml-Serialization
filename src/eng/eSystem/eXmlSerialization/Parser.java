@@ -58,6 +58,25 @@ class Parser {
     fillFieldList(el, lst, el.getNodeName()); //lst.getClass().getSimpleName());
   }
 
+  Object fillArray(Element el, Class arrayItemType) {
+    Object ret;
+
+    if (el.getTextContent().equals(settings.getNullString())) {
+      // list, but null, no instance
+      ret = null;
+    } else {
+      int cnt = getElements(el).size();
+      Class itemClass = arrayItemType;
+      Object arr = Array.newInstance(itemClass, cnt);
+      String key = el.getNodeName();
+
+      fillFieldArray(el, arr, key, itemClass);
+
+      ret = arr;
+    }
+    return ret;
+  }
+
   private <T> void fillField(Element el, Field f, T targetObject) {
     if (settings.isVerbose()) {
       System.out.println("  fillField( <" + el.getNodeName() + "...>, " + targetObject.getClass().getSimpleName() + "." + f.getName());
