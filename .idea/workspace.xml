@@ -2,6 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="4a241bf6-9281-43d3-8161-d0b266b8e05a" name="Default" comment="">
+<<<<<<< HEAD
+=======
+      <change beforePath="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/Parser.java" afterPath="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/Parser.java" />
+>>>>>>> b9fb0b4a110256528250f7e781cc618b9e650d73
       <change beforePath="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/XmlSerializer.java" afterPath="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/XmlSerializer.java" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -17,8 +21,13 @@
       <file leaf-file-name="XmlSerializer.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/XmlSerializer.java">
           <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
             <state relative-caret-position="341">
               <caret line="143" column="126" lean-forward="false" selection-start-line="143" selection-start-column="126" selection-end-line="143" selection-end-column="126" />
+=======
+            <state relative-caret-position="705">
+              <caret line="96" column="45" lean-forward="false" selection-start-line="96" selection-start-column="45" selection-end-line="96" selection-end-column="45" />
+>>>>>>> b9fb0b4a110256528250f7e781cc618b9e650d73
               <folding>
                 <element signature="docComment;method#XmlSerializer#0;class#XmlSerializer#0" expanded="false" />
                 <element signature="method#XmlSerializer#0;class#XmlSerializer#0" expanded="false" />
@@ -31,9 +40,16 @@
                 <element signature="method#loadXmlAndGetRootElement#0;class#XmlSerializer#0" expanded="false" />
                 <element signature="docComment;method#fillList#0;class#XmlSerializer#0" expanded="false" />
                 <element signature="method#fillList#0;class#XmlSerializer#0" expanded="false" />
+<<<<<<< HEAD
                 <element signature="method#fillArray#0;class#XmlSerializer#0" expanded="false" />
                 <element signature="method#readXmlDocument#0;class#XmlSerializer#0" expanded="false" />
                 <element signature="e#5649#5676#0" expanded="false" />
+=======
+                <element signature="docComment;method#fillArray#0;class#XmlSerializer#0" expanded="false" />
+                <element signature="method#fillArray#0;class#XmlSerializer#0" expanded="false" />
+                <element signature="method#readXmlDocument#0;class#XmlSerializer#0" expanded="false" />
+                <element signature="e#5650#5677#0" expanded="false" />
+>>>>>>> b9fb0b4a110256528250f7e781cc618b9e650d73
               </folding>
             </state>
           </provider>
@@ -912,8 +928,13 @@
           <caret line="77" column="0" lean-forward="false" selection-start-line="77" selection-start-column="0" selection-end-line="77" selection-end-column="0" />
           <folding>
             <element signature="docComment;class#Parser#0" expanded="false" />
+<<<<<<< HEAD
             <element signature="e#1744#1745#0" expanded="false" />
             <element signature="e#1829#1830#0" expanded="false" />
+=======
+            <element signature="e#1744#1745#0" expanded="true" />
+            <element signature="e#1829#1830#0" expanded="true" />
+>>>>>>> b9fb0b4a110256528250f7e781cc618b9e650d73
             <element signature="method#fillField#0;class#Parser#0" expanded="false" />
             <element signature="method#convertAndSetFieldComplexByCustomParser#0;class#Parser#0" expanded="false" />
             <element signature="method#convertAndSetFieldSimpleByCustomParser#0;class#Parser#0" expanded="false" />
@@ -926,8 +947,13 @@
             <element signature="method#tryGetInstanceCreator#0;class#Parser#0" expanded="false" />
             <element signature="e#11830#11862#0" expanded="false" />
             <element signature="method#setFieldArray#0;class#Parser#0" expanded="false" />
+<<<<<<< HEAD
             <element signature="e#13995#13996#0" expanded="false" />
             <element signature="e#14033#14034#0" expanded="false" />
+=======
+            <element signature="e#13995#13996#0" expanded="true" />
+            <element signature="e#14033#14034#0" expanded="true" />
+>>>>>>> b9fb0b4a110256528250f7e781cc618b9e650d73
             <element signature="method#getMappedType#0;class#Parser#0" expanded="false" />
           </folding>
         </state>
@@ -935,8 +961,13 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/XmlSerializer.java">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
         <state relative-caret-position="341">
           <caret line="143" column="126" lean-forward="false" selection-start-line="143" selection-start-column="126" selection-end-line="143" selection-end-column="126" />
+=======
+        <state relative-caret-position="705">
+          <caret line="96" column="45" lean-forward="false" selection-start-line="96" selection-start-column="45" selection-end-line="96" selection-end-column="45" />
+>>>>>>> b9fb0b4a110256528250f7e781cc618b9e650d73
           <folding>
             <element signature="docComment;method#XmlSerializer#0;class#XmlSerializer#0" expanded="false" />
             <element signature="method#XmlSerializer#0;class#XmlSerializer#0" expanded="false" />
@@ -949,9 +980,16 @@
             <element signature="method#loadXmlAndGetRootElement#0;class#XmlSerializer#0" expanded="false" />
             <element signature="docComment;method#fillList#0;class#XmlSerializer#0" expanded="false" />
             <element signature="method#fillList#0;class#XmlSerializer#0" expanded="false" />
+<<<<<<< HEAD
             <element signature="method#fillArray#0;class#XmlSerializer#0" expanded="false" />
             <element signature="method#readXmlDocument#0;class#XmlSerializer#0" expanded="false" />
             <element signature="e#5649#5676#0" expanded="false" />
+=======
+            <element signature="docComment;method#fillArray#0;class#XmlSerializer#0" expanded="false" />
+            <element signature="method#fillArray#0;class#XmlSerializer#0" expanded="false" />
+            <element signature="method#readXmlDocument#0;class#XmlSerializer#0" expanded="false" />
+            <element signature="e#5650#5677#0" expanded="false" />
+>>>>>>> b9fb0b4a110256528250f7e781cc618b9e650d73
           </folding>
         </state>
       </provider>

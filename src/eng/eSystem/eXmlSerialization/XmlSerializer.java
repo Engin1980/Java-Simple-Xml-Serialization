@@ -141,7 +141,11 @@ public class XmlSerializer {
   }
 
   /**
+<<<<<<< HEAD
    * Returns an array of specified type filled with the data from XMl file. Don't use this method for common classes and lists!!!
+=======
+   * Returns an array of specified type filled with the data from XMl file. Don't use this method for common classes and arrays!!!
+>>>>>>> b9fb0b4a110256528250f7e781cc618b9e650d73
    * @param xmlFileName XML file to be used as a source. Must exist and be accessible.
    * @param arrayItemType A data type to which the array element should be typed to.
    * @return An instance of array of specified type with the size according to the data read from xml file.
