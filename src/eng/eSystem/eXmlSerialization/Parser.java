@@ -5,9 +5,11 @@
  */
 package eng.eSystem.eXmlSerialization;
 
+import com.sun.org.apache.bcel.internal.generic.ObjectType;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import sun.rmi.transport.ObjectTable;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -25,6 +27,135 @@ class Parser {
 
   Parser(Settings settings) {
     this.settings = settings;
+  }
+
+  public Object deserialize(Element el, Class objectType) {
+    if (el == null) {
+        throw new IllegalArgumentException("Value of {el} cannot not be null.");
+    }
+    if (objectType == null) {
+        throw new IllegalArgumentException("Value of {objectType} cannot not be null.");
+    }
+
+    if (settings.isVerbose()) {
+      System.out.println("  deserialize( <" + el.getNodeName() + "...>, " + objectType.getSimpleName());
+    }
+
+    Class c = objectType;
+    Object ret;
+    IValueParser customValueParser = Shared.tryGetCustomValueParser(c, settings);
+    IElementParser customElementParser = Shared.tryGetCustomElementParser(c, settings);
+    if (customValueParser != null) {
+      ret = convertAndSetFieldSimpleByCustomParser2(el, customValueParser);
+    } else if (customElementParser != null) {
+      ret = convertAndSetFieldComplexByCustomParser2(el, customElementParser);
+    } else if (Mapping.isSimpleTypeOrEnum(c)) {
+      // jednoduchý typ
+      ret = convertAndSetFieldValue2(el, c);
+    } else if (List.class.isAssignableFrom(c)) {
+      ret = setFieldList2(el, c);
+    } else if (c.isArray()) {
+      ret = setFieldArray2(el,c );
+    } else {
+      ret = setFieldComplex2(el, objectType);
+    }
+    return ret;
+  }
+
+  private Object convertAndSetFieldComplexByCustomParser2(Element el, IElementParser customElementParser) {
+    Object ret;
+    try {
+      if (isNullValued(el))
+        ret = null;
+      else
+        ret = customElementParser.parse(el);
+    } catch (Exception ex) {
+      throw new XmlSerializationException(
+          "Failed to parse instance for " + customElementParser.getTypeName() +
+              " using custom-element-parser " + customElementParser.getClass().getName() + ".",
+          ex);
+    }
+    return ret;
+  }
+
+  private Object convertAndSetFieldSimpleByCustomParser2(Element el, IValueParser parser) {
+    String tmpS = extractSimpleValueFromElement(el, "N/A", true);
+    if (tmpS == null) {
+      return null;
+    }
+    Object tmpO;
+    if (tmpS.equals(settings.getNullString()))
+      tmpO = null;
+    else
+      tmpO = parser.parse(tmpS);
+    return tmpO;
+  }
+
+  private Object setFieldList2(Element el, Class c) {
+    Object ret;
+
+    if (el.getTextContent().equals(settings.getNullString())) {
+      // list, but null, no instance
+      ret = null;
+    } else {
+      List lst = (List) createInstance(c);
+      String key = c.getSimpleName();
+      fillFieldList(el, lst, key);
+      ret = lst;
+    }
+    return ret;
+  }
+
+  public Object setFieldArray2(Element el, Class c) {
+
+    Object ret;
+    if (el.getTextContent().equals(settings.getNullString())) {
+      // array, but null, no instance
+      ret = null;
+    } else {
+      int cnt = getElements(el).size();
+      Class itemClass = c.getComponentType();
+      ret = Array.newInstance(itemClass, cnt);
+      String key = c.getSimpleName();
+
+      fillFieldArray(el, ret, key, itemClass);
+    }
+    return ret;
+  }
+
+  private Object setFieldComplex2(Element el, Class c) {
+
+    Object ret;
+    try {
+      if (isNullValued(el)) {
+        ret = null;
+      } else {
+        ret = createInstance(c);
+      }
+    } catch (Exception ex) {
+      throw new XmlSerializationException(
+          "Failed to create instance for " + c.getSimpleName()+ ".",
+          ex);
+    }
+
+    if (ret != null)
+      fillObject(el, ret);
+
+    return ret;
+  }
+
+  private Object convertAndSetFieldValue2(Element el, Class c) {
+    String tmpS = extractSimpleValueFromElement(el, "N/A", true);
+    if (tmpS == null) {
+      return null;
+    }
+    Object tmpO;
+    if (tmpS.equals(settings.getNullString())) {
+      tmpO = null;
+    } else {
+      tmpO = convertToType(tmpS, c);
+    }
+    return tmpO;
   }
 
   <T> void fillObject(Element el, T targetObject) {
@@ -133,14 +264,17 @@ class Parser {
               " using custom-element-parser " + customElementParser.getClass().getName() + ".",
           ex);
     }
-    try {
-      f.setAccessible(true);
-      f.set(ref, newInstance);
-      f.setAccessible(false);
-    } catch (IllegalArgumentException | IllegalAccessException ex) {
-      throw new XmlSerializationException(
-          "Failed to set value to field " + ref.getClass().getName() + "." + f.getName(), ex);
-    }
+
+    setFieldValue(f, ref, newInstance);
+    // following comment can be deleted after previous line is verified
+//    try {
+//      f.setAccessible(true);
+//      f.set(ref, newInstance);
+//      f.setAccessible(false);
+//    } catch (IllegalArgumentException | IllegalAccessException ex) {
+//      throw new XmlSerializationException(
+//          "Failed to set value to field " + ref.getClass().getName() + "." + f.getName(), ex);
+//    }
   }
 
   private <T> void convertAndSetFieldSimpleByCustomParser(Element el, Field f, IValueParser parser, T targetObject) {
@@ -270,14 +404,18 @@ class Parser {
           "Failed to create instance for " + ref.getClass().getSimpleName() + "." + f.getName() + ".",
           ex);
     }
-    try {
-      f.setAccessible(true);
-      f.set(ref, newInstance);
-      f.setAccessible(false);
-    } catch (IllegalArgumentException | IllegalAccessException ex) {
-      throw new XmlSerializationException(
-          "Failed to set value to field " + ref.getClass().getName() + "." + f.getName(), ex);
-    }
+
+    setFieldValue(f, ref, newInstance);
+// previous line replaces following code, however not tested yet.
+// this comment can be deleted after testing
+//    try {
+//      f.setAccessible(true);
+//      f.set(ref, newInstance);
+//      f.setAccessible(false);
+//    } catch (IllegalArgumentException | IllegalAccessException ex) {
+//      throw new XmlSerializationException(
+//          "Failed to set value to field " + ref.getClass().getName() + "." + f.getName(), ex);
+//    }
 
     if (newInstance != null)
       fillObject(subEl, newInstance);

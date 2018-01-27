@@ -19,7 +19,7 @@ public class SerializationTest {
     XmlSerializer ser = new XmlSerializer();
 
     Object o = new Object();
-    ser.saveObject("R:\\testEmpty.xml", o);
+    ser.serialize("R:\\testEmpty.xml", o);
 
   }
 
@@ -72,7 +72,7 @@ public class SerializationTest {
     f.setSurname("Doe");
     p.getFriends()[1] = f;
 
-    ser.saveObject("R:\\testPerson.xml", p);
+    ser.serialize("R:\\testPerson.xml", p);
 
   }
 }

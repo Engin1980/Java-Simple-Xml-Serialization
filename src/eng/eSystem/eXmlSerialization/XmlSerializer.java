@@ -39,7 +39,7 @@ import java.util.List;
  *   </ul>
  * </p>
  * <p>
- *   For formatting object to XML, use {@linkplain #saveObject(String, Object)}.
+ *   For formatting object to XML, use {@linkplain #serialize(String, Object)}.
  * </p>
  * @author Marek
  */
@@ -89,6 +89,23 @@ public class XmlSerializer {
   }
 
   /**
+   * Deserializes an instance of the objectType from xmlFileName.
+   * <p>
+   *   If stored object in xml file is not null, then there must be way how a new instance
+   *   is created from objectType - either public parameter-less constructor,
+   *   or custom {@linkplain IInstanceCreator} defined in {@linkplain #getSettings()}.
+   * </p>
+   * @param xmlFileName XML file name to be read.
+   * @param objectType A type of a returned class.
+   * @return Object deserialized from the class.
+   */
+  public Object deserialize(@NotNull String xmlFileName, @NotNull Class objectType){
+    Element el = loadXmlAndGetRootElement(xmlFileName);
+    Object ret = this.parser.deserialize(el, objectType);
+    return ret;
+  }
+
+  /**
    * Saves an object into specified XMl file.
    * <p>
    *   Object should not be null. If XMl file exists, it will be overwritten.
@@ -96,7 +113,7 @@ public class XmlSerializer {
    * @param xmlFileName Target XML file name. If exists, will be overwritten.
    * @param sourceObject Object to be stored.
    */
-  public void saveObject(@NotNull String xmlFileName, @NotNull Object sourceObject){
+  public void serialize(@NotNull String xmlFileName, @NotNull Object sourceObject){
     Document doc;
 
     doc = this.formatter.saveObject(sourceObject);
