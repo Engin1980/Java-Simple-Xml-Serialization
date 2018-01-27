@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="4a241bf6-9281-43d3-8161-d0b266b8e05a" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/Parser.java" afterPath="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/Parser.java" />
       <change beforePath="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/XmlSerializer.java" afterPath="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/XmlSerializer.java" />
+      <change beforePath="$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/SerializationTest.java" afterPath="$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/SerializationTest.java" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -15,11 +15,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="XmlSerializer.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="XmlSerializer.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/XmlSerializer.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="705">
-              <caret line="96" column="45" lean-forward="false" selection-start-line="96" selection-start-column="45" selection-end-line="96" selection-end-column="45" />
+            <state relative-caret-position="292">
+              <caret line="98" column="62" lean-forward="false" selection-start-line="98" selection-start-column="62" selection-end-line="98" selection-end-column="62" />
               <folding>
                 <element signature="docComment;method#XmlSerializer#0;class#XmlSerializer#0" expanded="false" />
                 <element signature="method#XmlSerializer#0;class#XmlSerializer#0" expanded="false" />
@@ -27,6 +27,7 @@
                 <element signature="method#XmlSerializer#1;class#XmlSerializer#0" expanded="false" />
                 <element signature="docComment;method#fillObject#0;class#XmlSerializer#0" expanded="false" />
                 <element signature="method#fillObject#0;class#XmlSerializer#0" expanded="false" />
+                <element signature="docComment;method#saveObject#0;class#XmlSerializer#0" expanded="false" />
                 <element signature="method#saveObject#0;class#XmlSerializer#0" expanded="false" />
                 <element signature="method#saveXmlDocument#0;class#XmlSerializer#0" expanded="false" />
                 <element signature="method#loadXmlAndGetRootElement#0;class#XmlSerializer#0" expanded="false" />
@@ -35,8 +36,19 @@
                 <element signature="docComment;method#fillArray#0;class#XmlSerializer#0" expanded="false" />
                 <element signature="method#fillArray#0;class#XmlSerializer#0" expanded="false" />
                 <element signature="method#readXmlDocument#0;class#XmlSerializer#0" expanded="false" />
-                <element signature="e#5650#5677#0" expanded="false" />
+                <element signature="e#6524#6525#0" expanded="true" />
+                <element signature="e#6549#6550#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="SerializationTest.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/SerializationTest.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="315">
+              <caret line="29" column="7" lean-forward="false" selection-start-line="29" selection-start-column="7" selection-end-line="29" selection-end-column="7" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -126,10 +138,10 @@
         <option value="$PROJECT_DIR$/res/test.xml" />
         <option value="$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/model/Person.java" />
         <option value="$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/model/Friend.java" />
-        <option value="$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/SerializationTest.java" />
         <option value="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/Formatter.java" />
         <option value="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/Parser.java" />
         <option value="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/XmlSerializer.java" />
+        <option value="$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/SerializationTest.java" />
       </list>
     </option>
   </component>
@@ -154,8 +166,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
-      <pane id="PackagesPane" />
+      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -201,7 +212,8 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scratches" />
+      <pane id="PackagesPane" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -392,9 +404,6 @@
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="Deser_test_run - 2018.01.26 at 23h 47m 27s.xml">
-      <configuration name="Deser test run" configurationId="JUnit" />
-    </history-entry>
     <history-entry file="Deser_test_run - 2018.01.26 at 23h 59m 47s.xml">
       <configuration name="Deser test run" configurationId="JUnit" />
     </history-entry>
@@ -422,6 +431,9 @@
     <history-entry file="Ser_test_run - 2018.01.27 at 00h 07m 02s.xml">
       <configuration name="Ser test run" configurationId="JUnit" />
     </history-entry>
+    <history-entry file="Ser_test_run - 2018.01.27 at 23h 26m 30s.xml">
+      <configuration name="Ser test run" configurationId="JUnit" />
+    </history-entry>
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1554" height="916" extended-state="6" />
@@ -438,7 +450,6 @@
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2496749" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32876712" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -449,6 +460,7 @@
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2496749" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32876712" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
   <component name="VcsContentAnnotationSettings">
@@ -601,7 +613,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="315">
           <caret line="60" column="17" lean-forward="false" selection-start-line="60" selection-start-column="17" selection-end-line="60" selection-end-column="17" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -739,9 +750,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="315">
           <caret line="25" column="16" lean-forward="true" selection-start-line="25" selection-start-column="16" selection-end-line="25" selection-end-column="16" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -749,7 +757,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="240">
           <caret line="55" column="17" lean-forward="false" selection-start-line="55" selection-start-column="17" selection-end-line="55" selection-end-column="17" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -787,11 +794,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="437">
           <caret line="96" column="0" lean-forward="true" selection-start-line="96" selection-start-column="0" selection-end-line="96" selection-end-column="0" />
-          <folding>
-            <element signature="method#isRegexMatch#0;class#Shared#0" expanded="false" />
-            <element signature="method#getElementXPath#0;class#Shared#0" expanded="false" />
-            <element signature="docComment;method#isSkippedBySettings#0;class#Shared#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -850,15 +852,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="210">
           <caret line="14" column="36" lean-forward="false" selection-start-line="14" selection-start-column="36" selection-end-line="14" selection-end-column="36" />
-          <folding>
-            <element signature="e#144#145#0" expanded="true" />
-            <element signature="e#165#166#0" expanded="true" />
-            <element signature="e#197#198#0" expanded="true" />
-            <element signature="e#221#222#0" expanded="true" />
-            <element signature="e#285#286#0" expanded="true" />
-            <element signature="e#329#330#0" expanded="true" />
-            <element signature="e#361#362#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -900,14 +893,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/SerializationTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="386">
-          <caret line="71" column="20" lean-forward="false" selection-start-line="71" selection-start-column="20" selection-end-line="71" selection-end-column="20" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/Parser.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="326">
@@ -937,8 +922,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/XmlSerializer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="705">
-          <caret line="96" column="45" lean-forward="false" selection-start-line="96" selection-start-column="45" selection-end-line="96" selection-end-column="45" />
+        <state relative-caret-position="292">
+          <caret line="98" column="62" lean-forward="false" selection-start-line="98" selection-start-column="62" selection-end-line="98" selection-end-column="62" />
           <folding>
             <element signature="docComment;method#XmlSerializer#0;class#XmlSerializer#0" expanded="false" />
             <element signature="method#XmlSerializer#0;class#XmlSerializer#0" expanded="false" />
@@ -946,6 +931,7 @@
             <element signature="method#XmlSerializer#1;class#XmlSerializer#0" expanded="false" />
             <element signature="docComment;method#fillObject#0;class#XmlSerializer#0" expanded="false" />
             <element signature="method#fillObject#0;class#XmlSerializer#0" expanded="false" />
+            <element signature="docComment;method#saveObject#0;class#XmlSerializer#0" expanded="false" />
             <element signature="method#saveObject#0;class#XmlSerializer#0" expanded="false" />
             <element signature="method#saveXmlDocument#0;class#XmlSerializer#0" expanded="false" />
             <element signature="method#loadXmlAndGetRootElement#0;class#XmlSerializer#0" expanded="false" />
@@ -954,8 +940,17 @@
             <element signature="docComment;method#fillArray#0;class#XmlSerializer#0" expanded="false" />
             <element signature="method#fillArray#0;class#XmlSerializer#0" expanded="false" />
             <element signature="method#readXmlDocument#0;class#XmlSerializer#0" expanded="false" />
-            <element signature="e#5650#5677#0" expanded="false" />
+            <element signature="e#6524#6525#0" expanded="true" />
+            <element signature="e#6549#6550#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/SerializationTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="315">
+          <caret line="29" column="7" lean-forward="false" selection-start-line="29" selection-start-column="7" selection-end-line="29" selection-end-column="7" />
+          <folding />
         </state>
       </provider>
     </entry>

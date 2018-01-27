@@ -27,6 +27,7 @@ public class SerializationTest {
   public void PersonTest(){
 
     XmlSerializer ser = new XmlSerializer();
+    // ser.getSettings().setVerbose(true);
 
     Person p = new Person();
     p.setName("John");

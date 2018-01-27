@@ -96,7 +96,7 @@ public class XmlSerializer {
    * @param xmlFileName Target XML file name. If exists, will be overwritten.
    * @param sourceObject Object to be stored.
    */
-  public void saveObject(String xmlFileName, Object sourceObject){
+  public void saveObject(@NotNull String xmlFileName, @NotNull Object sourceObject){
     Document doc;
 
     doc = this.formatter.saveObject(sourceObject);
@@ -152,7 +152,8 @@ public class XmlSerializer {
    * @see #fillObject(String, Object)
    * @see #fillList(String, List)
    */
-  public Object fillArray(String xmlFileName, Class arrayItemType){
+  @NotNull
+  public Object fillArray(@NotNull String xmlFileName, @NotNull Class arrayItemType){
     Element el = loadXmlAndGetRootElement(xmlFileName);
     Object ret = this.parser.fillArray(el, arrayItemType);
     return ret;
@@ -174,5 +175,16 @@ public class XmlSerializer {
     }
 
     return doc;
+  }
+
+  /**
+   * Returns an instance of current {@linkplain Settings}. Setting's properties can be adjusted,
+   * setting object is read-only.
+   * @return Instance of settings.
+   * @see Settings
+   */
+  @NotNull
+  public Settings getSettings() {
+    return settings;
   }
 }
