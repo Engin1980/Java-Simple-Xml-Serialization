@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="EXmlSerialization:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/EXmlSerialization_jar</output-path>
+    <root id="archive" name="EXmlSerialization.jar">
+      <element id="module-output" name="EXmlSerialization" />
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/META-INF/MANIFEST.MF" />
+      </element>
+    </root>
+  </artifact>
+</component>
