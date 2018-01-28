@@ -176,8 +176,8 @@ class Parser {
         fillField(el, f, targetObject);
       } catch (Exception ex) {
         throw new XmlSerializationException(ex,
-            "Failed to fill field '%s' of object of type '%s' using element '%s'.",
-            f.getName(), c.getName(),
+            "Failed to fill field '%s' ('%s') of object of type '%s' using element '%s'.",
+            f.getName(), f.getType().getName(), c.getName(),
             getElementXPath(el, true, true));
       }
     }
