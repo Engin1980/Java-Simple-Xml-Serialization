@@ -7,9 +7,41 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4a241bf6-9281-43d3-8161-d0b266b8e05a" name="Default" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/.idea/artifacts/EXmlSerialization_jar.xml" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/out/artifacts/EXmlSerialization_jar/EXmlSerialization.jar" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change beforePath="$PROJECT_DIR$/out/artifacts/EXmlSerialization_jar/EXmlSerialization.jar" afterPath="$PROJECT_DIR$/out/artifacts/EXmlSerialization_jar/EXmlSerialization.jar" />
+      <change beforePath="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/Formatter.java" afterPath="$PROJECT_DIR$/src/eng/eSystem/xmlSerialization/Formatter.java" />
+      <change beforePath="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/IElementParser.java" afterPath="$PROJECT_DIR$/src/eng/eSystem/xmlSerialization/IElementParser.java" />
+      <change beforePath="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/IInstanceCreator.java" afterPath="$PROJECT_DIR$/src/eng/eSystem/xmlSerialization/IInstanceCreator.java" />
+      <change beforePath="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/IValueParser.java" afterPath="$PROJECT_DIR$/src/eng/eSystem/xmlSerialization/IValueParser.java" />
+      <change beforePath="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/Mapping.java" afterPath="$PROJECT_DIR$/src/eng/eSystem/xmlSerialization/Mapping.java" />
+      <change beforePath="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/Parser.java" afterPath="$PROJECT_DIR$/src/eng/eSystem/xmlSerialization/Parser.java" />
+      <change beforePath="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/Settings.java" afterPath="$PROJECT_DIR$/src/eng/eSystem/xmlSerialization/Settings.java" />
+      <change beforePath="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/Shared.java" afterPath="$PROJECT_DIR$/src/eng/eSystem/xmlSerialization/Shared.java" />
+      <change beforePath="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/XmlInvalidDataException.java" afterPath="$PROJECT_DIR$/src/eng/eSystem/xmlSerialization/XmlInvalidDataException.java" />
+      <change beforePath="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/XmlListItemMapping.java" afterPath="$PROJECT_DIR$/src/eng/eSystem/xmlSerialization/XmlListItemMapping.java" />
+      <change beforePath="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/XmlOptional.java" afterPath="$PROJECT_DIR$/src/eng/eSystem/xmlSerialization/XmlOptional.java" />
+      <change beforePath="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/XmlSerializationException.java" afterPath="$PROJECT_DIR$/src/eng/eSystem/xmlSerialization/XmlSerializationException.java" />
+      <change beforePath="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/XmlSerializer.java" afterPath="$PROJECT_DIR$/src/eng/eSystem/xmlSerialization/XmlSerializer.java" />
+      <change beforePath="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/common/instanceCreators/AwtColorCreator.java" afterPath="$PROJECT_DIR$/src/eng/eSystem/xmlSerialization/common/instanceCreators/AwtColorCreator.java" />
+      <change beforePath="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/common/parsers/AwtFontElementParser.java" afterPath="$PROJECT_DIR$/src/eng/eSystem/xmlSerialization/common/parsers/AwtFontElementParser.java" />
+      <change beforePath="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/common/parsers/HexToAwtColorValueParser.java" afterPath="$PROJECT_DIR$/src/eng/eSystem/xmlSerialization/common/parsers/HexToAwtColorValueParser.java" />
+      <change beforePath="$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/common/parsers/JavaTimeLocalDateValueParser.java" afterPath="$PROJECT_DIR$/src/eng/eSystem/xmlSerialization/common/parsers/JavaTimeLocalDateValueParser.java" />
+      <change beforePath="$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/DeserializaitonTest.java" afterPath="$PROJECT_DIR$/test/eng/eSystem/xmlSerialization/DeserializaitonTest.java" />
+      <change beforePath="$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/Model2Test.java" afterPath="$PROJECT_DIR$/test/eng/eSystem/xmlSerialization/Model2Test.java" />
+      <change beforePath="$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/SerializationTest.java" afterPath="$PROJECT_DIR$/test/eng/eSystem/xmlSerialization/SerializationTest.java" />
+      <change beforePath="$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/model/Address.java" afterPath="$PROJECT_DIR$/test/eng/eSystem/xmlSerialization/model/Address.java" />
+      <change beforePath="$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/model/Friend.java" afterPath="$PROJECT_DIR$/test/eng/eSystem/xmlSerialization/model/Friend.java" />
+      <change beforePath="$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/model/MultiList.java" afterPath="$PROJECT_DIR$/test/eng/eSystem/xmlSerialization/model/MultiList.java" />
+      <change beforePath="$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/model/NamedColor.java" afterPath="$PROJECT_DIR$/test/eng/eSystem/xmlSerialization/model/NamedColor.java" />
+      <change beforePath="$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/model/Person.java" afterPath="$PROJECT_DIR$/test/eng/eSystem/xmlSerialization/model/Person.java" />
+      <change beforePath="$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/model/Phone.java" afterPath="$PROJECT_DIR$/test/eng/eSystem/xmlSerialization/model/Phone.java" />
+      <change beforePath="$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/model2/Address.java" afterPath="$PROJECT_DIR$/test/eng/eSystem/xmlSerialization/model2/Address.java" />
+      <change beforePath="$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/model2/Database.java" afterPath="$PROJECT_DIR$/test/eng/eSystem/xmlSerialization/model2/Database.java" />
+      <change beforePath="$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/model2/Gps.java" afterPath="$PROJECT_DIR$/test/eng/eSystem/xmlSerialization/model2/Gps.java" />
+      <change beforePath="$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/model2/HomePhone.java" afterPath="$PROJECT_DIR$/test/eng/eSystem/xmlSerialization/model2/HomePhone.java" />
+      <change beforePath="$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/model2/MobilePhone.java" afterPath="$PROJECT_DIR$/test/eng/eSystem/xmlSerialization/model2/MobilePhone.java" />
+      <change beforePath="$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/model2/Person.java" afterPath="$PROJECT_DIR$/test/eng/eSystem/xmlSerialization/model2/Person.java" />
+      <change beforePath="$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/model2/Phone.java" afterPath="$PROJECT_DIR$/test/eng/eSystem/xmlSerialization/model2/Phone.java" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -20,7 +52,55 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf />
+    <leaf>
+      <file leaf-file-name="Parser.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/eng/eSystem/xmlSerialization/Parser.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="163">
+              <caret line="306" column="17" lean-forward="false" selection-start-line="306" selection-start-column="17" selection-end-line="306" selection-end-column="17" />
+              <folding>
+                <element signature="method#deserialize#0;class#Parser#0" expanded="false" />
+                <element signature="method#convertAndSetFieldComplexByCustomParser2#0;class#Parser#0" expanded="false" />
+                <element signature="method#convertAndSetFieldSimpleByCustomParser2#0;class#Parser#0" expanded="false" />
+                <element signature="method#setFieldList2#0;class#Parser#0" expanded="false" />
+                <element signature="method#setFieldArray2#0;class#Parser#0" expanded="false" />
+                <element signature="method#setFieldComplex2#0;class#Parser#0" expanded="false" />
+                <element signature="method#convertAndSetFieldValue2#0;class#Parser#0" expanded="false" />
+                <element signature="method#fillObject#0;class#Parser#0" expanded="false" />
+                <element signature="method#fillArray#0;class#Parser#0" expanded="false" />
+                <element signature="method#convertAndSetFieldComplexByCustomParser#0;class#Parser#0" expanded="false" />
+                <element signature="method#convertAndSetFieldValue#0;class#Parser#0" expanded="false" />
+                <element signature="method#setFieldValue#0;class#Parser#0" expanded="false" />
+                <element signature="method#convertToType#0;class#Parser#0" expanded="false" />
+                <element signature="method#setFieldComplex#0;class#Parser#0" expanded="false" />
+                <element signature="method#isNullValued#0;class#Parser#0" expanded="false" />
+                <element signature="method#createInstance#0;class#Parser#0" expanded="false" />
+                <element signature="method#tryGetInstanceCreator#0;class#Parser#0" expanded="false" />
+                <element signature="method#setFieldList#0;class#Parser#0" expanded="false" />
+                <element signature="method#fillFieldList#0;class#Parser#0" expanded="false" />
+                <element signature="method#setFieldArray#0;class#Parser#0" expanded="false" />
+                <element signature="method#fillFieldArray#0;class#Parser#0" expanded="false" />
+                <element signature="e#17990#17991#0" expanded="true" />
+                <element signature="e#18028#18029#0" expanded="true" />
+                <element signature="method#getElements#1;class#Parser#0" expanded="false" />
+                <element signature="method#getItemType#0;class#Parser#0" expanded="false" />
+                <element signature="method#getMappedType#0;class#Parser#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="AwtFontElementParser.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/eng/eSystem/xmlSerialization/common/parsers/AwtFontElementParser.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="446">
+              <caret line="61" column="1" lean-forward="true" selection-start-line="14" selection-start-column="34" selection-end-line="61" selection-end-column="1" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -112,7 +192,7 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="7">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="69" />
     <option name="y" value="20" />
     <option name="width" value="1400" />
@@ -156,7 +236,22 @@
               <item name="Java-Simple-Xml-Serialization" type="b2602c69:ProjectViewProjectNode" />
               <item name="Java-Simple-Xml-Serialization" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="eXmlSerialization" type="462c0819:PsiDirectoryNode" />
+              <item name="xmlSerialization" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Java-Simple-Xml-Serialization" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Java-Simple-Xml-Serialization" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="xmlSerialization" type="462c0819:PsiDirectoryNode" />
+              <item name="common" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Java-Simple-Xml-Serialization" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Java-Simple-Xml-Serialization" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="xmlSerialization" type="462c0819:PsiDirectoryNode" />
+              <item name="common" type="462c0819:PsiDirectoryNode" />
+              <item name="parsers" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="Java-Simple-Xml-Serialization" type="b2602c69:ProjectViewProjectNode" />
@@ -226,8 +321,8 @@
       <module name="EXmlSerialization" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" value="eng.eSystem.eXmlSerialization" />
-      <option name="MAIN_CLASS_NAME" value="eng.eSystem.eXmlSerialization.DeserializaitonTest" />
+      <option name="PACKAGE_NAME" value="eng.eSystem.xmlSerialization" />
+      <option name="MAIN_CLASS_NAME" value="eng.eSystem.xmlSerialization.DeserializaitonTest" />
       <option name="METHOD_NAME" value="" />
       <option name="TEST_OBJECT" value="class" />
       <option name="VM_PARAMETERS" value="-ea" />
@@ -246,8 +341,8 @@
       <module name="EXmlSerialization" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" value="eng.eSystem.eXmlSerialization" />
-      <option name="MAIN_CLASS_NAME" value="eng.eSystem.eXmlSerialization.Model2Test" />
+      <option name="PACKAGE_NAME" value="eng.eSystem.xmlSerialization" />
+      <option name="MAIN_CLASS_NAME" value="eng.eSystem.xmlSerialization.Model2Test" />
       <option name="METHOD_NAME" value="model2Test" />
       <option name="TEST_OBJECT" value="method" />
       <option name="VM_PARAMETERS" value="-ea" />
@@ -265,8 +360,8 @@
       <module name="EXmlSerialization" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" value="eng.eSystem.eXmlSerialization" />
-      <option name="MAIN_CLASS_NAME" value="eng.eSystem.eXmlSerialization.SerializationTest" />
+      <option name="PACKAGE_NAME" value="eng.eSystem.xmlSerialization" />
+      <option name="MAIN_CLASS_NAME" value="eng.eSystem.xmlSerialization.SerializationTest" />
       <option name="METHOD_NAME" value="" />
       <option name="TEST_OBJECT" value="class" />
       <option name="VM_PARAMETERS" value="-ea" />
@@ -284,8 +379,8 @@
       <module name="EXmlSerialization" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" value="eng.eSystem.eXmlSerialization" />
-      <option name="MAIN_CLASS_NAME" value="eng.eSystem.eXmlSerialization.DeserializaitonTest" />
+      <option name="PACKAGE_NAME" value="eng.eSystem.xmlSerialization" />
+      <option name="MAIN_CLASS_NAME" value="eng.eSystem.xmlSerialization.DeserializaitonTest" />
       <option name="METHOD_NAME" value="fillObjectSimple" />
       <option name="TEST_OBJECT" value="method" />
       <option name="VM_PARAMETERS" value="-ea" />
@@ -410,19 +505,20 @@
     </history-entry>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1554" height="916" extended-state="7" />
+    <frame x="-8" y="-8" width="1554" height="916" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32876712" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32876712" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32876712" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32876712" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2496749" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2496749" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -443,7 +539,7 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/Formatter.java</url>
+          <url>file://$PROJECT_DIR$/src/eng/eSystem/xmlSerialization/Formatter.java</url>
           <line>254</line>
           <properties />
           <option name="timeStamp" value="42" />
@@ -531,7 +627,7 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/model/Address.java">
+    <entry file="file://$PROJECT_DIR$/test/eng/eSystem/xmlSerialization/model/Address.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="105">
           <caret line="7" column="27" lean-forward="false" selection-start-line="7" selection-start-column="27" selection-end-line="7" selection-end-column="27" />
@@ -546,7 +642,7 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Java-Simple-Xml-Serialization.iml" />
-    <entry file="file://$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/Mapping.java">
+    <entry file="file://$PROJECT_DIR$/src/eng/eSystem/xmlSerialization/Mapping.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
@@ -561,14 +657,14 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/IInstanceCreator.java">
+    <entry file="file://$PROJECT_DIR$/src/eng/eSystem/xmlSerialization/IInstanceCreator.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="90">
           <caret line="6" column="1" lean-forward="true" selection-start-line="6" selection-start-column="1" selection-end-line="6" selection-end-column="1" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/common/instanceCreators/AwtColorCreator.java">
+    <entry file="file://$PROJECT_DIR$/src/eng/eSystem/xmlSerialization/common/instanceCreators/AwtColorCreator.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="255">
           <caret line="17" column="0" lean-forward="true" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
@@ -598,7 +694,7 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/eng/EXmlSerialization/common/instanceCreators/AwtFontCreator.java" />
-    <entry file="file://$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/model/NamedColor.java">
+    <entry file="file://$PROJECT_DIR$/test/eng/eSystem/xmlSerialization/model/NamedColor.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="300">
           <caret line="28" column="25" lean-forward="false" selection-start-line="28" selection-start-column="25" selection-end-line="28" selection-end-column="25" />
@@ -613,62 +709,62 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/model2/MobilePhone.java">
+    <entry file="file://$PROJECT_DIR$/test/eng/eSystem/xmlSerialization/model2/MobilePhone.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="45">
           <caret line="3" column="1" lean-forward="true" selection-start-line="3" selection-start-column="1" selection-end-line="3" selection-end-column="1" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/XmlSerializationException.java">
+    <entry file="file://$PROJECT_DIR$/src/eng/eSystem/xmlSerialization/XmlSerializationException.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="240">
           <caret line="18" column="1" lean-forward="true" selection-start-line="18" selection-start-column="1" selection-end-line="18" selection-end-column="1" />
           <folding>
-            <element signature="e#252#253#0" expanded="false" />
-            <element signature="e#283#284#0" expanded="false" />
-            <element signature="e#352#353#0" expanded="false" />
-            <element signature="e#396#397#0" expanded="false" />
+            <element signature="e#251#252#0" expanded="false" />
+            <element signature="e#282#283#0" expanded="false" />
+            <element signature="e#351#352#0" expanded="false" />
+            <element signature="e#395#396#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/model2/HomePhone.java">
+    <entry file="file://$PROJECT_DIR$/test/eng/eSystem/xmlSerialization/model2/HomePhone.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="60">
           <caret line="4" column="0" lean-forward="true" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/model2/Phone.java">
+    <entry file="file://$PROJECT_DIR$/test/eng/eSystem/xmlSerialization/model2/Phone.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="60">
           <caret line="4" column="24" lean-forward="true" selection-start-line="2" selection-start-column="0" selection-end-line="4" selection-end-column="24" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/model2/Gps.java">
+    <entry file="file://$PROJECT_DIR$/test/eng/eSystem/xmlSerialization/model2/Gps.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="195">
           <caret line="13" column="1" lean-forward="true" selection-start-line="2" selection-start-column="0" selection-end-line="13" selection-end-column="1" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/model2/Address.java">
+    <entry file="file://$PROJECT_DIR$/test/eng/eSystem/xmlSerialization/model2/Address.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="60">
           <caret line="4" column="0" lean-forward="false" selection-start-line="4" selection-start-column="0" selection-end-line="9" selection-end-column="25" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/model2/Person.java">
+    <entry file="file://$PROJECT_DIR$/test/eng/eSystem/xmlSerialization/model2/Person.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="60">
           <caret line="5" column="0" lean-forward="false" selection-start-line="5" selection-start-column="0" selection-end-line="10" selection-end-column="29" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/model2/Database.java">
+    <entry file="file://$PROJECT_DIR$/test/eng/eSystem/xmlSerialization/model2/Database.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="60">
           <caret line="4" column="0" lean-forward="false" selection-start-line="4" selection-start-column="0" selection-end-line="10" selection-end-column="1" />
@@ -683,7 +779,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/XmlInvalidDataException.java">
+    <entry file="file://$PROJECT_DIR$/src/eng/eSystem/xmlSerialization/XmlInvalidDataException.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="156">
           <caret line="20" column="0" lean-forward="true" selection-start-line="20" selection-start-column="0" selection-end-line="20" selection-end-column="0" />
@@ -698,7 +794,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/model/MultiList.java">
+    <entry file="file://$PROJECT_DIR$/test/eng/eSystem/xmlSerialization/model/MultiList.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="255">
           <caret line="17" column="28" lean-forward="false" selection-start-line="17" selection-start-column="28" selection-end-line="17" selection-end-column="28" />
@@ -713,10 +809,13 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/XmlListItemMapping.java">
+    <entry file="file://$PROJECT_DIR$/src/eng/eSystem/xmlSerialization/XmlListItemMapping.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="315">
           <caret line="25" column="16" lean-forward="true" selection-start-line="25" selection-start-column="16" selection-end-line="25" selection-end-column="16" />
+          <folding>
+            <element signature="imports" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -729,21 +828,21 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/IElementFormatter.java" />
     <entry file="file://$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/IValueFormatter.java" />
-    <entry file="file://$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/IValueParser.java">
+    <entry file="file://$PROJECT_DIR$/src/eng/eSystem/xmlSerialization/IValueParser.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="120">
           <caret line="8" column="1" lean-forward="true" selection-start-line="8" selection-start-column="1" selection-end-line="8" selection-end-column="1" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/IElementParser.java">
+    <entry file="file://$PROJECT_DIR$/src/eng/eSystem/xmlSerialization/IElementParser.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="120">
           <caret line="8" column="1" lean-forward="true" selection-start-line="8" selection-start-column="1" selection-end-line="8" selection-end-column="1" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/model/Phone.java">
+    <entry file="file://$PROJECT_DIR$/test/eng/eSystem/xmlSerialization/model/Phone.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="60">
           <caret line="4" column="0" lean-forward="false" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
@@ -757,7 +856,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/Shared.java">
+    <entry file="file://$PROJECT_DIR$/src/eng/eSystem/xmlSerialization/Shared.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="437">
           <caret line="96" column="0" lean-forward="true" selection-start-line="96" selection-start-column="0" selection-end-line="96" selection-end-column="0" />
@@ -769,70 +868,57 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/Settings.java">
+    <entry file="file://$PROJECT_DIR$/src/eng/eSystem/xmlSerialization/Settings.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="165">
           <caret line="16" column="0" lean-forward="false" selection-start-line="16" selection-start-column="0" selection-end-line="16" selection-end-column="0" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/common/parsers/JavaTimeLocalDateValueParser.java">
+    <entry file="file://$PROJECT_DIR$/src/eng/eSystem/xmlSerialization/common/parsers/JavaTimeLocalDateValueParser.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="885">
           <caret line="79" column="8" lean-forward="true" selection-start-line="79" selection-start-column="8" selection-end-line="79" selection-end-column="8" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/common/parsers/AwtFontElementParser.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="380">
-          <caret line="43" column="0" lean-forward="false" selection-start-line="43" selection-start-column="0" selection-end-line="43" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/common/parsers/HexToAwtColorValueParser.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="135">
-          <caret line="14" column="20" lean-forward="true" selection-start-line="14" selection-start-column="20" selection-end-line="14" selection-end-column="20" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/Model2Test.java">
+    <entry file="file://$PROJECT_DIR$/test/eng/eSystem/xmlSerialization/Model2Test.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="695">
           <caret line="60" column="4" lean-forward="false" selection-start-line="60" selection-start-column="4" selection-end-line="60" selection-end-column="4" />
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/model/Friend.java">
+    <entry file="file://$PROJECT_DIR$/test/eng/eSystem/xmlSerialization/model/Friend.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="210">
           <caret line="14" column="36" lean-forward="false" selection-start-line="14" selection-start-column="36" selection-end-line="14" selection-end-column="36" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/DeserializaitonTest.java">
+    <entry file="file://$PROJECT_DIR$/test/eng/eSystem/xmlSerialization/DeserializaitonTest.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="345">
           <caret line="35" column="37" lean-forward="false" selection-start-line="35" selection-start-column="37" selection-end-line="35" selection-end-column="37" />
+          <folding>
+            <element signature="method#fillObjectWithAddress#0;class#DeserializaitonTest#0" expanded="false" />
+            <element signature="method#fillObjectWithPhoneList#0;class#DeserializaitonTest#0" expanded="false" />
+            <element signature="method#fillObjectWithPhoneNumbersList#0;class#DeserializaitonTest#0" expanded="false" />
+            <element signature="method#fillListWithCustomElementParser#0;class#DeserializaitonTest#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/SerializationTest.java">
+    <entry file="file://$PROJECT_DIR$/test/eng/eSystem/xmlSerialization/SerializationTest.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-334">
           <caret line="29" column="7" lean-forward="false" selection-start-line="29" selection-start-column="7" selection-end-line="29" selection-end-column="7" />
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/Parser.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="945">
-          <caret line="575" column="0" lean-forward="true" selection-start-line="575" selection-start-column="0" selection-end-line="575" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/XmlSerializer.java">
+    <entry file="file://$PROJECT_DIR$/src/eng/eSystem/xmlSerialization/XmlSerializer.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="630">
           <caret line="101" column="83" lean-forward="false" selection-start-line="101" selection-start-column="83" selection-end-line="101" selection-end-column="83" />
@@ -867,21 +953,24 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/eng/eSystem/eXmlSerialization/model/Person.java">
+    <entry file="file://$PROJECT_DIR$/test/eng/eSystem/xmlSerialization/model/Person.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="300">
           <caret line="22" column="38" lean-forward="false" selection-start-line="22" selection-start-column="38" selection-end-line="22" selection-end-column="38" />
+          <folding>
+            <element signature="e#1428#1429#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/eng/eSystem/eXmlSerialization/Formatter.java">
+    <entry file="file://$PROJECT_DIR$/src/eng/eSystem/xmlSerialization/Formatter.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="183">
           <caret line="55" column="46" lean-forward="false" selection-start-line="55" selection-start-column="46" selection-end-line="55" selection-end-column="46" />
           <folding>
             <element signature="imports" expanded="false" />
-            <element signature="e#574#575#0" expanded="false" />
-            <element signature="e#608#609#0" expanded="false" />
+            <element signature="e#572#573#0" expanded="false" />
+            <element signature="e#606#607#0" expanded="false" />
             <element signature="method#getFieldValue#0;class#Formatter#0" expanded="false" />
             <element signature="method#convertAndStoreFieldComplexByCustomParser#0;class#Formatter#0" expanded="false" />
             <element signature="method#convertAndStoreFieldSimpleByCustomParser#0;class#Formatter#0" expanded="false" />
@@ -894,6 +983,57 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/eng/eSystem/xmlSerialization/common/parsers/HexToAwtColorValueParser.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="225">
+          <caret line="28" column="28" lean-forward="true" selection-start-line="28" selection-start-column="28" selection-end-line="28" selection-end-column="28" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/eng/eSystem/xmlSerialization/Parser.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="163">
+          <caret line="306" column="17" lean-forward="false" selection-start-line="306" selection-start-column="17" selection-end-line="306" selection-end-column="17" />
+          <folding>
+            <element signature="method#deserialize#0;class#Parser#0" expanded="false" />
+            <element signature="method#convertAndSetFieldComplexByCustomParser2#0;class#Parser#0" expanded="false" />
+            <element signature="method#convertAndSetFieldSimpleByCustomParser2#0;class#Parser#0" expanded="false" />
+            <element signature="method#setFieldList2#0;class#Parser#0" expanded="false" />
+            <element signature="method#setFieldArray2#0;class#Parser#0" expanded="false" />
+            <element signature="method#setFieldComplex2#0;class#Parser#0" expanded="false" />
+            <element signature="method#convertAndSetFieldValue2#0;class#Parser#0" expanded="false" />
+            <element signature="method#fillObject#0;class#Parser#0" expanded="false" />
+            <element signature="method#fillArray#0;class#Parser#0" expanded="false" />
+            <element signature="method#convertAndSetFieldComplexByCustomParser#0;class#Parser#0" expanded="false" />
+            <element signature="method#convertAndSetFieldValue#0;class#Parser#0" expanded="false" />
+            <element signature="method#setFieldValue#0;class#Parser#0" expanded="false" />
+            <element signature="method#convertToType#0;class#Parser#0" expanded="false" />
+            <element signature="method#setFieldComplex#0;class#Parser#0" expanded="false" />
+            <element signature="method#isNullValued#0;class#Parser#0" expanded="false" />
+            <element signature="method#createInstance#0;class#Parser#0" expanded="false" />
+            <element signature="method#tryGetInstanceCreator#0;class#Parser#0" expanded="false" />
+            <element signature="method#setFieldList#0;class#Parser#0" expanded="false" />
+            <element signature="method#fillFieldList#0;class#Parser#0" expanded="false" />
+            <element signature="method#setFieldArray#0;class#Parser#0" expanded="false" />
+            <element signature="method#fillFieldArray#0;class#Parser#0" expanded="false" />
+            <element signature="e#17990#17991#0" expanded="true" />
+            <element signature="e#18028#18029#0" expanded="true" />
+            <element signature="method#getElements#1;class#Parser#0" expanded="false" />
+            <element signature="method#getItemType#0;class#Parser#0" expanded="false" />
+            <element signature="method#getMappedType#0;class#Parser#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/eng/eSystem/xmlSerialization/common/parsers/AwtFontElementParser.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="446">
+          <caret line="61" column="1" lean-forward="true" selection-start-line="14" selection-start-column="34" selection-end-line="61" selection-end-column="1" />
           <folding />
         </state>
       </provider>
