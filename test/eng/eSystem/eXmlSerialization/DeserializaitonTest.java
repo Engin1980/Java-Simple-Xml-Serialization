@@ -33,6 +33,24 @@ public class DeserializaitonTest {
     assertNull(p.getBackupAddress());
     assertNotNull(p.getPrivateIdA());
     assertNull(p.getPrivateIdB());
+    assertEquals(Person.Gender.female, p.getGender());
+  }
+
+  @Test
+  public void deserializeObjectSimple() {
+
+    Settings settings = new Settings();
+    settings.getIgnoredFieldsRegex().add("phone.*");
+    XmlSerializer ser = new XmlSerializer(settings);
+
+    Person p = (Person) ser.deserialize(PERSON_FILE_NAME, Person.class);
+
+    assertEquals("Michal", p.getName());
+    assertEquals("Volny", p.surname);
+
+    assertNull(p.getBackupAddress());
+    assertNotNull(p.getPrivateIdA());
+    assertNull(p.getPrivateIdB());
   }
 
   @Test
@@ -152,7 +170,7 @@ public class DeserializaitonTest {
   }
 
   @Test
-  public void multiList(){
+  public void fillMultiList(){
     Settings settings = new Settings();
 
     settings.getListItemMapping().add(
@@ -171,8 +189,24 @@ public class DeserializaitonTest {
     assertFalse(o.getbList().isEmpty());
   }
 
-
   @Test
-  public void fillList() {
+  public void deserializeMultiList(){
+    Settings settings = new Settings();
+
+    settings.getListItemMapping().add(
+        new XmlListItemMapping("aL.+", Integer.class)
+    );
+    settings.getListItemMapping().add(
+        new XmlListItemMapping("bL.+", String.class)
+    );
+
+    XmlSerializer ser = new XmlSerializer(settings);
+
+
+    MultiList o = (MultiList) ser.deserialize(MULTILIST_FILE_NAME, MultiList.class);
+
+    assertFalse(o.getaList().isEmpty());
+    assertFalse(o.getbList().isEmpty());
   }
+
 }

@@ -574,7 +574,6 @@ class Parser {
     }
   }
 
-
   private List<Element> getElements(Element el) {
     return getElements(el, null);
   }

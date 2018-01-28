@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<person name="Michal" privateIdA="1021" privateIdB="(null)">
+<person name="Michal" privateIdA="1021" privateIdB="(null)" gender="female">
     <surname>Volny</surname>
     <backupAddress>(null)</backupAddress>
     <address>

@@ -5,6 +5,13 @@ import eng.eSystem.eXmlSerialization.XmlOptional;
 import java.util.List;
 
 public class Person {
+
+  public enum Gender{
+    unset,
+    male,
+    female
+  }
+
   private String name;
   public String surname;
   private String privateIdA;
@@ -13,6 +20,7 @@ public class Person {
   private Address backupAddress;
   private List<Phone> phones;
   private List<String> phoneNumbers;
+  private Gender gender = Gender.unset;
   @XmlOptional
   private Friend[] friends;
 
@@ -62,5 +70,13 @@ public class Person {
 
   public void setFriends(Friend[] friends) {
     this.friends = friends;
+  }
+
+  public Gender getGender() {
+    return gender;
+  }
+
+  public void setGender(Gender gender) {
+    this.gender = gender;
   }
 }
