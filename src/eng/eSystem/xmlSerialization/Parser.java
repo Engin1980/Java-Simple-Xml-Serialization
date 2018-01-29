@@ -311,7 +311,7 @@ class Parser {
     } else {
       NodeList tmp = el.getElementsByTagName(key);
       if (tmp.getLength() > 0) {
-        ret = tmp.item(0).getTextContent();
+        ret = tmp.item(0).getTextContent().trim();
       }
     }
 
