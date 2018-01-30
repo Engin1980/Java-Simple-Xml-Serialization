@@ -12,11 +12,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Use this annotation to mark fields, which, when not found in XMl file, will not raise an exception.
+ * Use this annotation to mark a field which is be always skipped even if value is found in the XML source file.
  * It is strongly suggested to set a default value to such field.
  * @author Marek
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface XmlOptional {
+public @interface XmlIgnore {
 }

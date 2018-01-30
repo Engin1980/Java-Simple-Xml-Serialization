@@ -51,11 +51,16 @@ class Formatter {
     for (Field f : fields) {
       if (java.lang.reflect.Modifier.isStatic(f.getModifiers())) {
         continue; // statické přeskakujem
+      } else if (f.getAnnotation(XmlIgnore.class) != null) {
+        if (settings.isVerbose()) {
+          System.out.println("  " + el.getNodeName() + "." + f.getName() + " field skipped due to @XmlIgnored annotation.");
+        }
+        continue; // skipped due to annotation
       } else if (Shared.isSkippedBySettings(f, settings)) {
         if (settings.isVerbose()) {
           System.out.println("  " + el.getNodeName() + "." + f.getName() + " field skipped due to settings-ignoredFieldsRegex list.");
         }
-        continue; // parent neplníme, ty jsou reference na nadřazené objekty a plní se sami
+        continue; 
       }
       try {
         storeField(el, f, sourceObject);
