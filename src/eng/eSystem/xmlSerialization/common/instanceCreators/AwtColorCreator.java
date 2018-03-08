@@ -6,8 +6,8 @@ import java.awt.*;
 
 public class AwtColorCreator implements IInstanceCreator<Color> {
   @Override
-  public String getTypeName() {
-    return java.awt.Color.class.getName();
+  public Class getType() {
+    return java.awt.Color.class;
   }
 
   @Override

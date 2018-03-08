@@ -7,6 +7,8 @@ package eng.eSystem.xmlSerialization;
 
 import org.w3c.dom.Element;
 
+import java.util.List;
+
 /**
  * @author Marek
  */
@@ -24,9 +26,33 @@ public class XmlInvalidDataException extends XmlSerializationException {
         String.format(
             "Looking for '%s' xml-attribute or xml-element in '%s' to be put in field '%s' of object of '%s' failed.",
             fieldName,
-            Shared.getElementXPath(parentElement, true, true),
+            Shared.getElementInfoString(parentElement),
             targetClass.getName(),
             fieldName));
+
+    return new XmlInvalidDataException(sb.toString());
+  }
+
+  public static XmlInvalidDataException createNoSuchElementInMappings(Element parentElement, String fieldName, Class<? extends Object> targetClass,
+                                                                      List<XmlCustomFieldMapping>usedCustomMappings) {
+    StringBuilder sb = new StringBuilder();
+
+    StringBuilder txt = new StringBuilder();
+    txt.append(usedCustomMappings.get(0).toString());
+    for (XmlCustomFieldMapping usedCustomMapping : usedCustomMappings) {
+      txt.append("// ");
+      txt.append(usedCustomMapping.toString());
+    }
+
+    sb.append("Value for property not found in XML data. ");
+    sb.append(
+        String.format(
+            "Looking for mapping-based xml-attribute or xml-element in '%s' to be put in field '%s' of object of '%s' failed. Used mapings: %s",
+            Shared.getElementInfoString(parentElement),
+            targetClass.getName(),
+            fieldName,
+            txt.toString()
+            ));
 
     return new XmlInvalidDataException(sb.toString());
   }
@@ -41,7 +67,7 @@ public class XmlInvalidDataException extends XmlSerializationException {
         String.format(
             "Looking for '%s' xml-element in '%s' to be put in field '%s' of object of '%s', but only same-named attribute was found.",
             fieldName,
-            Shared.getElementXPath(parentElement, true, true),
+            Shared.getElementInfoString(parentElement),
             targetClass.getName(),
             fieldName));
 

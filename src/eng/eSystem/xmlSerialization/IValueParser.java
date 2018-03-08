@@ -1,7 +1,7 @@
 package eng.eSystem.xmlSerialization;
 
 public interface IValueParser<T> {
-  String getTypeName();
+  Class getType();
 
   T parse(String value);
 

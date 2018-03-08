@@ -20,6 +20,11 @@ class Mapping {
     simpleTypes.add(String.class);
     simpleTypes.add(char.class);
     simpleTypes.add(Character.class);
+    simpleTypes.add(Number.class);
+    simpleTypes.add(byte.class);
+    simpleTypes.add(Byte.class);
+    simpleTypes.add(short.class);
+    simpleTypes.add(Short.class);
   }
 
   static boolean isSimpleTypeOrEnum(Class c) {

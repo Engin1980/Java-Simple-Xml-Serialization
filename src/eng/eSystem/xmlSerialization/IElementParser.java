@@ -1,7 +1,7 @@
 package eng.eSystem.xmlSerialization;
 
 public interface IElementParser<T> {
-  String getTypeName();
+  Class getType();
 
   T parse(org.w3c.dom.Element element);
 

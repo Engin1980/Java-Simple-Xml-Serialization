@@ -1,7 +1,7 @@
 package eng.eSystem.xmlSerialization;
 
 public interface IInstanceCreator <T> {
-  String getTypeName();
+  Class getType();
 
   T createInstance();
 }

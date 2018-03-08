@@ -11,8 +11,7 @@ import org.w3c.dom.NodeList;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static eng.eSystem.xmlSerialization.Shared.*;
 
@@ -21,147 +20,160 @@ import static eng.eSystem.xmlSerialization.Shared.*;
  */
 class Parser {
 
+  private static final Object UNSET = new Object();
   private final Settings settings;
+  private Map<String, String> typeMap = new HashMap<>();
 
   Parser(Settings settings) {
     this.settings = settings;
   }
 
-  public Object deserialize(Element el, Class objectType) {
-    if (el == null) {
-        throw new IllegalArgumentException("Value of {el} cannot not be null.");
+  public synchronized Object deserialize(Element root, Class objectType) {
+    if (root == null) {
+      throw new IllegalArgumentException("Value of {el} cannot not be null.");
     }
     if (objectType == null) {
-        throw new IllegalArgumentException("Value of {objectType} cannot not be null.");
+      throw new IllegalArgumentException("Value of {objectType} cannot not be null.");
     }
 
     if (settings.isVerbose()) {
-      System.out.println("  deserialize( <" + el.getNodeName() + "...>, " + objectType.getSimpleName());
+      System.out.println("  deserialize( <" + root.getNodeName() + "...>, " + objectType.getSimpleName());
     }
 
+    loadTypeMaps(root);
+
     Class c = objectType;
+    Object ret = parseIt(root, c);
+
+    return ret;
+  }
+
+  private void loadTypeMaps(Element el) {
+    typeMap.clear();
+
+    Element elm = getElement(el, Shared.TYPE_MAP_ELEMENT_NAME, false);
+    if (elm != null){
+        List<Element> types = getElements(elm);
+      for (Element type : types) {
+        String key = type.getAttribute(Shared.TYPE_MAP_KEY_ATTRIBUTE_NAME);
+        String fullName = type.getAttribute(Shared.TYPE_MAP_FULL_ATTRIBUTE_NAME);
+        typeMap.put(key, fullName);
+      }
+    }
+  }
+
+  public Object parseArray(Element el, Class c) {
+
     Object ret;
-    IValueParser customValueParser = Shared.tryGetCustomValueParser(c, settings);
-    IElementParser customElementParser = Shared.tryGetCustomElementParser(c, settings);
-    if (customValueParser != null) {
-      ret = convertAndSetFieldSimpleByCustomParser2(el, customValueParser);
-    } else if (customElementParser != null) {
-      ret = convertAndSetFieldComplexByCustomParser2(el, customElementParser);
-    } else if (Mapping.isSimpleTypeOrEnum(c)) {
-      // jednoduchý typ
-      ret = convertAndSetFieldValue2(el, c);
-    } else if (List.class.isAssignableFrom(c)) {
-      ret = setFieldList2(el, c);
-    } else if (c.isArray()) {
-      ret = setFieldArray2(el,c );
-    } else {
-      ret = setFieldComplex2(el, objectType);
+    List<Element> children = getElements(el);
+    removeTypeMapElementIfExist(children);
+    int cnt = children.size();
+    Class itemType = c.getComponentType();
+    ret = createArrayInstance(itemType, cnt);
+
+    for (int i = 0; i < children.size(); i++) {
+      Element e = children.get(i);
+      Object itemValue = parseIt(e, itemType);
+      Array.set(ret, i, itemValue);
+
+      // mappings, now ingored::
+//      Class itemType = getItemType(classFieldKey, e, false);
+//      if (itemType == null) itemType = itemType;
+//      if (Mapping.isSimpleTypeOrEnum(itemType)) {
+//        String value = e.getTextContent();
+//        Object val = convertToType(value, itemType);
+//        Array.set(arr, i, val);
+//      } else {
+//        // list item is complex type
+//        Object inn = createObjectInstance(itemType);
+//        Array.set(arr, i, inn);
+//
+//        fillObject(e, inn);
+//      }
     }
     return ret;
   }
 
-  private Object convertAndSetFieldComplexByCustomParser2(Element el, IElementParser customElementParser) {
+  private Object parseIt(Element el, Class type) {
+    Object ret;
+    if (isNullValuedElement(el))
+      ret = null;
+    else {
+      IElementParser customElementParser = Shared.tryGetCustomElementParser(type, settings);
+      if (customElementParser != null) {
+        ret = convertElementByElementParser(el, customElementParser);
+      } else if (Mapping.isSimpleTypeOrEnum(type)) {
+        // jednoduchý typ
+        ret = parsePrimitiveFromElement(el, type);
+      } else if (List.class.isAssignableFrom(type)) {
+        ret = parseList(el, type);
+      } else if (type.isArray()) {
+        ret = parseArray(el, type);
+      } else {
+        ret = parseObject(el, type);
+      }
+    }
+    return ret;
+  }
+
+  private Object convertElementByElementParser(Element el, IElementParser customElementParser) {
     Object ret;
     try {
-      if (isNullValued(el))
-        ret = null;
-      else
-        ret = customElementParser.parse(el);
+      ret = customElementParser.parse(el);
     } catch (Exception ex) {
       throw new XmlSerializationException(
-          "Failed to parse instance for " + customElementParser.getTypeName() +
+          "Failed to parse instance for " + customElementParser.getType() +
               " using custom-element-parser " + customElementParser.getClass().getName() + ".",
           ex);
     }
     return ret;
   }
 
-  private Object convertAndSetFieldSimpleByCustomParser2(Element el, IValueParser parser) {
-    String tmpS = extractSimpleValueFromElement(el, "N/A", true);
-    if (tmpS == null) {
-      return null;
-    }
-    Object tmpO;
-    if (tmpS.equals(settings.getNullString()))
-      tmpO = null;
-    else
-      tmpO = parser.parse(tmpS);
-    return tmpO;
-  }
-
-  private Object setFieldList2(Element el, Class c) {
+  private Object parseList(Element el, Class c) {
     Object ret;
 
-    if (el.getTextContent().equals(settings.getNullString())) {
-      // list, but null, no instance
-      ret = null;
-    } else {
-      List lst = (List) createInstance(c);
-      String key = c.getSimpleName();
-      fillFieldList(el, lst, key);
-      ret = lst;
+    List lst = (List) createObjectInstanceByElement(el, c);
+
+    List<Element> children = getElements(el);
+    removeTypeMapElementIfExist(children);
+
+    Class expectedClass = tryGetArrayItemTypeByElement(el);
+    if (expectedClass == null) expectedClass = Object.class;
+
+    for (Element e : children) {
+
+      Class itemExpectedClass;
+
+      XmlListItemMapping map = tryGetListElementMapping(e);
+      if (map != null)
+        itemExpectedClass = map.itemType;
+      else
+        itemExpectedClass = expectedClass;
+
+      Object itemValue = parseIt(e, itemExpectedClass);
+      lst.add(itemValue);
     }
+
+    ret = lst;
     return ret;
   }
 
-  public Object setFieldArray2(Element el, Class c) {
+  private Object createObjectInstanceByElement(Element el, Class c){
 
-    Object ret;
-    if (el.getTextContent().equals(settings.getNullString())) {
-      // array, but null, no instance
-      ret = null;
-    } else {
-      int cnt = getElements(el).size();
-      Class itemClass = c.getComponentType();
-      ret = Array.newInstance(itemClass, cnt);
-      String key = c.getSimpleName();
+    Class customType = tryGetCustomTypeByElement(el);
+    if (customType != null)
+      c = customType;
 
-      fillFieldArray(el, ret, key, itemClass);
-    }
-    return ret;
-  }
-
-  private Object setFieldComplex2(Element el, Class c) {
-
-    Object ret;
-    try {
-      if (isNullValued(el)) {
-        ret = null;
-      } else {
-        ret = createInstance(c);
-      }
-    } catch (Exception ex) {
-      throw new XmlSerializationException(
-          "Failed to create instance for " + c.getSimpleName()+ ".",
-          ex);
-    }
-
-    if (ret != null)
-      fillObject(el, ret);
+    Object ret = createObjectInstance(c);
 
     return ret;
   }
 
-  private Object convertAndSetFieldValue2(Element el, Class c) {
-    String tmpS = extractSimpleValueFromElement(el, "N/A", true);
-    if (tmpS == null) {
-      return null;
-    }
-    Object tmpO;
-    if (tmpS.equals(settings.getNullString())) {
-      tmpO = null;
-    } else {
-      tmpO = convertToType(tmpS, c);
-    }
-    return tmpO;
-  }
+  private Object parseObject(Element el, Class c) {
 
-  <T> void fillObject(Element el, T targetObject) {
-    if (settings.isVerbose()) {
-      System.out.println("fillObject( <" + el.getNodeName() + "...>, " + targetObject.getClass().getSimpleName());
-    }
-    Class c = targetObject.getClass();
-    Field[] fields = getDeclaredFields(c);
+    Object ret = createObjectInstanceByElement(el, c);
+
+    Field[] fields = getDeclaredFields(ret.getClass());
 
     for (Field f : fields) {
       if (java.lang.reflect.Modifier.isStatic(f.getModifiers())) {
@@ -178,138 +190,146 @@ class Parser {
         continue;
       }
       try {
-        fillField(el, f, targetObject);
+        Object tmp = parseField(el, f);
+        if (tmp != UNSET) {
+          f.setAccessible(true);
+          f.set(ret, tmp);
+        }
       } catch (Exception ex) {
         throw new XmlSerializationException(ex,
             "Failed to fill field '%s' ('%s') of object of type '%s' using element '%s'.",
             f.getName(), f.getType().getName(), c.getName(),
-            getElementXPath(el, true, true));
+            Shared.getElementInfoString(el));
       }
     }
+
+    return ret;
   }
 
-  void fillList(Element el, List lst) {
-    fillFieldList(el, lst, el.getNodeName());
+  private Class tryGetCustomTypeByElement(Element el) {
+    Class ret = null;
+    String tmp;
+    if (el.hasAttribute(Shared.TYPE_MAP_OF_ATTRIBUTE_NAME)) {
+      tmp = el.getAttribute(Shared.TYPE_MAP_OF_ATTRIBUTE_NAME);
+      ret = loadClass(tmp);
+    }
+
+    return ret;
   }
 
-  Object fillArray(Element el, Class arrayItemType) {
-    Object ret;
-
-    if (el.getTextContent().equals(settings.getNullString())) {
-      // list, but null, no instance
+  private Class tryGetArrayItemTypeByElement(Element el) {
+    Class ret = null;
+    String tmp;
+    if (el.hasAttribute(Shared.TYPE_MAP_ITEM_OF_ATTRIBUTE_NAME)) {
+      tmp = el.getAttribute(Shared.TYPE_MAP_ITEM_OF_ATTRIBUTE_NAME);
+      ret = loadClass(tmp);
+    } else
       ret = null;
-    } else {
-      int cnt = getElements(el).size();
-      Class itemClass = arrayItemType;
-      Object arr = Array.newInstance(itemClass, cnt);
-      String key = el.getNodeName();
 
-      fillFieldArray(el, arr, key, itemClass);
+    return ret;
+  }
 
-      ret = arr;
+  private Class loadClass(String className) {
+    Class ret;
+
+    String tmp = tryGetMappedType(className);
+    if (tmp != null)
+      className = tmp;
+
+    try {
+      ret = Class.forName(className);
+    } catch (ClassNotFoundException e) {
+      throw new XmlDeserializationException(e, "Failed to load class %s.", className);
     }
     return ret;
   }
 
-  private <T> void fillField(Element el, Field f, T targetObject) {
+  private String tryGetMappedType(String className) {
+    String ret;
+    if (this.typeMap.containsKey(className))
+      ret = this.typeMap.get(className);
+    else
+      ret = null;
+    return ret;
+  }
+
+  private Object parsePrimitiveFromElement(Element el, Class c) {
+    String txt = el.getTextContent();
+    Class tmp = tryGetCustomTypeByElement(el);
+    if (tmp != null) c = tmp;
+    Object ret = convertToType(txt, c);
+    return ret;
+  }
+
+  private Object parseField(Element parentElement, Field f) {
+    Object ret;
     if (settings.isVerbose()) {
-      System.out.println("  fillField( <" + el.getNodeName() + "...>, " + targetObject.getClass().getSimpleName() + "." + f.getName());
+      //System.out.println("  fillField( <" + parentElement.getNodeName() + "...>, " + targetObject.getClass().getSimpleName() + "." + f.getName());
     }
 
     Class c = f.getType();
+
     IValueParser customValueParser = Shared.tryGetCustomValueParser(c, settings);
-    IElementParser customElementParser = Shared.tryGetCustomElementParser(c, settings);
-    if (customValueParser != null) {
-      convertAndSetFieldSimpleByCustomParser(el, f, customValueParser, targetObject);
-    } else if (customElementParser != null) {
-      convertAndSetFieldComplexByCustomParser(el, f, customElementParser, targetObject);
-    } else if (Mapping.isSimpleTypeOrEnum(c)) {
-      // jednoduchý typ
-      convertAndSetFieldValue(el, f, targetObject);
-    } else if (List.class.isAssignableFrom(c)) {
-      setFieldList(el, f, targetObject);
-    } else if (c.isArray()) {
-      setFieldArray(el, f, targetObject);
+    boolean storedInAttribute =
+        Mapping.isSimpleTypeOrEnum(c) || customValueParser != null;
+
+    boolean required = f.getAnnotation(XmlOptional.class) == null;
+    if (storedInAttribute) {
+      String attributeValue = readAttributeValue(parentElement, f.getName(), required);
+      if (attributeValue == null) {
+        ret = UNSET;
+      } else if (attributeValue.equals(settings.getNullString())){
+        ret = null;
+      } else {
+        if (customValueParser != null)
+          ret = convertValueByCustomParser(attributeValue, customValueParser);
+        else
+          ret = convertToType(attributeValue, c);
+      }
     } else {
-      setFieldComplex(el, f, targetObject);
+      Element el = getElement(parentElement,f.getName(), required);
+      if (el == null)
+        ret = UNSET;
+      else {
+        ret = parseIt(el, c);
+      }
+    }
+
+    return ret;
+  }
+
+  private Element getElement(Element parentElement, String name, boolean required) {
+    Element ret = null;
+    List<Element> elms = getElements(parentElement);
+    for (Element elm : elms) {
+      if (elm.getNodeName().equals(name)){
+        ret = elm;
+        break;
+      }
+    }
+    if (ret == null && required){
+      throw new XmlSerializationException("Unable to find sub-element \"" + name + "\" in element \"" +
+          Shared.getElementInfoString(parentElement) + "\"");
+    }
+    return ret;
+  }
+
+  private void removeTypeMapElementIfExist(List<Element> lst){
+    for (int i = 0; i < lst.size(); i++) {
+      if (lst.get(i).getNodeName().equals(Shared.TYPE_MAP_ELEMENT_NAME)){
+        lst.remove(lst.get(i));
+        i--;
+      }
     }
   }
 
-  private <T> void convertAndSetFieldComplexByCustomParser(Element el, Field f, IElementParser customElementParser, T ref) {
-
-    // first check if I have something to fill the object with
-    boolean required = f.getAnnotation(XmlOptional.class) == null;
-
-    Element subEl;
-    try {
-      subEl = getElements(el, f.getName()).get(0);
-    } catch (Exception e) {
-      if (required)
-        throw XmlInvalidDataException.createNoSuchElement(el, f.getName(), ref.getClass());
-      else
-        subEl = null;
-    }
-
-    // if is optional and element-data has not been found, skip
-    if (subEl == null)
-      return;
-
-    // then create instance and fill it
-    Object newInstance;
-    try {
-      if (isNullValued(subEl))
-        newInstance = null;
-      else
-        newInstance = customElementParser.parse(subEl);
-    } catch (Exception ex) {
-      throw new XmlSerializationException(
-          "Failed to parse instance for " + ref.getClass().getSimpleName() + "." + f.getName() +
-              " using custom-element-parser " + customElementParser.getClass().getName() + ".",
-          ex);
-    }
-
-    setFieldValue(f, ref, newInstance);
-    // following comment can be deleted after previous line is verified
-//    try {
-//      f.setAccessible(true);
-//      f.set(ref, newInstance);
-//      f.setAccessible(false);
-//    } catch (IllegalArgumentException | IllegalAccessException ex) {
-//      throw new XmlSerializationException(
-//          "Failed to set value to field " + ref.getClass().getName() + "." + f.getName(), ex);
-//    }
+  private Object convertValueByCustomParser(String value, IValueParser parser) {
+    Object ret;
+    ret = parser.parse(value);
+    return ret;
   }
 
-  private <T> void convertAndSetFieldSimpleByCustomParser(Element el, Field f, IValueParser parser, T targetObject) {
-    boolean required = f.getAnnotation(XmlOptional.class) == null;
-    String tmpS = extractSimpleValueFromElement(el, f.getName(), required);
-    if (tmpS == null) {
-      return;
-    }
-    Object tmpO;
-    if (tmpS.equals(settings.getNullString()))
-      tmpO = null;
-    else
-      tmpO = parser.parse(tmpS);
-    setFieldValue(f, targetObject, tmpO);
-  }
-
-  private <T> void convertAndSetFieldValue(Element el, Field f, T targetObject) {
-    boolean required = f.getAnnotation(XmlOptional.class) == null;
-    String tmpS = extractSimpleValueFromElement(el, f.getName(), required);
-    if (tmpS == null) {
-      return;
-    }
-    Object tmpO;
-    if (tmpS.equals(settings.getNullString())) {
-      tmpO = null;
-    } else {
-      tmpO = convertToType(tmpS, f.getType());
-    }
-    setFieldValue(f, targetObject, tmpO);
-  }
-
-  private String extractSimpleValueFromElement(Element el, String key, boolean isRequired) {
+  private String readAttributeValue(Element el, String key, boolean isRequired) {
     String ret = null;
     if (el.hasAttribute(key)) {
       ret = el.getAttribute(key);
@@ -322,21 +342,10 @@ class Parser {
 
     if (ret == null && isRequired) {
       throw new XmlSerializationException("Unable to find key \"" + key + "\" in element \"" +
-          Shared.getElementXPath(el, true, true) + "\"");
+          Shared.getElementInfoString(el) + "\"");
     }
 
     return ret;
-  }
-
-  private <T> void setFieldValue(Field f, T targetObject, Object value) throws SecurityException, XmlSerializationException {
-    try {
-      f.setAccessible(true);
-      f.set(targetObject, value);
-      f.setAccessible(false);
-    } catch (IllegalArgumentException | IllegalAccessException ex) {
-      throw new XmlSerializationException(
-          "Failed to set into " + f.getDeclaringClass().getName() + "." + f.getName() + " value " + value);
-    }
   }
 
   private Object convertToType(String value, Class<?> type) {
@@ -345,6 +354,14 @@ class Parser {
       ret = Enum.valueOf((Class<Enum>) type, value);
     } else {
       switch (type.getName()) {
+        case "byte":
+        case "java.lang.Byte":
+          ret = Byte.parseByte(value);
+          break;
+        case "short":
+        case "java.lang.Short":
+          ret = Short.parseShort(value);
+          break;
         case "int":
         case "java.lang.Integer":
           ret = Integer.parseInt(value);
@@ -365,78 +382,24 @@ class Parser {
           ret = value;
           break;
         default:
-          throw new XmlSerializationException("Type " + type.getName() + " is not supported.");
+          throw new XmlSerializationException("Type " + type.getName() + " does not have primitive conversion. Use custom IValueParser.");
       }
     }
 
     return ret;
   }
 
-  private <T> void setFieldComplex(Element el, Field f, T ref) {
-
-    // first check if I have something to fill the object with
-    boolean required = f.getAnnotation(XmlOptional.class) == null;
-
-    Element subEl;
-    try {
-      subEl = getElements(el, f.getName()).get(0);
-    } catch (Exception e) {
-      if (el.getAttribute(f.getName()).isEmpty() == false) {
-        throw XmlInvalidDataException.createAttributeInsteadOfElementFound(el, f.getName(), ref.getClass());
-      }
-      if (required) {
-        throw XmlInvalidDataException.createNoSuchElement(el, f.getName(), ref.getClass());
-      } else
-        subEl = null;
-    }
-
-    // if is optional and element-data has not been found, skip
-    if (subEl == null)
-      return;
-
-    // then create instance and fill it
-    Object newInstance;
-    try {
-      if (isNullValued(subEl)) {
-        newInstance = null;
-      } else {
-        newInstance = createInstance(f.getType());
-      }
-    } catch (Exception ex) {
-      throw new XmlSerializationException(
-          "Failed to create instance for " + ref.getClass().getSimpleName() + "." + f.getName() + ".",
-          ex);
-    }
-
-    setFieldValue(f, ref, newInstance);
-// previous line replaces following code, however not tested yet.
-// this comment can be deleted after testing
-//    try {
-//      f.setAccessible(true);
-//      f.set(ref, newInstance);
-//      f.setAccessible(false);
-//    } catch (IllegalArgumentException | IllegalAccessException ex) {
-//      throw new XmlSerializationException(
-//          "Failed to set value to field " + ref.getClass().getName() + "." + f.getName(), ex);
-//    }
-
-    if (newInstance != null)
-      fillObject(subEl, newInstance);
-  }
-
-  private boolean isNullValued(Element el) {
+  private boolean isNullValuedElement(Element el) {
     if (el.getTextContent().equals(settings.getNullString()))
       return true;
     else
       return false;
   }
 
-  private Object createInstance(Class<?> type) {
+  private Object createObjectInstance(Class<?> type) {
     Object ret;
 
-    // programuje se proti List, tak sem přijde požadavek na "List"
-    // ale to je rozhraní, takže ho nahradím ArrayListem
-    if (type.equals(List.class)) {
+    if (type.equals(List.class) ||type.equals(AbstractList.class)) {
       type = settings.getDefaultListTypeImplementation();
     }
 
@@ -447,15 +410,27 @@ class Parser {
       try {
         ret = type.newInstance();
       } catch (InstantiationException | IllegalAccessException ex) {
-        throw new XmlSerializationException("Failed to create new instance of " + type.getName() + ". Check if public parameter-less constructor exists.", ex);
+        throw new XmlDeserializationException(
+            ex,
+            "Failed to create new instance of %s. Probably missing public parameter-less constructor.",
+            type.getName());
       }
     else {
       try {
         ret = creator.createInstance();
       } catch (Exception ex) {
-        throw new XmlSerializationException("Failed to create a new instance of " + type.getName() + " using creator " + creator.getClass().getName() + ".", ex);
+        throw new XmlDeserializationException(
+            ex,
+            "Failed to create a new instance of {%s} using custom creator %s.",
+            type.getName() , creator.getClass().getName());
       }
     }
+    return ret;
+  }
+
+  private Object createArrayInstance(Class<?> elementType, int length) {
+    Object ret;
+    ret = Array.newInstance(elementType, length);
     return ret;
   }
 
@@ -463,7 +438,7 @@ class Parser {
     IInstanceCreator ret = null;
 
     for (IInstanceCreator iInstanceCreator : settings.getInstanceCreators()) {
-      if (iInstanceCreator.getTypeName().equals(type.getName())) {
+      if (iInstanceCreator.getType().equals(type)) {
         ret = iInstanceCreator;
         break;
       }
@@ -472,167 +447,32 @@ class Parser {
     return ret;
   }
 
-  private void setFieldList(Element el, Field f, Object targetObject) {
-    // first check if I have something to fill the object with
-    boolean required = f.getAnnotation(XmlOptional.class) == null;
-
-    List<Element> tmp = getElements(el, f.getName());
-    if (tmp.isEmpty()) {
-      if (required)
-        throw XmlInvalidDataException.createNoSuchElement(el, f.getName(), targetObject.getClass());
-      else
-        return;
-    }
-
-    el = tmp.get(0);
-
-    if (el.getTextContent().equals(settings.getNullString())) {
-      // list, but null, no instance
-      setFieldValue(f, targetObject, null);
-    } else {
-      List lst = (List) createInstance(f.getType());
-      setFieldValue(f, targetObject, lst);
-
-      String key = targetObject.getClass().getSimpleName() + "." + f.getName();
-      fillFieldList(el, lst, key);
-    }
-  }
-
-  private void fillFieldList(Element el, List lst, String classFieldKey) {
-    List<Element> children = getElements(el);
-    for (Element e : children) {
-      if (isNullValued(e)) {
-        lst.add(null);
-        continue;
-      }
-
-      Class itemType = getItemType(classFieldKey, e, true);
-      if (Mapping.isSimpleTypeOrEnum(itemType)) {
-        // list item is a primitive type
-        // in this case it should be some like <xxx>value</xxx>
-        String value = e.getTextContent();
-        Object val = convertToType(value, itemType);
-        lst.add(val);
-      } else {
-        // list item is complex type
-        Object inn = createInstance(itemType);
-        lst.add(inn);
-
-        fillObject(e, inn);
-      }
-    }
-  }
-
-  private void setFieldArray(Element el, Field f, Object targetObject) {
-    // first check if I have something to fill the object with
-    boolean required = f.getAnnotation(XmlOptional.class) == null;
-
-    List<Element> tmp = getElements(el, f.getName());
-    if (tmp.isEmpty()) {
-      if (required)
-        throw XmlInvalidDataException.createNoSuchElement(el, f.getName(), targetObject.getClass());
-      else
-        return;
-    }
-
-    el = tmp.get(0);
-
-    if (el.getTextContent().equals(settings.getNullString())) {
-      // list, but null, no instance
-      setFieldValue(f, targetObject, null);
-    } else {
-      int cnt = getElements(el).size();
-      Class itemClass = f.getType().getComponentType();
-      Object arr = Array.newInstance(itemClass, cnt);
-      String key = targetObject.getClass().getSimpleName() + "." + f.getName();
-
-      setFieldValue(f, targetObject, arr);
-
-      fillFieldArray(el, arr, key, itemClass);
-    }
-  }
-
-  private void fillFieldArray(Element el, Object arr, String classFieldKey, Class itemClass) {
-    List<Element> children = getElements(el);
-    for (int i = 0; i < children.size(); i++) {
-      Element e = children.get(i);
-      if (isNullValued(e)) {
-        Array.set(arr, i, null);
-        continue;
-      }
-
-      Class itemType = getItemType(classFieldKey, e, false);
-      if (itemType == null) itemType = itemClass;
-      if (Mapping.isSimpleTypeOrEnum(itemType)) {
-        String value = e.getTextContent();
-        Object val = convertToType(value, itemType);
-        Array.set(arr, i, val);
-      } else {
-        // list item is complex type
-        Object inn = createInstance(itemType);
-        Array.set(arr, i, inn);
-
-        fillObject(e, inn);
-      }
-    }
-  }
-
   private List<Element> getElements(Element el) {
-    return getElements(el, null);
-  }
-
-  private List<Element> getElements(Element el, String subElementName) {
     List<Element> ret = new ArrayList();
     NodeList c = el.getChildNodes();
     for (int i = 0; i < c.getLength(); i++) {
       Node n = c.item(i);
-      if (n.getNodeType() != Node.ELEMENT_NODE) {
+      if (n.getNodeType() != Node.ELEMENT_NODE)
         continue;
-      }
-      if (subElementName != null && n.getNodeName().equals(subElementName) == false) {
-        continue;
-      }
+
       Element eel = (Element) c.item(i);
       ret.add(eel);
     }
     return ret;
   }
 
-  private Class getItemType(String classFieldKey, Element elementOrNull, boolean mustExist) {
-    Class ret;
+  private XmlListItemMapping tryGetListElementMapping(Element itemElement) {
+    Element parentElement = (Element) itemElement.getParentNode();
+    String parentXPath = Shared.getElementXPath(parentElement);
 
-    String elementName;
-    if (elementOrNull != null)
-      elementName = elementOrNull.getNodeName();
-    else
-      elementName = null;
-
-    ret = getMappedType(classFieldKey, elementName);
-
-    if (ret == null && mustExist) {
-      throw new XmlSerializationException("No list-mapping found for list-typed field '%s' using xml-element '%s'. Check settings.getListItemMapping().",
-          classFieldKey, getElementXPath(elementOrNull, true, true));
+    XmlListItemMapping ret = null;
+    for (XmlListItemMapping mi : settings.getListItemMappings()) {
+      if (isRegexMatch(mi.listElementXPathRegex, parentXPath) && (mi.itemElementName == null || mi.itemElementName.equals(itemElement.getNodeName()))){
+        ret = mi;
+        break;
+      }
     }
 
     return ret;
   }
-
-  private Class getMappedType(String xpath, String elementName) {
-    Class ret = null;
-    // TODO this regex mapping takes not full element path, but only element name !!!
-    for (XmlListItemMapping mi : settings.getListItemMapping()) {
-      if (isRegexMatch(mi.listPathRegex, xpath))
-        if (mi.itemPathRegexOrNull == null) {
-          ret = mi.itemType;
-          break;
-        } else if (
-            isRegexMatch(mi.itemPathRegexOrNull, elementName)) {
-          ret = mi.itemType;
-          break;
-        }
-    }
-
-    return ret;
-  }
-
 }

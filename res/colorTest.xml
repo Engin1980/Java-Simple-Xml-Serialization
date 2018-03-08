@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<colors>
-    <item name="Red" color="FF0000"/>
-    <item name="Light blue" color="AAAAFF"/>
-    <item name="Black with font" color="AAAAFF">
-        <font family="Verdana" style="0" size="12"/>
-    </item>
-</colors>

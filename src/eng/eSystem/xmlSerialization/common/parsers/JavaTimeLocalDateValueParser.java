@@ -43,8 +43,8 @@ public class JavaTimeLocalDateValueParser implements IValueParser<java.time.Loca
   }
 
   @Override
-  public String getTypeName() {
-    return java.time.LocalDate.class.getName();
+  public Class getType() {
+    return java.time.LocalDate.class;
   }
 
   @Override

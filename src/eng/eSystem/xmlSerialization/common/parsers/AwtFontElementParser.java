@@ -19,8 +19,8 @@ public class AwtFontElementParser implements IElementParser<Font> {
   public final static String ATTR_SIZE = "size";
 
   @Override
-  public String getTypeName() {
-    return java.awt.Font.class.getName();
+  public Class getType() {
+    return java.awt.Font.class;
   }
 
   @Override

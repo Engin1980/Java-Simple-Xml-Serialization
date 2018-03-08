@@ -11,41 +11,59 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 class Shared {
-  public static boolean isRegexMatch(String regex, String text){
+
+  public static final String TYPE_MAP_ITEM_ELEMENT_NAME = "item";
+  public static final String TYPE_MAP_FULL_ATTRIBUTE_NAME = "class";
+  public static final String TYPE_MAP_KEY_ATTRIBUTE_NAME = "key";
+  public static final String TYPE_MAP_OF_ATTRIBUTE_NAME = "__of";
+  public static final String TYPE_MAP_ITEM_OF_ATTRIBUTE_NAME = "__itemOf";
+  public static final String TYPE_MAP_ELEMENT_NAME = "__typeMap";
+
+  public static boolean isRegexMatch(String regex, String text) {
     Pattern p = Pattern.compile(regex);
     Matcher m = p.matcher(text);
     boolean ret = m.find();
     return ret;
   }
 
-  public static String getElementXPath(Element el, boolean appendAttributes, boolean addBrackets){
+  public static String getElementXPath(Element el){
+    String ret = getElementInfoText(el, false, false);
+    return ret;
+  }
+
+  public static String getElementInfoString(Element el){
+    String ret = getElementInfoText(el, true, true);
+    return ret;
+  }
+
+  private static String getElementInfoText(Element el, boolean appendAttributes, boolean addBrackets) {
     StringBuilder sb = new StringBuilder();
 
     if (el == null)
       return "null";
 
     if (addBrackets)
-    sb.append("<");
+      sb.append("<");
     sb.append(el.getTagName());
-    if (appendAttributes){
-        sb.append(" ");
-        NamedNodeMap nnm = el.getAttributes();
-        for (int i = 0; i < nnm.getLength(); i++) {
-          Node n = nnm.item(i);
-          sb.append(String.format("%s=\"%s\" ", n.getNodeName(), n.getNodeValue()));
-        }
+    if (appendAttributes) {
+      sb.append(" ");
+      NamedNodeMap nnm = el.getAttributes();
+      for (int i = 0; i < nnm.getLength(); i++) {
+        Node n = nnm.item(i);
+        sb.append(String.format("%s=\"%s\" ", n.getNodeName(), n.getNodeValue()));
+      }
     }
-    if (sb.charAt(sb.length()-1) == ' ')
-      sb.deleteCharAt(sb.length()-1);
+    if (sb.charAt(sb.length() - 1) == ' ')
+      sb.deleteCharAt(sb.length() - 1);
     if (addBrackets)
       sb.append(">");
 
     Node n = el.getParentNode();
-    while (n != null && n.getNodeType() != Node.DOCUMENT_NODE){
+    while (n != null && n.getNodeType() != Node.DOCUMENT_NODE) {
       sb.insert(0, "/");
       String tmp;
       if (addBrackets)
-        tmp = "<" + n.getNodeName()+  ">";
+        tmp = "<" + n.getNodeName() + ">";
       else
         tmp = n.getNodeName();
       sb.insert(0, tmp);
@@ -55,11 +73,11 @@ class Shared {
     return sb.toString();
   }
 
-  public static Field[] getDeclaredFields(Class c){
+  public static Field[] getDeclaredFields(Class c) {
     List<Field> lst = new ArrayList<>();
     Field[] fs;
 
-    while (c != null){
+    while (c != null) {
       fs = c.getDeclaredFields();
       for (Field f : fs) {
         lst.add(f);
@@ -96,7 +114,7 @@ class Shared {
     IElementParser ret = null;
 
     for (IElementParser iElementParser : settings.getElementParsers()) {
-      if (iElementParser.getTypeName().equals(c.getName())) {
+      if (iElementParser.getType().equals(c)) {
         ret = iElementParser;
         break;
       }
@@ -109,7 +127,7 @@ class Shared {
     IValueParser ret = null;
 
     for (IValueParser iValueParser : settings.getValueParsers()) {
-      if (iValueParser.getTypeName().equals(c.getName())) {
+      if (iValueParser.getType().equals(c)) {
         ret = iValueParser;
         break;
       }
@@ -117,4 +135,14 @@ class Shared {
 
     return ret;
   }
+
+//  public static List<XmlCustomFieldMapping> tryGetCustomMappings(Field fi, Settings settings) {
+//    List<XmlCustomFieldMapping> ret = new ArrayList<>();
+//    for (XmlCustomFieldMapping item : settings.getCustomFieldMappings()) {
+//      if (item.getFieldName().equals(fi.getName()) && item.getDeclaredFieldType().equals(fi.getDeclaringClass())) {
+//        ret.add(item);
+//      }
+//    }
+//    return ret;
+//  }
 }

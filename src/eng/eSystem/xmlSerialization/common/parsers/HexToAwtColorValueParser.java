@@ -14,8 +14,8 @@ import java.util.regex.Pattern;
  */
 public class HexToAwtColorValueParser implements IValueParser<java.awt.Color> {
   @Override
-  public String getTypeName() {
-    return java.awt.Color.class.getName();
+  public Class getType() {
+    return java.awt.Color.class;
   }
 
   @Override
