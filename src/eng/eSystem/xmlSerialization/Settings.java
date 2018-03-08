@@ -15,7 +15,7 @@ public class Settings {
   private final List<IValueParser> valueParsers = new ArrayList<>();
   private final List<IElementParser> elementParsers = new ArrayList<>();
   private final List<XmlListItemMapping> listItemMapping = new ArrayList();
-  private final List<XmlCustomFieldMapping> customFieldMappings = new ArrayList<>();
+  //private final List<XmlCustomFieldMapping> customFieldMappings = new ArrayList<>();
   private boolean verbose = false;
   private String nullString = "(null)";
   private Class defaultListTypeImplementation = ArrayList.class;
@@ -166,14 +166,14 @@ public class Settings {
   }
 
   /**
-   * Gets a list of definitions of custom mappings between element-field based on type.<br />
-   * This is mainly used for inheritance. If a instance of a specific class should be used instead of parent class, this mapping must be
-   * defined in this list. For <i>abstract</i> classes it is required as it is not possible to create
-   * an instance of abstract class. How element is defined see {@linkplain XmlCustomFieldMapping}.
-   * @return
-   * @see XmlCustomFieldMapping
-   */
-  public List<XmlCustomFieldMapping> getCustomFieldMappings() {
-    return customFieldMappings;
-  }
+//   * Gets a list of definitions of custom mappings between element-field based on type.<br />
+//   * This is mainly used for inheritance. If a instance of a specific class should be used instead of parent class, this mapping must be
+//   * defined in this list. For <i>abstract</i> classes it is required as it is not possible to create
+//   * an instance of abstract class. How element is defined see {@linkplain XmlCustomFieldMapping}.
+//   * @return
+//   * @see XmlCustomFieldMapping
+//   */
+//  public List<XmlCustomFieldMapping> getCustomFieldMappings() {
+//    return customFieldMappings;
+//  }
 }
