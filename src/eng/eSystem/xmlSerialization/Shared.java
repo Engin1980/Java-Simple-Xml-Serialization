@@ -15,8 +15,8 @@ class Shared {
   public static final String TYPE_MAP_ITEM_ELEMENT_NAME = "item";
   public static final String TYPE_MAP_FULL_ATTRIBUTE_NAME = "class";
   public static final String TYPE_MAP_KEY_ATTRIBUTE_NAME = "key";
-  public static final String TYPE_MAP_OF_ATTRIBUTE_NAME = "__of";
-  public static final String TYPE_MAP_ITEM_OF_ATTRIBUTE_NAME = "__itemOf";
+  public static final String TYPE_MAP_OF_ATTRIBUTE_NAME = "__class";
+  public static final String TYPE_MAP_ITEM_OF_ATTRIBUTE_NAME = "__itemClass";
   public static final String TYPE_MAP_ELEMENT_NAME = "__typeMap";
 
   public static boolean isRegexMatch(String regex, String text) {
@@ -89,12 +89,6 @@ class Shared {
     return ret;
   }
 
-  /**
-   * Returns true if field should be skipped according to regex ignore settings
-   *
-   * @param f
-   * @return
-   */
   public static boolean isSkippedBySettings(Field f, Settings settings) {
     boolean ret = false;
 
@@ -108,7 +102,6 @@ class Shared {
 
     return ret;
   }
-
 
   public static IElementParser tryGetCustomElementParser(Class c, Settings settings) {
     IElementParser ret = null;
@@ -136,13 +129,4 @@ class Shared {
     return ret;
   }
 
-//  public static List<XmlCustomFieldMapping> tryGetCustomMappings(Field fi, Settings settings) {
-//    List<XmlCustomFieldMapping> ret = new ArrayList<>();
-//    for (XmlCustomFieldMapping item : settings.getCustomFieldMappings()) {
-//      if (item.getFieldName().equals(fi.getName()) && item.getDeclaredFieldType().equals(fi.getDeclaringClass())) {
-//        ret.add(item);
-//      }
-//    }
-//    return ret;
-//  }
 }

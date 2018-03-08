@@ -13,7 +13,8 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.*;
 
-import static eng.eSystem.xmlSerialization.Shared.*;
+import static eng.eSystem.xmlSerialization.Shared.getDeclaredFields;
+import static eng.eSystem.xmlSerialization.Shared.isRegexMatch;
 
 /**
  * @author Marek
@@ -21,8 +22,10 @@ import static eng.eSystem.xmlSerialization.Shared.*;
 class Parser {
 
   private static final Object UNSET = new Object();
+  private static final String SEPARATOR = "\t";
   private final Settings settings;
   private Map<String, String> typeMap = new HashMap<>();
+  private int logIndent = 0;
 
   Parser(Settings settings) {
     this.settings = settings;
@@ -36,33 +39,20 @@ class Parser {
       throw new IllegalArgumentException("Value of {objectType} cannot not be null.");
     }
 
-    if (settings.isVerbose()) {
-      System.out.println("  deserialize( <" + root.getNodeName() + "...>, " + objectType.getSimpleName());
-    }
-
     loadTypeMaps(root);
 
     Class c = objectType;
-    Object ret = parseIt(root, c);
+    Object ret;
+    try {
+      ret = parseIt(root, c);
+    } catch (XmlDeserializationException ex) {
+      throw new XmlSerializationException("Deserialization failed.", ex);
+    }
 
     return ret;
   }
 
-  private void loadTypeMaps(Element el) {
-    typeMap.clear();
-
-    Element elm = getElement(el, Shared.TYPE_MAP_ELEMENT_NAME, false);
-    if (elm != null){
-        List<Element> types = getElements(elm);
-      for (Element type : types) {
-        String key = type.getAttribute(Shared.TYPE_MAP_KEY_ATTRIBUTE_NAME);
-        String fullName = type.getAttribute(Shared.TYPE_MAP_FULL_ATTRIBUTE_NAME);
-        typeMap.put(key, fullName);
-      }
-    }
-  }
-
-  public Object parseArray(Element el, Class c) {
+  public Object parseArray(Element el, Class c) throws XmlDeserializationException {
 
     Object ret;
     List<Element> children = getElements(el);
@@ -94,42 +84,91 @@ class Parser {
     return ret;
   }
 
-  private Object parseIt(Element el, Class type) {
-    Object ret;
-    if (isNullValuedElement(el))
-      ret = null;
-    else {
-      IElementParser customElementParser = Shared.tryGetCustomElementParser(type, settings);
-      if (customElementParser != null) {
-        ret = convertElementByElementParser(el, customElementParser);
-      } else if (Mapping.isSimpleTypeOrEnum(type)) {
-        // jednoduchý typ
-        ret = parsePrimitiveFromElement(el, type);
-      } else if (List.class.isAssignableFrom(type)) {
-        ret = parseList(el, type);
-      } else if (type.isArray()) {
-        ret = parseArray(el, type);
-      } else {
-        ret = parseObject(el, type);
+  private void logVerbose(String format, Object... params) {
+    if (settings.isVerbose())
+      log(String.format(format, params));
+  }
+
+  private void log(String format, Object... params) {
+    log(String.format(format, params));
+  }
+
+  private void log(String txt) {
+    for (int i = 0; i < logIndent; i++) {
+      System.out.print(SEPARATOR);
+    }
+
+    System.out.println(txt);
+  }
+
+  private void loadTypeMaps(Element el) {
+    typeMap.clear();
+
+    Element elm;
+    try {
+      elm = getElement(el, Shared.TYPE_MAP_ELEMENT_NAME, false);
+    } catch (Exception ex) {
+      elm = null;
+    }
+    if (elm != null) {
+      List<Element> types = getElements(elm);
+      for (Element type : types) {
+        String key = type.getAttribute(Shared.TYPE_MAP_KEY_ATTRIBUTE_NAME);
+        String fullName = type.getAttribute(Shared.TYPE_MAP_FULL_ATTRIBUTE_NAME);
+        typeMap.put(key, fullName);
       }
     }
+  }
+
+  private Object parseIt(Element el, Class type) throws XmlDeserializationException {
+    logIndent++;
+    logVerbose("deserialize <%s> --> %s", el.getNodeName(), type.getName());
+
+    Object ret;
+    try {
+      if (isNullValuedElement(el))
+        ret = null;
+      else {
+        IElementParser customElementParser = Shared.tryGetCustomElementParser(type, settings);
+        if (customElementParser != null) {
+          ret = convertElementByElementParser(el, customElementParser);
+        } else if (Mapping.isSimpleTypeOrEnum(type)) {
+          // jednoduchý typ
+          ret = parsePrimitiveFromElement(el, type);
+        } else if (List.class.isAssignableFrom(type)) {
+          ret = parseList(el, type);
+        } else if (type.isArray()) {
+          ret = parseArray(el, type);
+        } else {
+          ret = parseObject(el, type);
+        }
+      }
+    } catch (XmlDeserializationException ex) {
+      throw new XmlDeserializationException(ex,
+          "Failed to parse class '%s' from element %s",
+          type.getName(), Shared.getElementInfoString(el));
+    }
+
+    logVerbose("... result = " + ret);
+    logIndent--;
     return ret;
   }
 
-  private Object convertElementByElementParser(Element el, IElementParser customElementParser) {
+  private Object convertElementByElementParser(Element el, IElementParser customElementParser) throws XmlDeserializationException {
     Object ret;
     try {
       ret = customElementParser.parse(el);
     } catch (Exception ex) {
-      throw new XmlSerializationException(
-          "Failed to parse instance for " + customElementParser.getType() +
-              " using custom-element-parser " + customElementParser.getClass().getName() + ".",
-          ex);
+      throw new XmlDeserializationException(
+          ex, "Failed to parse instance of class %s from %s using parser %s.",
+          customElementParser.getType().getName(),
+          Shared.getElementInfoString(el),
+          customElementParser.getClass().getName());
     }
     return ret;
   }
 
-  private Object parseList(Element el, Class c) {
+  private Object parseList(Element el, Class c) throws XmlDeserializationException {
     Object ret;
 
     List lst = (List) createObjectInstanceByElement(el, c);
@@ -158,7 +197,7 @@ class Parser {
     return ret;
   }
 
-  private Object createObjectInstanceByElement(Element el, Class c){
+  private Object createObjectInstanceByElement(Element el, Class c) throws XmlDeserializationException {
 
     Class customType = tryGetCustomTypeByElement(el);
     if (customType != null)
@@ -169,7 +208,7 @@ class Parser {
     return ret;
   }
 
-  private Object parseObject(Element el, Class c) {
+  private Object parseObject(Element el, Class c) throws XmlDeserializationException {
 
     Object ret = createObjectInstanceByElement(el, c);
 
@@ -177,16 +216,12 @@ class Parser {
 
     for (Field f : fields) {
       if (java.lang.reflect.Modifier.isStatic(f.getModifiers())) {
-        continue; // statické přeskakujem
+        continue; // static are skipped
       } else if (f.getAnnotation(XmlIgnore.class) != null) {
-        if (settings.isVerbose()) {
-          System.out.println("  " + el.getNodeName() + "." + f.getName() + " field skipped due to @XmlIgnored annotation.");
-        }
+        logVerbose("%s.%s field skipped due to @XmlIgnored annotation.", el.getNodeName(), f.getName());
         continue; // skipped due to annotation
       } else if (Shared.isSkippedBySettings(f, settings)) {
-        if (settings.isVerbose()) {
-          System.out.println("  " + el.getNodeName() + "." + f.getName() + " field skipped due to settings-ignoredFieldsRegex list.");
-        }
+        logVerbose("%s.%s field skipped due to ignore field setting.", el.getNodeName(), f.getName());
         continue;
       }
       try {
@@ -196,9 +231,9 @@ class Parser {
           f.set(ret, tmp);
         }
       } catch (Exception ex) {
-        throw new XmlSerializationException(ex,
-            "Failed to fill field '%s' ('%s') of object of type '%s' using element '%s'.",
-            f.getName(), f.getType().getName(), c.getName(),
+        throw new XmlDeserializationException(ex,
+            "Failed to fill field '%s.%s' ('%s') with value '%s' ('%s') at xml-element %s.",
+            c.getName(), f.getName(), f.getType().getName(),
             Shared.getElementInfoString(el));
       }
     }
@@ -206,30 +241,41 @@ class Parser {
     return ret;
   }
 
-  private Class tryGetCustomTypeByElement(Element el) {
+  private Class tryGetCustomTypeByElement(Element el) throws XmlDeserializationException {
     Class ret = null;
     String tmp;
     if (el.hasAttribute(Shared.TYPE_MAP_OF_ATTRIBUTE_NAME)) {
       tmp = el.getAttribute(Shared.TYPE_MAP_OF_ATTRIBUTE_NAME);
-      ret = loadClass(tmp);
+      try {
+        ret = loadClass(tmp);
+      } catch (Exception ex) {
+        throw new XmlDeserializationException(ex,
+            "Failed to load class for element class defined in %s.", Shared.getElementInfoString(el));
+      }
     }
 
     return ret;
   }
 
-  private Class tryGetArrayItemTypeByElement(Element el) {
-    Class ret = null;
+  private Class tryGetArrayItemTypeByElement(Element el) throws XmlDeserializationException {
+    Class ret;
     String tmp;
     if (el.hasAttribute(Shared.TYPE_MAP_ITEM_OF_ATTRIBUTE_NAME)) {
       tmp = el.getAttribute(Shared.TYPE_MAP_ITEM_OF_ATTRIBUTE_NAME);
-      ret = loadClass(tmp);
+      try {
+        ret = loadClass(tmp);
+      } catch (Exception ex) {
+        throw new XmlDeserializationException(ex,
+            "Failed to load class for element item-class defined in %s.", Shared.getElementInfoString(el));
+      }
+
     } else
       ret = null;
 
     return ret;
   }
 
-  private Class loadClass(String className) {
+  private Class loadClass(String className) throws XmlDeserializationException {
     Class ret;
 
     String tmp = tryGetMappedType(className);
@@ -239,7 +285,7 @@ class Parser {
     try {
       ret = Class.forName(className);
     } catch (ClassNotFoundException e) {
-      throw new XmlDeserializationException(e, "Failed to load class %s.", className);
+      throw new XmlDeserializationException(e, "Failed to load class '%s' from JVM.", className);
     }
     return ret;
   }
@@ -253,83 +299,102 @@ class Parser {
     return ret;
   }
 
-  private Object parsePrimitiveFromElement(Element el, Class c) {
+  private Object parsePrimitiveFromElement(Element el, Class c) throws XmlDeserializationException {
     String txt = el.getTextContent();
+    Object ret;
     Class tmp = tryGetCustomTypeByElement(el);
     if (tmp != null) c = tmp;
-    Object ret = convertToType(txt, c);
+    ret = convertToType(txt, c);
     return ret;
   }
 
-  private Object parseField(Element parentElement, Field f) {
+  private Object parseField(Element parentElement, Field f) throws XmlDeserializationException {
     Object ret;
-    if (settings.isVerbose()) {
-      //System.out.println("  fillField( <" + parentElement.getNodeName() + "...>, " + targetObject.getClass().getSimpleName() + "." + f.getName());
-    }
+    logIndent++;
+    logVerbose("deserialize field %s.%s from %s",
+        f.getDeclaringClass().getName(),
+        f.getName(),
+        Shared.getElementInfoString(parentElement)
+    );
 
-    Class c = f.getType();
+    try {
+      Class c = f.getType();
 
-    IValueParser customValueParser = Shared.tryGetCustomValueParser(c, settings);
-    boolean storedInAttribute =
-        Mapping.isSimpleTypeOrEnum(c) || customValueParser != null;
+      IValueParser customValueParser = Shared.tryGetCustomValueParser(c, settings);
+      boolean storedInAttribute =
+          Mapping.isSimpleTypeOrEnum(c) || customValueParser != null;
 
-    boolean required = f.getAnnotation(XmlOptional.class) == null;
-    if (storedInAttribute) {
-      String attributeValue = readAttributeValue(parentElement, f.getName(), required);
-      if (attributeValue == null) {
-        ret = UNSET;
-      } else if (attributeValue.equals(settings.getNullString())){
-        ret = null;
+      boolean required = f.getAnnotation(XmlOptional.class) == null;
+      if (storedInAttribute) {
+        String attributeValue = readAttributeValue(parentElement, f.getName(), required);
+        if (attributeValue == null) {
+          ret = UNSET;
+        } else if (attributeValue.equals(settings.getNullString())) {
+          ret = null;
+        } else {
+          if (customValueParser != null)
+            ret = convertValueByCustomParser(attributeValue, customValueParser);
+          else
+            ret = convertToType(attributeValue, c);
+        }
       } else {
-        if (customValueParser != null)
-          ret = convertValueByCustomParser(attributeValue, customValueParser);
-        else
-          ret = convertToType(attributeValue, c);
+        Element el = getElement(parentElement, f.getName(), required);
+        if (el == null)
+          ret = UNSET;
+        else {
+          ret = parseIt(el, c);
+        }
       }
-    } else {
-      Element el = getElement(parentElement,f.getName(), required);
-      if (el == null)
-        ret = UNSET;
-      else {
-        ret = parseIt(el, c);
-      }
+    } catch (Exception ex){
+      throw new XmlDeserializationException(ex,
+          "Failed to parse field '%s.%s' ('%s') from element %s.",
+          f.getDeclaringClass().getName(), f.getName(), f.getType().getName(), Shared.getElementInfoString(parentElement));
     }
 
+    logVerbose("... result = " + ret);
+    logIndent--;
     return ret;
   }
 
-  private Element getElement(Element parentElement, String name, boolean required) {
+  private Element getElement(Element parentElement, String name, boolean required) throws XmlDeserializationException {
     Element ret = null;
     List<Element> elms = getElements(parentElement);
     for (Element elm : elms) {
-      if (elm.getNodeName().equals(name)){
+      if (elm.getNodeName().equals(name)) {
         ret = elm;
         break;
       }
     }
-    if (ret == null && required){
-      throw new XmlSerializationException("Unable to find sub-element \"" + name + "\" in element \"" +
-          Shared.getElementInfoString(parentElement) + "\"");
+    if (ret == null && required) {
+      throw new XmlDeserializationException("Unable to find sub-element '%s' in element %s.",
+          name,
+          Shared.getElementInfoString(parentElement));
     }
     return ret;
   }
 
-  private void removeTypeMapElementIfExist(List<Element> lst){
+  private void removeTypeMapElementIfExist(List<Element> lst) {
     for (int i = 0; i < lst.size(); i++) {
-      if (lst.get(i).getNodeName().equals(Shared.TYPE_MAP_ELEMENT_NAME)){
+      if (lst.get(i).getNodeName().equals(Shared.TYPE_MAP_ELEMENT_NAME)) {
         lst.remove(lst.get(i));
         i--;
       }
     }
   }
 
-  private Object convertValueByCustomParser(String value, IValueParser parser) {
+  private Object convertValueByCustomParser(String value, IValueParser parser) throws XmlDeserializationException {
     Object ret;
-    ret = parser.parse(value);
+    try {
+      ret = parser.parse(value);
+    } catch (Exception ex) {
+      throw new XmlDeserializationException(ex,
+          "Failed to convert '%s' to type '%s' using '%s' custom IValueParser.",
+          value, parser.getType().getName(), parser.getClass().getName());
+    }
     return ret;
   }
 
-  private String readAttributeValue(Element el, String key, boolean isRequired) {
+  private String readAttributeValue(Element el, String key, boolean isRequired) throws XmlDeserializationException {
     String ret = null;
     if (el.hasAttribute(key)) {
       ret = el.getAttribute(key);
@@ -341,49 +406,57 @@ class Parser {
     }
 
     if (ret == null && isRequired) {
-      throw new XmlSerializationException("Unable to find key \"" + key + "\" in element \"" +
-          Shared.getElementInfoString(el) + "\"");
+      throw new XmlDeserializationException(
+          "Unable to find key '%s' in element %s.",
+          key, Shared.getElementInfoString(el));
     }
 
     return ret;
   }
 
-  private Object convertToType(String value, Class<?> type) {
+  private Object convertToType(String value, Class<?> type) throws XmlDeserializationException {
     Object ret;
-    if (type.isEnum()) {
-      ret = Enum.valueOf((Class<Enum>) type, value);
-    } else {
-      switch (type.getName()) {
-        case "byte":
-        case "java.lang.Byte":
-          ret = Byte.parseByte(value);
-          break;
-        case "short":
-        case "java.lang.Short":
-          ret = Short.parseShort(value);
-          break;
-        case "int":
-        case "java.lang.Integer":
-          ret = Integer.parseInt(value);
-          break;
-        case "double":
-        case "java.lang.Double":
-          ret = Double.parseDouble(value);
-          break;
-        case "char":
-        case "java.lang.Character":
-          ret = value.charAt(0);
-          break;
-        case "boolean":
-        case "java.lang.Boolean":
-          ret = Boolean.parseBoolean(value);
-          break;
-        case "java.lang.String":
-          ret = value;
-          break;
-        default:
-          throw new XmlSerializationException("Type " + type.getName() + " does not have primitive conversion. Use custom IValueParser.");
+    try {
+      if (type.isEnum()) {
+        ret = Enum.valueOf((Class<Enum>) type, value);
+      } else {
+        switch (type.getName()) {
+          case "byte":
+          case "java.lang.Byte":
+            ret = Byte.parseByte(value);
+            break;
+          case "short":
+          case "java.lang.Short":
+            ret = Short.parseShort(value);
+            break;
+          case "int":
+          case "java.lang.Integer":
+            ret = Integer.parseInt(value);
+            break;
+          case "double":
+          case "java.lang.Double":
+            ret = Double.parseDouble(value);
+            break;
+          case "char":
+          case "java.lang.Character":
+            ret = value.charAt(0);
+            break;
+          case "boolean":
+          case "java.lang.Boolean":
+            ret = Boolean.parseBoolean(value);
+            break;
+          case "java.lang.String":
+            ret = value;
+            break;
+          default:
+            throw new XmlDeserializationException("Type '%s' does not have primitive conversion defined. Use custom IValueParser.", type.getName());
+        }
       }
+    } catch (Exception ex) {
+      throw new XmlDeserializationException(ex,
+          "Failed to convert value '%s' into type '%s'.",
+          value,
+          type.getName());
     }
 
     return ret;
@@ -396,10 +469,10 @@ class Parser {
       return false;
   }
 
-  private Object createObjectInstance(Class<?> type) {
+  private Object createObjectInstance(Class<?> type) throws XmlDeserializationException {
     Object ret;
 
-    if (type.equals(List.class) ||type.equals(AbstractList.class)) {
+    if (type.equals(List.class) || type.equals(AbstractList.class)) {
       type = settings.getDefaultListTypeImplementation();
     }
 
@@ -412,7 +485,7 @@ class Parser {
       } catch (InstantiationException | IllegalAccessException ex) {
         throw new XmlDeserializationException(
             ex,
-            "Failed to create new instance of %s. Probably missing public parameter-less constructor.",
+            "Failed to create new instance of '%s'. Probably missing public parameter-less constructor.",
             type.getName());
       }
     else {
@@ -421,16 +494,23 @@ class Parser {
       } catch (Exception ex) {
         throw new XmlDeserializationException(
             ex,
-            "Failed to create a new instance of {%s} using custom creator %s.",
-            type.getName() , creator.getClass().getName());
+            "Failed to create a new instance of '%s' using custom creator '%s'.",
+            type.getName(), creator.getClass().getName());
       }
     }
     return ret;
   }
 
-  private Object createArrayInstance(Class<?> elementType, int length) {
+  private Object createArrayInstance(Class elementType, int length) throws XmlDeserializationException {
     Object ret;
-    ret = Array.newInstance(elementType, length);
+    try {
+      ret = Array.newInstance(elementType, length);
+    } catch (Exception ex) {
+      throw new XmlDeserializationException(
+          ex,
+          "Failed to create a new instance of '%s[]'.",
+          elementType.getName());
+    }
     return ret;
   }
 
@@ -467,7 +547,7 @@ class Parser {
 
     XmlListItemMapping ret = null;
     for (XmlListItemMapping mi : settings.getListItemMappings()) {
-      if (isRegexMatch(mi.listElementXPathRegex, parentXPath) && (mi.itemElementName == null || mi.itemElementName.equals(itemElement.getNodeName()))){
+      if (isRegexMatch(mi.listElementXPathRegex, parentXPath) && (mi.itemElementName == null || mi.itemElementName.equals(itemElement.getNodeName()))) {
         ret = mi;
         break;
       }

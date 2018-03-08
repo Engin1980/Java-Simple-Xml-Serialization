@@ -62,7 +62,9 @@ public class Tests {
     f.setSurname("Doe");
     src.getFriends()[1] = f;
 
-    XmlSerializer ser = new XmlSerializer();
+    Settings sett = new Settings();
+    sett.setVerbose(true);
+    XmlSerializer ser = new XmlSerializer(sett);
 
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
     ser.serialize(bos, src);
@@ -109,6 +111,7 @@ public class Tests {
         "</data>";
 
     Settings settings = new Settings();
+
 
     settings.getListItemMappings().add(
         new XmlListItemMapping("aL.+", Integer.class)
