@@ -1,6 +1,7 @@
 package eng.eSystem.xmlSerialization.testModelOtherSettings;
 
 import eng.eSystem.xmlSerialization.Settings;
+import eng.eSystem.xmlSerialization.XmlCustomFieldMapping;
 import eng.eSystem.xmlSerialization.XmlListItemMapping;
 import eng.eSystem.xmlSerialization.XmlSerializer;
 import org.junit.Test;
@@ -168,7 +169,7 @@ public class Tests {
   }
 
   @Test
-  public void textIgnoredFields() {
+  public void testIgnoredFields() {
     IgnoredFieldsModel src = new IgnoredFieldsModel();
     src.ignoredText = "nothing";
     src.otherIgnoredText = "another nothing";
@@ -196,5 +197,44 @@ public class Tests {
     assertNull(trg.otherIgnoredText);
   }
 
+  @Test
+  public void testCustomFieldMapping() {
+    CustomFieldMappingModel src = new CustomFieldMappingModel();
+    CustomFieldMappingModel.MyParent a = new CustomFieldMappingModel.MyParent();
+    a.number = 10;
+    src.a = a;
+    CustomFieldMappingModel.MyChild b = new CustomFieldMappingModel.MyChild();
+    b.number = 55;
+    b.text = "bubla";
+    src.b = b;
+
+    Settings sett = new Settings();
+    sett.getCustomFieldMappings().add(
+        new XmlCustomFieldMapping(
+            "b", CustomFieldMappingModel.MyParent.class, CustomFieldMappingModel.MyChild.class, CustomFieldMappingModel.class, "myOwnB"));
+    sett.getCustomFieldMappings().add(
+        new XmlCustomFieldMapping(
+            "a", CustomFieldMappingModel.MyParent.class, CustomFieldMappingModel.MyParent.class, CustomFieldMappingModel.class, "myOwnA"));
+
+    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    XmlSerializer ser = new XmlSerializer(sett);
+
+    ser.serialize(bos, src);
+
+    byte[] bdata = bos.toByteArray();
+    String xml = new String(bdata);
+
+    System.out.println(new String(bdata));
+
+    ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
+
+    CustomFieldMappingModel trg = (CustomFieldMappingModel) ser.deserialize(bis, CustomFieldMappingModel.class);
+
+    assertTrue(xml.contains("myOwnA"));
+    assertTrue(xml.contains("myOwnB"));
+    assertEquals(CustomFieldMappingModel.MyParent.class, trg.a.getClass());
+    assertEquals(CustomFieldMappingModel.MyChild.class, trg.b.getClass());
+
+  }
 
 }

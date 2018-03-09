@@ -1,6 +1,7 @@
 package eng.eSystem.xmlSerialization.common.parsers;
 
 import eng.eSystem.xmlSerialization.IValueParser;
+import eng.eSystem.xmlSerialization.XmlDeserializationException;
 import eng.eSystem.xmlSerialization.XmlSerializationException;
 
 import java.time.LocalDate;
@@ -48,7 +49,7 @@ public class JavaTimeLocalDateValueParser implements IValueParser<java.time.Loca
   }
 
   @Override
-  public LocalDate parse(String value) {
+  public LocalDate parse(String value) throws XmlDeserializationException {
     
     LocalDate ret;
 
@@ -56,7 +57,7 @@ public class JavaTimeLocalDateValueParser implements IValueParser<java.time.Loca
       ret =
           LocalDate.parse(value, formatter);
     } catch (Exception ex){
-      throw new XmlSerializationException(ex, "Failed to parse value '%s' using formatter type '%s' ('%s').",
+      throw new XmlDeserializationException(ex, "Failed to parse value '%s' using formatter type '%s' ('%s').",
           value,
           this.formatter.getClass().getName(),
           this.formatter.toString()
@@ -68,7 +69,7 @@ public class JavaTimeLocalDateValueParser implements IValueParser<java.time.Loca
   }
 
   @Override
-  public String format(LocalDate value) {
+  public String format(LocalDate value) throws XmlSerializationException {
     String ret;
     try {
       ret = value.format(this.formatter);

@@ -31,7 +31,7 @@ class Parser {
     this.settings = settings;
   }
 
-  public synchronized Object deserialize(Element root, Class objectType) {
+  public synchronized Object deserialize(Element root, Class objectType) throws XmlDeserializationException {
     if (root == null) {
       throw new IllegalArgumentException("Value of {el} cannot not be null.");
     }
@@ -43,11 +43,7 @@ class Parser {
 
     Class c = objectType;
     Object ret;
-    try {
-      ret = parseIt(root, c);
-    } catch (XmlDeserializationException ex) {
-      throw new XmlSerializationException("Deserialization failed.", ex);
-    }
+    ret = parseIt(root, c);
 
     return ret;
   }
@@ -86,19 +82,7 @@ class Parser {
 
   private void logVerbose(String format, Object... params) {
     if (settings.isVerbose())
-      log(String.format(format, params));
-  }
-
-  private void log(String format, Object... params) {
-    log(String.format(format, params));
-  }
-
-  private void log(String txt) {
-    for (int i = 0; i < logIndent; i++) {
-      System.out.print(SEPARATOR);
-    }
-
-    System.out.println(txt);
+      Shared.log(Shared.eLogType.info, format, params);
   }
 
   private void loadTypeMaps(Element el) {
@@ -168,26 +152,37 @@ class Parser {
     return ret;
   }
 
-  private Object parseList(Element el, Class c) throws XmlDeserializationException {
+  private Object parseList(Element listElement, Class c) throws XmlDeserializationException {
     Object ret;
+    List<String> elementsWithObjectWarningLogged = new ArrayList<>();
 
-    List lst = (List) createObjectInstanceByElement(el, c);
+    List lst = (List) createObjectInstanceByElement(listElement, c);
 
-    List<Element> children = getElements(el);
+    List<Element> children = getElements(listElement);
     removeTypeMapElementIfExist(children);
 
-    Class expectedClass = tryGetArrayItemTypeByElement(el);
+    Class expectedClass = tryGetArrayItemTypeByElement(listElement);
     if (expectedClass == null) expectedClass = Object.class;
+
 
     for (Element e : children) {
 
       Class itemExpectedClass;
 
       XmlListItemMapping map = tryGetListElementMapping(e);
-      if (map != null)
+      if (map != null) {
         itemExpectedClass = map.itemType;
-      else
+      } else {
         itemExpectedClass = expectedClass;
+        if (itemExpectedClass.equals(Object.class) && elementsWithObjectWarningLogged.contains(e.getNodeName()) == false) {
+          elementsWithObjectWarningLogged.add(e.getNodeName());
+          Shared.log(
+              Shared.eLogType.warning,
+              "List item from element <%s> for list '%s' is deserialized as 'Object' class. Probably missing custom list mapping. Full node info: %s",
+              e.getNodeName(), lst.getClass().getName(), Shared.getElementInfoString(e));
+        }
+      }
+
 
       Object itemValue = parseIt(e, itemExpectedClass);
       lst.add(itemValue);
@@ -224,16 +219,25 @@ class Parser {
         logVerbose("%s.%s field skipped due to ignore field setting.", el.getNodeName(), f.getName());
         continue;
       }
+      Object tmp;
       try {
-        Object tmp = parseField(el, f);
+        tmp = parseField(el, f);
+      } catch (Exception ex) {
+        throw new XmlDeserializationException(ex,
+            "Failed to fill field '%s.%s' ('%s') from xml-element %s.",
+            c.getName(), f.getName(), f.getType().getName(),
+            Shared.getElementInfoString(el));
+      }
+      try {
         if (tmp != UNSET) {
           f.setAccessible(true);
           f.set(ret, tmp);
         }
       } catch (Exception ex) {
+        String tmpType = tmp == null ? "null" : tmp.getClass().getName();
         throw new XmlDeserializationException(ex,
-            "Failed to fill field '%s.%s' ('%s') with value '%s' ('%s') at xml-element %s.",
-            c.getName(), f.getName(), f.getType().getName(),
+            "Failed to fill field '%s.%s' ('%s') with value '%s' ('%s') from xml-element %s.",
+            c.getName(), f.getName(), f.getType().getName(), tmp, tmpType,
             Shared.getElementInfoString(el));
       }
     }
@@ -332,20 +336,29 @@ class Parser {
         } else if (attributeValue.equals(settings.getNullString())) {
           ret = null;
         } else {
-          if (customValueParser != null)
+          if (customValueParser != null) {
+            logVerbose("... applied custom value parser %s", customValueParser.getClass().getName());
             ret = convertValueByCustomParser(attributeValue, customValueParser);
-          else
+          } else
             ret = convertToType(attributeValue, c);
         }
       } else {
-        Element el = getElement(parentElement, f.getName(), required);
+        String fieldElementName = f.getName();
+        XmlCustomFieldMapping map = tryGetCustomFieldMapping(f, parentElement);
+        if (map != null) {
+          logVerbose("... applied custom field mapping %s", map);
+          fieldElementName = map.getXmlElementName();
+          c = map.getTargetFieldClass();
+        }
+
+        Element el = getElement(parentElement, fieldElementName, required);
         if (el == null)
           ret = UNSET;
         else {
           ret = parseIt(el, c);
         }
       }
-    } catch (Exception ex){
+    } catch (Exception ex) {
       throw new XmlDeserializationException(ex,
           "Failed to parse field '%s.%s' ('%s') from element %s.",
           f.getDeclaringClass().getName(), f.getName(), f.getType().getName(), Shared.getElementInfoString(parentElement));
@@ -354,6 +367,45 @@ class Parser {
     logVerbose("... result = " + ret);
     logIndent--;
     return ret;
+  }
+
+  private XmlCustomFieldMapping tryGetCustomFieldMapping(Field f, Element parentElement) {
+    XmlCustomFieldMapping ret = null;
+
+    for (XmlCustomFieldMapping mapping : settings.getCustomFieldMappings()) {
+      boolean tmp = isMappingFitting(mapping, f);
+      if (tmp) {
+        tmp = containsElementWithName(parentElement, mapping.getXmlElementName());
+        if (tmp) {
+          ret = mapping;
+          break;
+        }
+      }
+    }
+    return ret;
+  }
+
+  private boolean containsElementWithName(Element parentElement, String xmlElementName) {
+    Element elm;
+    try {
+      elm = getElement(parentElement, xmlElementName, false);
+    } catch (XmlDeserializationException e) {
+      elm = null;
+    }
+    return (elm != null);
+  }
+
+  private boolean isMappingFitting(XmlCustomFieldMapping mapping, Field f) {
+    if (mapping.getFieldName().equals(f.getName()) == false)
+      return false;
+
+    if (mapping.getClassDeclaringField() != null && !(mapping.getClassDeclaringField().equals(f.getDeclaringClass())))
+      return false;
+
+    if (mapping.getDeclaredFieldClass() != null && !(mapping.getDeclaredFieldClass().equals(f.getType())))
+      return false;
+
+    return true;
   }
 
   private Element getElement(Element parentElement, String name, boolean required) throws XmlDeserializationException {

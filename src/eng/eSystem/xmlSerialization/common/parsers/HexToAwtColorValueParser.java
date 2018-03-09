@@ -1,6 +1,7 @@
 package eng.eSystem.xmlSerialization.common.parsers;
 
 import eng.eSystem.xmlSerialization.IValueParser;
+import eng.eSystem.xmlSerialization.XmlDeserializationException;
 import eng.eSystem.xmlSerialization.XmlSerializationException;
 
 import java.awt.*;
@@ -19,7 +20,7 @@ public class HexToAwtColorValueParser implements IValueParser<java.awt.Color> {
   }
 
   @Override
-  public java.awt.Color parse(String value) {
+  public java.awt.Color parse(String value) throws XmlDeserializationException {
     Color ret = null;
     String ps = "(..)(..)(..)";
     Pattern p = Pattern.compile(ps);
@@ -38,7 +39,7 @@ public class HexToAwtColorValueParser implements IValueParser<java.awt.Color> {
       }
     }
     if (ret == null) {
-      throw new XmlSerializationException("Unable to parse \"" + value + "\" into color.");
+      throw new XmlDeserializationException("Unable to parse \"" + value + "\" into color.");
     }
 
     return ret;

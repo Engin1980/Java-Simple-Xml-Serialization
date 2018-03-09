@@ -133,8 +133,14 @@ public class XmlSerializer {
    * @return Object deserialized from the class.
    */
   public Object deserialize(@NotNull InputStream xmlFileName, @NotNull Class objectType) {
-    Element el = loadXmlAndGetRootElement(xmlFileName);
-    Object ret = this.parser.deserialize(el, objectType);
+    Element el;
+    Object ret;
+    try {
+      el = loadXmlAndGetRootElement(xmlFileName);
+      ret = this.parser.deserialize(el, objectType);
+    } catch (XmlDeserializationException ex){
+      throw new XmlException(ex);
+    }
     return ret;
   }
 
@@ -163,8 +169,12 @@ public class XmlSerializer {
    */
   public void serialize(@NotNull OutputStream outputStream, @NotNull Object sourceObject) {
     Document doc;
-    doc = this.formatter.saveObject(sourceObject);
-    saveXmlDocument(outputStream, doc);
+    try {
+      doc = this.formatter.saveObject(sourceObject);
+      saveXmlDocument(outputStream, doc);
+    } catch (XmlSerializationException ex){
+      throw new XmlException(ex);
+    }
   }
 
 //  /**
@@ -245,7 +255,7 @@ public class XmlSerializer {
     return settings;
   }
 
-  private void saveXmlDocument(OutputStream os, Document doc) {
+  private void saveXmlDocument(OutputStream os, Document doc) throws XmlSerializationException {
     try {
 
       TransformerFactory tFactory =
@@ -264,13 +274,13 @@ public class XmlSerializer {
     }
   }
 
-  private Element loadXmlAndGetRootElement(InputStream xmlFileName) {
+  private Element loadXmlAndGetRootElement(InputStream xmlFileName) throws XmlDeserializationException {
     Document doc = readXmlDocument(xmlFileName);
     Element el = doc.getDocumentElement();
     return el;
   }
 
-  private Document readXmlDocument(InputStream inputStream) {
+  private Document readXmlDocument(InputStream inputStream) throws XmlDeserializationException {
     Document doc = null;
     try {
       DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -281,7 +291,7 @@ public class XmlSerializer {
       //read this - http://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
       doc.getDocumentElement().normalize();
     } catch (ParserConfigurationException | SAXException | IOException ex) {
-      throw new XmlSerializationException(ex, "Failed to load XML file from stream.");
+      throw new XmlDeserializationException(ex, "Failed to load XML file from stream.");
     }
 
     return doc;

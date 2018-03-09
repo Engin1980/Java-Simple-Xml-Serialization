@@ -1,6 +1,7 @@
 package eng.eSystem.xmlSerialization.common.parsers;
 
 import eng.eSystem.xmlSerialization.IElementParser;
+import eng.eSystem.xmlSerialization.XmlDeserializationException;
 import eng.eSystem.xmlSerialization.XmlSerializationException;
 import org.w3c.dom.Element;
 
@@ -24,7 +25,7 @@ public class AwtFontElementParser implements IElementParser<Font> {
   }
 
   @Override
-  public Font parse(Element element) {
+  public Font parse(Element element) throws XmlDeserializationException {
     String familyName = getAttributeValue(element, ATTR_FAMILY);
     String styleS = getAttributeValue(element, ATTR_STYLE);
     String sizeS = getAttributeValue(element, ATTR_SIZE);
@@ -43,19 +44,19 @@ public class AwtFontElementParser implements IElementParser<Font> {
     element.setAttribute(ATTR_SIZE, Integer.toString(value.getSize()));
   }
 
-  private int toInt(String value, String key) {
+  private int toInt(String value, String key) throws XmlDeserializationException {
     int ret;
     try{
       ret = Integer.parseInt(value);
      } catch (Exception ex){
-      throw new XmlSerializationException("Failed to convert attribute " + key + " value " + value + " to {int} in " + this.getClass().getName() + " parsing.");
+      throw new XmlDeserializationException("Failed to convert attribute " + key + " value " + value + " to {int} in " + this.getClass().getName() + " parsing.");
     }
     return ret;
   }
 
-  private String getAttributeValue(Element el, String key){
+  private String getAttributeValue(Element el, String key) throws XmlDeserializationException{
     if (el.hasAttribute(key) == false)
-      throw new XmlSerializationException("Failed to find required attribute " + key + " for " + this.getClass().getName() + " parsing.");
+      throw new XmlDeserializationException("Failed to find required attribute " + key + " for " + this.getClass().getName() + " parsing.");
     String ret = el.getAttribute(key);
     return ret;
   }
