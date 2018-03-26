@@ -2,6 +2,8 @@ package eng.eSystem.xmlSerialization;
 
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
+import eng.eSystem.collections.IList;
+import eng.eSystem.collections.ISet;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -10,10 +12,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Formatter {
 
@@ -126,6 +125,12 @@ public class Formatter {
           storePrimitive(el, value);
         } else if (List.class.isAssignableFrom(realType)) {
           storeList(el, (List) value);
+        } else if (IList.class.isAssignableFrom(realType)) {
+          storeIList(el, (IList) value);
+        } else if (Set.class.isAssignableFrom(realType)) {
+          storeSet(el, (Set) value);
+        } else if (ISet.class.isAssignableFrom(realType)) {
+          storeISet(el, (ISet) value);
         } else if (realType.isArray()) {
           storeArray(el, value);
         } else {
@@ -140,6 +145,37 @@ public class Formatter {
     }
 
     logIndent--;
+  }
+
+  private void storeISet(Element el, ISet iset) throws XmlSerializationException {
+    Set set = iset.toSet();
+    storeSet(el, set);
+  }
+
+  private void storeSet(Element el, Set set) throws XmlSerializationException {
+    Class listItemType = deriveIterableItemType(set);
+    addItemTypeAttribute(el, listItemType);
+
+    for (Object item : set) {
+
+      String tagName;
+      if (item == null)
+        tagName = "item";
+      else {
+        XmlListItemMapping map = tryGetListItemMapping(el, item.getClass());
+        tagName = (map == null || map.itemElementName == null) ?
+            item.getClass().getSimpleName() :
+            map.itemElementName;
+      }
+
+      Element itemElement = createElementForObject(el, tagName);
+      storeIt(itemElement, item, listItemType);
+    }
+  }
+
+  private void storeIList(Element el, IList list) throws XmlSerializationException {
+    List lst = list.toList();
+    storeList(el, lst);
   }
 
   private void logVerbose(String format, Object... params) {
@@ -225,7 +261,7 @@ public class Formatter {
 
   private void storeList(Element el, List list) throws XmlSerializationException {
 
-    Class listItemType = deriveListItemType(list);
+    Class listItemType = deriveIterableItemType(list);
     addItemTypeAttribute(el, listItemType);
 
     for (Object item : list) {
@@ -261,7 +297,7 @@ public class Formatter {
     return ret;
   }
 
-  private Class deriveListItemType(List value) {
+  private Class deriveIterableItemType(Iterable value) {
     Class ret;
     List<Class> topTypes = new ArrayList<>(1);
 

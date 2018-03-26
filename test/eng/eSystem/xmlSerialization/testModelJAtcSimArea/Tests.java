@@ -3,12 +3,14 @@ package eng.eSystem.xmlSerialization.testModelJAtcSimArea;
 import eng.eSystem.xmlSerialization.XmlCustomFieldMapping;
 import eng.eSystem.xmlSerialization.XmlListItemMapping;
 import eng.eSystem.xmlSerialization.XmlSerializer;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 
 public class Tests {
 
+  @Ignore
   @Test
   public void testDeserialize(){
     String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +

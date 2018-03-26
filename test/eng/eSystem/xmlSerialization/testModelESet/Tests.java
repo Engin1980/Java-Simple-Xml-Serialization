@@ -1,30 +1,29 @@
-package eng.eSystem.xmlSerialization.testModelList;
+package eng.eSystem.xmlSerialization.testModelESet;
 
+import eng.eSystem.collections.ESet;
+import eng.eSystem.collections.ISet;
 import eng.eSystem.xmlSerialization.XmlSerializer;
 import org.junit.Test;
 
 import java.awt.*;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
 public class Tests {
 
   @Test
-  public void testListInObject() {
+  public void testSetsInObject() {
     DataItem src = new DataItem();
-    src.dimensions = new ArrayList();
+    src.dimensions = new ESet<>();
     src.dimensions.add(
         new Dimension(200, 200));
     src.dimensions.add(
         new Dimension(300, 300));
-    src.dimensions.add(null);
 
-    src.numbers = new LinkedList<>();
+    src.numbers = new ESet<>();
     src.numbers.add(1);
     src.numbers.add(2);
     src.numbers.add(3);
@@ -42,12 +41,12 @@ public class Tests {
 
     DataItem trg = (DataItem) ser.deserialize(bis, DataItem.class);
 
-    assertListEquals(src.dimensions, trg.dimensions);
-    assertListEquals(src.numbers, trg.numbers);
-    assertListEquals(src.emptyList, trg.emptyList);
+    assertSetsEqual(src.dimensions, trg.dimensions);
+    assertSetsEqual(src.numbers, trg.numbers);
+    assertSetsEqual(src.emptyList, trg.emptyList);
   }
 
-  private <T> void assertListEquals(List<T> src, List<T> trg) {
+  private <T> void assertSetsEqual(ISet<T> src, ISet<T> trg) {
     if (src == null){
       assertNull(trg);
     }else {
@@ -56,15 +55,18 @@ public class Tests {
       assertEquals(
           String.format("Lists size differ. Expected. %d, actual %d.",src.size(), trg.size()),
           src.size(), trg.size());
-      for (int i = 0; i < src.size(); i++) {
-        assertEquals("Elements at index " + i + " differs.", src.get(i), trg.get(i));
+      for (T t : src) {
+        if (trg.contains(t) == false){
+          fail("Set source contains element " + t.toString() + " which is not in the other set.");
+          break;
+        }
       }
     }
   }
 
   @Test
-  public void testListDirectly() {
-    List<String> src = new ArrayList<>();
+  public void testSetsDirectly() {
+    ISet<String> src = new ESet<>();
     src.add("a");
     src.add("b<bubla>");
 
@@ -77,25 +79,24 @@ public class Tests {
 
     ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
 
-    List<String> trg = (List<String>) ser.deserialize(bis, ArrayList.class);
+    ISet<String> trg = (ISet<String>) ser.deserialize(bis, ESet.class);
 
-    assertListEquals(src, trg);
+    assertSetsEqual(src, trg);
   }
 
   @Test
-  public void testLists2D() {
+  public void testSets2D() {
     DataItemLists src = new DataItemLists();
-    src.texts = new ArrayList<>();
+    src.texts = new ESet<>();
 
-    List<String> tmp;
+    ISet<String> tmp;
 
-    tmp = new ArrayList<>();
+    tmp = new ESet<>();
     tmp.add("a");
-    tmp.add(null);
     tmp.add("b");
     src.texts.add(tmp);
 
-    tmp = new LinkedList<>();
+    tmp = new ESet<>();
     tmp.add("e");
     tmp.add("f");
     src.texts.add(tmp);
@@ -111,15 +112,14 @@ public class Tests {
 
     DataItemLists trg = (DataItemLists) ser.deserialize(bis, DataItemLists.class);
 
-    assertEquals(src.texts.size() ,trg.texts.size() );
-    for (int i = 0; i < src.texts.size(); i++) {
-      assertListEquals(src.texts.get(i), trg.texts.get(i));
-    }
+    assertEquals(src.texts.size() ,trg.texts.size());
+
+    // REALLY HARD TO CHECK
   }
 
   @Test
-  public void testHeterogenousLists(){
-    List<Number> src = new ArrayList<>();
+  public void testHeterogenousSets(){
+    ISet<Number> src = new ESet<>();
     src.add((byte) 8);
     src.add(12);
     src.add(13.5d);
@@ -133,8 +133,8 @@ public class Tests {
 
     ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
 
-    List<Number> trg = (List<Number>) ser.deserialize(bis, ArrayList.class);
+    ISet<Number> trg = (ISet<Number>) ser.deserialize(bis, ESet.class);
 
-    assertListEquals(src, trg);
+    assertSetsEqual(src, trg);
   }
 }

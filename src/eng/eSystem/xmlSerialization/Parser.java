@@ -5,6 +5,8 @@
  */
 package eng.eSystem.xmlSerialization;
 
+import eng.eSystem.collections.IList;
+import eng.eSystem.collections.ISet;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -121,6 +123,12 @@ class Parser {
           ret = parsePrimitiveFromElement(el, type);
         } else if (List.class.isAssignableFrom(type)) {
           ret = parseList(el, type);
+        } else if (IList.class.isAssignableFrom(type)){
+          ret = parseIList(el, type);
+        } else if (Set.class.isAssignableFrom(type)) {
+          ret = parseSet(el, type);
+        } else if (ISet.class.isAssignableFrom(type)){
+          ret = parseISet(el, type);
         } else if (type.isArray()) {
           ret = parseArray(el, type);
         } else {
@@ -135,6 +143,126 @@ class Parser {
 
     logVerbose("... result = " + ret);
     logIndent--;
+    return ret;
+  }
+
+  private Object parseISet(Element setElement, Class c) throws XmlDeserializationException {
+    Object ret;
+    List<String> elementsWithObjectWarningLogged = new ArrayList<>();
+
+    ISet set = (ISet) createObjectInstanceByElement(setElement, c);
+
+    List<Element> children = getElements(setElement);
+    removeTypeMapElementIfExist(children);
+
+    Class expectedClass = tryGetArrayItemTypeByElement(setElement);
+    if (expectedClass == null) expectedClass = Object.class;
+
+
+    for (Element e : children) {
+
+      Class itemExpectedClass;
+
+      XmlListItemMapping map = tryGetListElementMapping(e);
+      if (map != null) {
+        itemExpectedClass = map.itemType;
+      } else {
+        itemExpectedClass = expectedClass;
+        if (itemExpectedClass.equals(Object.class) && elementsWithObjectWarningLogged.contains(e.getNodeName()) == false) {
+          elementsWithObjectWarningLogged.add(e.getNodeName());
+          Shared.log(
+              Shared.eLogType.warning,
+              "Set item from element <%s> for set '%s' is deserialized as 'Object' class. Probably missing custom collection mapping. Full node info: %s",
+              e.getNodeName(), set.getClass().getName(), Shared.getElementInfoString(e));
+        }
+      }
+
+
+      Object itemValue = parseIt(e, itemExpectedClass);
+      set.add(itemValue);
+    }
+
+    ret = set;
+    return ret;
+  }
+
+  private Object parseSet(Element setElement, Class c) throws XmlDeserializationException {
+    Object ret;
+    List<String> elementsWithObjectWarningLogged = new ArrayList<>();
+
+    Set set = (Set) createObjectInstanceByElement(setElement, c);
+
+    List<Element> children = getElements(setElement);
+    removeTypeMapElementIfExist(children);
+
+    Class expectedClass = tryGetArrayItemTypeByElement(setElement);
+    if (expectedClass == null) expectedClass = Object.class;
+
+
+    for (Element e : children) {
+
+      Class itemExpectedClass;
+
+      XmlListItemMapping map = tryGetListElementMapping(e);
+      if (map != null) {
+        itemExpectedClass = map.itemType;
+      } else {
+        itemExpectedClass = expectedClass;
+        if (itemExpectedClass.equals(Object.class) && elementsWithObjectWarningLogged.contains(e.getNodeName()) == false) {
+          elementsWithObjectWarningLogged.add(e.getNodeName());
+          Shared.log(
+              Shared.eLogType.warning,
+              "Set item from element <%s> for set '%s' is deserialized as 'Object' class. Probably missing custom collection mapping. Full node info: %s",
+              e.getNodeName(), set.getClass().getName(), Shared.getElementInfoString(e));
+        }
+      }
+
+
+      Object itemValue = parseIt(e, itemExpectedClass);
+      set.add(itemValue);
+    }
+
+    ret = set;
+    return ret;
+  }
+
+  private Object parseIList(Element listElement, Class c) throws XmlDeserializationException {
+    Object ret;
+    List<String> elementsWithObjectWarningLogged = new ArrayList<>();
+
+    IList lst = (IList) createObjectInstanceByElement(listElement, c);
+
+    List<Element> children = getElements(listElement);
+    removeTypeMapElementIfExist(children);
+
+    Class expectedClass = tryGetArrayItemTypeByElement(listElement);
+    if (expectedClass == null) expectedClass = Object.class;
+
+
+    for (Element e : children) {
+
+      Class itemExpectedClass;
+
+      XmlListItemMapping map = tryGetListElementMapping(e);
+      if (map != null) {
+        itemExpectedClass = map.itemType;
+      } else {
+        itemExpectedClass = expectedClass;
+        if (itemExpectedClass.equals(Object.class) && elementsWithObjectWarningLogged.contains(e.getNodeName()) == false) {
+          elementsWithObjectWarningLogged.add(e.getNodeName());
+          Shared.log(
+              Shared.eLogType.warning,
+              "List item from element <%s> for list '%s' is deserialized as 'Object' class. Probably missing custom list mapping. Full node info: %s",
+              e.getNodeName(), lst.getClass().getName(), Shared.getElementInfoString(e));
+        }
+      }
+
+
+      Object itemValue = parseIt(e, itemExpectedClass);
+      lst.add(itemValue);
+    }
+
+    ret = lst;
     return ret;
   }
 

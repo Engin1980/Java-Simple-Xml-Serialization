@@ -1,5 +1,8 @@
-package eng.eSystem.xmlSerialization.testModelList;
+package eng.eSystem.xmlSerialization.testModelEList;
 
+import com.sun.javafx.collections.ElementObservableListDecorator;
+import eng.eSystem.collections.EList;
+import eng.eSystem.collections.IList;
 import eng.eSystem.xmlSerialization.XmlSerializer;
 import org.junit.Test;
 
@@ -17,14 +20,14 @@ public class Tests {
   @Test
   public void testListInObject() {
     DataItem src = new DataItem();
-    src.dimensions = new ArrayList();
+    src.dimensions = new EList<>();
     src.dimensions.add(
         new Dimension(200, 200));
     src.dimensions.add(
         new Dimension(300, 300));
-    src.dimensions.add(null);
+    src.dimensions.add((Dimension)null);
 
-    src.numbers = new LinkedList<>();
+    src.numbers = new EList<>();
     src.numbers.add(1);
     src.numbers.add(2);
     src.numbers.add(3);
@@ -47,7 +50,7 @@ public class Tests {
     assertListEquals(src.emptyList, trg.emptyList);
   }
 
-  private <T> void assertListEquals(List<T> src, List<T> trg) {
+  private <T> void assertListEquals(IList<T> src, IList<T> trg) {
     if (src == null){
       assertNull(trg);
     }else {
@@ -64,7 +67,7 @@ public class Tests {
 
   @Test
   public void testListDirectly() {
-    List<String> src = new ArrayList<>();
+    IList<String> src = new EList<>();
     src.add("a");
     src.add("b<bubla>");
 
@@ -77,7 +80,7 @@ public class Tests {
 
     ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
 
-    List<String> trg = (List<String>) ser.deserialize(bis, ArrayList.class);
+    IList<String> trg = (IList<String>) ser.deserialize(bis, EList.class);
 
     assertListEquals(src, trg);
   }
@@ -85,17 +88,17 @@ public class Tests {
   @Test
   public void testLists2D() {
     DataItemLists src = new DataItemLists();
-    src.texts = new ArrayList<>();
+    src.texts = new EList<>();
 
-    List<String> tmp;
+    IList<String> tmp;
 
-    tmp = new ArrayList<>();
+    tmp = new EList<>();
     tmp.add("a");
-    tmp.add(null);
+    tmp.add((String)null);
     tmp.add("b");
     src.texts.add(tmp);
 
-    tmp = new LinkedList<>();
+    tmp = new EList<>();
     tmp.add("e");
     tmp.add("f");
     src.texts.add(tmp);
@@ -119,7 +122,7 @@ public class Tests {
 
   @Test
   public void testHeterogenousLists(){
-    List<Number> src = new ArrayList<>();
+    IList<Number> src = new EList<>();
     src.add((byte) 8);
     src.add(12);
     src.add(13.5d);
@@ -133,7 +136,7 @@ public class Tests {
 
     ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
 
-    List<Number> trg = (List<Number>) ser.deserialize(bis, ArrayList.class);
+    IList<Number> trg = (IList<Number>) ser.deserialize(bis, EList.class);
 
     assertListEquals(src, trg);
   }

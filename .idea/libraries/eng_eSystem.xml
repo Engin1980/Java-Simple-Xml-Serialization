@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="eng.eSystem">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../eng.eSystem/out/artifacts/eng.eSystem.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
