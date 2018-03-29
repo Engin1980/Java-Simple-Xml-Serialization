@@ -5,8 +5,7 @@
  */
 package eng.eSystem.xmlSerialization;
 
-import eng.eSystem.collections.IList;
-import eng.eSystem.collections.ISet;
+import eng.eSystem.collections.*;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -123,11 +122,11 @@ class Parser {
           ret = parsePrimitiveFromElement(el, type);
         } else if (List.class.isAssignableFrom(type)) {
           ret = parseList(el, type);
-        } else if (IList.class.isAssignableFrom(type)){
+        } else if (IList.class.isAssignableFrom(type)) {
           ret = parseIList(el, type);
         } else if (Set.class.isAssignableFrom(type)) {
           ret = parseSet(el, type);
-        } else if (ISet.class.isAssignableFrom(type)){
+        } else if (ISet.class.isAssignableFrom(type)) {
           ret = parseISet(el, type);
         } else if (type.isArray()) {
           ret = parseArray(el, type);
@@ -652,9 +651,14 @@ class Parser {
   private Object createObjectInstance(Class<?> type) throws XmlDeserializationException {
     Object ret;
 
-    if (type.equals(List.class) || type.equals(AbstractList.class)) {
+    if (type.equals(List.class) || type.equals(AbstractList.class))
       type = settings.getDefaultListTypeImplementation();
-    }
+    else if (type.equals(IList.class) || type.equals(IReadOnlyList.class) || type.equals(ICollection.class))
+      type = EList.class;
+    else if (type.equals(ISet.class) || type.equals(IReadOnlySet.class))
+      type = ESet.class;
+    else if (type.equals(IMap.class))
+      type = EMap.class;
 
     // check if there is not an custom instance creator
     IInstanceCreator creator = tryGetInstanceCreator(type);

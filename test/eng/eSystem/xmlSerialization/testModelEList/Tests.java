@@ -1,6 +1,5 @@
 package eng.eSystem.xmlSerialization.testModelEList;
 
-import com.sun.javafx.collections.ElementObservableListDecorator;
 import eng.eSystem.collections.EList;
 import eng.eSystem.collections.IList;
 import eng.eSystem.xmlSerialization.XmlSerializer;
@@ -9,9 +8,6 @@ import org.junit.Test;
 import java.awt.*;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 
 import static org.junit.Assert.*;
 
