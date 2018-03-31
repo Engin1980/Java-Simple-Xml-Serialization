@@ -11,7 +11,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 import static eng.eSystem.xmlSerialization.Shared.getDeclaredFields;
@@ -665,11 +667,25 @@ class Parser {
 
     if (creator == null)
       try {
-        ret = type.newInstance();
+        Constructor constructor;
+        constructor = type.getDeclaredConstructor(null);
+        constructor.setAccessible(true);
+        ret = constructor.newInstance(null);
+        // ret = type.newInstance(); // old solution
       } catch (InstantiationException | IllegalAccessException ex) {
         throw new XmlDeserializationException(
             ex,
             "Failed to create new instance of '%s'. Probably missing public parameter-less constructor.",
+            type.getName());
+      } catch (NoSuchMethodException ex) {
+        throw new XmlDeserializationException(
+            ex,
+            "Failed to create new instance of '%s'. Probably missing any parameter-less constructor.",
+            type.getName());
+      } catch (InvocationTargetException ex) {
+        throw new XmlDeserializationException(
+            ex,
+            "Failed to create new instance of '%s'.",
             type.getName());
       }
     else {
