@@ -224,7 +224,7 @@ public class Tests {
     byte[] bdata = bos.toByteArray();
     String xml = new String(bdata);
 
-    System.out.println(new String(bdata));
+    // System.out.println(new String(bdata));
 
     ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
 

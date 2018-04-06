@@ -63,7 +63,7 @@ public class Tests {
     src.getFriends()[1] = f;
 
     Settings sett = new Settings();
-    sett.setVerbose(true);
+    //sett.setVerbose(true);
     XmlSerializer ser = new XmlSerializer(sett);
 
     ByteArrayOutputStream bos = new ByteArrayOutputStream();

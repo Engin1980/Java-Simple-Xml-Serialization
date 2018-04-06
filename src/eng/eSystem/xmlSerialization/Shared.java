@@ -23,6 +23,8 @@ class Shared {
   public static final String TYPE_MAP_KEY_ATTRIBUTE_NAME = "key";
   public static final String TYPE_MAP_OF_ATTRIBUTE_NAME = "__class";
   public static final String TYPE_MAP_ITEM_OF_ATTRIBUTE_NAME = "__itemClass";
+  public static final String TYPE_MAP_KEY_OF_ATTRIBUTE_NAME = "__keyClass";
+  public static final String TYPE_MAP_VALUE_OF_ATTRIBUTE_NAME = "__valueClass";
   public static final String TYPE_MAP_ELEMENT_NAME = "__typeMap";
   private static final String LOG_TEXT_PREFIX = "E-XmlSerialization";
 

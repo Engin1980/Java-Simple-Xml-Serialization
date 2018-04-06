@@ -3,6 +3,7 @@ package eng.eSystem.xmlSerialization;
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
 import eng.eSystem.collections.IList;
+import eng.eSystem.collections.IMap;
 import eng.eSystem.collections.ISet;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -131,6 +132,10 @@ public class Formatter {
           storeSet(el, (Set) value);
         } else if (ISet.class.isAssignableFrom(realType)) {
           storeISet(el, (ISet) value);
+        } else if (Map.class.isAssignableFrom(realType)) {
+          storeMap(el, (Map) value);
+        } else if (IMap.class.isAssignableFrom(realType)) {
+          storeIMap(el, (IMap) value);
         } else if (realType.isArray()) {
           storeArray(el, value);
         } else {
@@ -281,6 +286,48 @@ public class Formatter {
     }
   }
 
+  private void storeMap(Element el, Map map) throws XmlSerializationException {
+
+    Class keyItemType = deriveIterableItemType(map.keySet());
+    addKeyTypeAttribute(el, keyItemType);
+    Class valueItemType = deriveIterableItemType(map.values());
+    addValueTypeAttribute(el, valueItemType);
+
+    for (Object key : map.keySet()) {
+      String tagName = "item";
+      Object value = map.get(key);
+
+      Element itemElement = createElementForObject(el, tagName);
+
+      Element keyElement = createElementForObject(itemElement, "key");
+      storeIt(keyElement, key, keyItemType);
+
+      Element valueElement = createElementForObject(itemElement, "value");
+      storeIt(valueElement, value, valueItemType);
+    }
+  }
+
+  private void storeIMap(Element el, IMap map) throws XmlSerializationException {
+
+    Class keyItemType = deriveIterableItemType(map.keySet());
+    addKeyTypeAttribute(el, keyItemType);
+    Class valueItemType = deriveIterableItemType(map.values());
+    addValueTypeAttribute(el, valueItemType);
+
+    for (Object key : map.keySet()) {
+      String tagName = "item";
+      Object value = map.get(key);
+
+      Element itemElement = createElementForObject(el, tagName);
+
+      Element keyElement = createElementForObject(itemElement, "key");
+      storeIt(keyElement, key, keyItemType);
+
+      Element valueElement = createElementForObject(itemElement, "value");
+      storeIt(valueElement, value, valueItemType);
+    }
+  }
+
   private XmlListItemMapping tryGetListItemMapping(Element listElement, Class itemClass) {
     XmlListItemMapping ret = null;
     String listElementXPath = Shared.getElementXPath(listElement);
@@ -422,35 +469,37 @@ public class Formatter {
   }
 
   private void addClassAttribute(Element element, Class<?> realType) {
-    String attributeTypeName;
-
-    if (settings.isUseSimpleTypeNamesInReferences()) {
-
-      if (typeMap.containsKey(realType) == false) {
-        String simple = generateTypeSimpleName(realType);
-        typeMap.put(realType, simple);
-      }
-      attributeTypeName = typeMap.get(realType);
-    } else
-      attributeTypeName = realType.getName();
-
+    String attributeTypeName = registerAndGetTypeForAttribute(realType);
     element.setAttribute(Shared.TYPE_MAP_OF_ATTRIBUTE_NAME, attributeTypeName);
   }
 
-  private void addItemTypeAttribute(Element element, Class<?> realType) {
-    String attributeTypeName;
-
+  private String registerAndGetTypeForAttribute(Class<?> type) {
+    String ret;
     if (settings.isUseSimpleTypeNamesInReferences()) {
 
-      if (typeMap.containsKey(realType) == false) {
-        String simple = generateTypeSimpleName(realType);
-        typeMap.put(realType, simple);
+      if (typeMap.containsKey(type) == false) {
+        String simple = generateTypeSimpleName(type);
+        typeMap.put(type, simple);
       }
-      attributeTypeName = typeMap.get(realType);
+      ret = typeMap.get(type);
     } else
-      attributeTypeName = realType.getName();
+      ret = type.getName();
+    return ret;
+  }
 
+  private void addItemTypeAttribute(Element element, Class<?> realType) {
+    String attributeTypeName = registerAndGetTypeForAttribute(realType);
     element.setAttribute(Shared.TYPE_MAP_ITEM_OF_ATTRIBUTE_NAME, attributeTypeName);
+  }
+
+  private void addKeyTypeAttribute(Element element, Class<?> realType) {
+    String attributeTypeName = registerAndGetTypeForAttribute(realType);
+    element.setAttribute(Shared.TYPE_MAP_KEY_OF_ATTRIBUTE_NAME, attributeTypeName);
+  }
+
+  private void addValueTypeAttribute(Element element, Class<?> realType) {
+    String attributeTypeName = registerAndGetTypeForAttribute(realType);
+    element.setAttribute(Shared.TYPE_MAP_VALUE_OF_ATTRIBUTE_NAME, attributeTypeName);
   }
 
   private String generateTypeSimpleName(Class<?> realType) {

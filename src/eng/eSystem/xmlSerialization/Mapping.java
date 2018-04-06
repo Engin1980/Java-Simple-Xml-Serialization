@@ -13,6 +13,8 @@ class Mapping {
   static {
     simpleTypes.add(Integer.class);
     simpleTypes.add(int.class);
+    simpleTypes.add(Long.class);
+    simpleTypes.add(long.class);
     simpleTypes.add(Double.class);
     simpleTypes.add(double.class);
     simpleTypes.add(Boolean.class);
@@ -25,6 +27,8 @@ class Mapping {
     simpleTypes.add(Byte.class);
     simpleTypes.add(short.class);
     simpleTypes.add(Short.class);
+    simpleTypes.add(float.class);
+    simpleTypes.add(Float.class);
   }
 
   static boolean isSimpleTypeOrEnum(Class c) {

@@ -130,6 +130,10 @@ class Parser {
           ret = parseSet(el, type);
         } else if (ISet.class.isAssignableFrom(type)) {
           ret = parseISet(el, type);
+        } else if (Map.class.isAssignableFrom(type)) {
+          ret = parseMap(el, type);
+        } else if (IMap.class.isAssignableFrom(type)) {
+          ret = parseIMap(el, type);
         } else if (type.isArray()) {
           ret = parseArray(el, type);
         } else {
@@ -321,6 +325,108 @@ class Parser {
     return ret;
   }
 
+  private Object parseMap(Element mapElement, Class c) throws XmlDeserializationException {
+    Object ret;
+//    List<String> elementsWithObjectWarningLogged = new ArrayList<>();
+
+    Map map = (Map) createObjectInstanceByElement(mapElement, c);
+
+    List<Element> children = getElements(mapElement);
+    removeTypeMapElementIfExist(children);
+
+    Class keyAttExpectedClass = tryGetKeyItemTypeByElement(mapElement);
+    Class valueAttExpectedClass = tryGetValueItemTypeByElement(mapElement);
+
+    if (keyAttExpectedClass == null) keyAttExpectedClass = Object.class;
+    if (valueAttExpectedClass == null) valueAttExpectedClass = Object.class;
+
+    for (Element e : children) {
+
+      Class keyExpectedClass;
+      Class valueExpectedClass;
+
+      keyExpectedClass = keyAttExpectedClass;
+      valueExpectedClass = valueAttExpectedClass;
+
+//      XmlListItemMapping map = tryGetListElementMapping(e);
+//      if (map != null) {
+//        itemExpectedClass = map.itemType;
+//      } else {
+//        itemExpectedClass = expectedClass;
+//        if (itemExpectedClass.equals(Object.class) && elementsWithObjectWarningLogged.contains(e.getNodeName()) == false) {
+//          elementsWithObjectWarningLogged.add(e.getNodeName());
+//          Shared.log(
+//              Shared.eLogType.warning,
+//              "List item from element <%s> for list '%s' is deserialized as 'Object' class. Probably missing custom list mapping. Full node info: %s",
+//              e.getNodeName(), lst.getClass().getName(), Shared.getElementInfoString(e));
+//        }
+//      }
+
+
+      Element keyElement = (Element) e.getElementsByTagName("key").item(0);
+      Element valueElement = (Element) e.getElementsByTagName("value").item(0);
+
+      Object key = parseIt(keyElement, keyExpectedClass);
+      Object value = parseIt(valueElement, valueExpectedClass);
+
+      map.put(key, value);
+    }
+
+    ret = map;
+    return ret;
+  }
+
+  private Object parseIMap(Element mapElement, Class c) throws XmlDeserializationException {
+    Object ret;
+//    List<String> elementsWithObjectWarningLogged = new ArrayList<>();
+
+    IMap map = (IMap) createObjectInstanceByElement(mapElement, c);
+
+    List<Element> children = getElements(mapElement);
+    removeTypeMapElementIfExist(children);
+
+    Class keyAttExpectedClass = tryGetKeyItemTypeByElement(mapElement);
+    Class valueAttExpectedClass = tryGetValueItemTypeByElement(mapElement);
+
+    if (keyAttExpectedClass == null) keyAttExpectedClass = Object.class;
+    if (valueAttExpectedClass == null) valueAttExpectedClass = Object.class;
+
+    for (Element e : children) {
+
+      Class keyExpectedClass;
+      Class valueExpectedClass;
+
+      keyExpectedClass = keyAttExpectedClass;
+      valueExpectedClass = valueAttExpectedClass;
+
+//      XmlListItemMapping map = tryGetListElementMapping(e);
+//      if (map != null) {
+//        itemExpectedClass = map.itemType;
+//      } else {
+//        itemExpectedClass = expectedClass;
+//        if (itemExpectedClass.equals(Object.class) && elementsWithObjectWarningLogged.contains(e.getNodeName()) == false) {
+//          elementsWithObjectWarningLogged.add(e.getNodeName());
+//          Shared.log(
+//              Shared.eLogType.warning,
+//              "List item from element <%s> for list '%s' is deserialized as 'Object' class. Probably missing custom list mapping. Full node info: %s",
+//              e.getNodeName(), lst.getClass().getName(), Shared.getElementInfoString(e));
+//        }
+//      }
+
+
+      Element keyElement = (Element) e.getElementsByTagName("key").item(0);
+      Element valueElement = (Element) e.getElementsByTagName("value").item(0);
+
+      Object key = parseIt(keyElement, keyExpectedClass);
+      Object value = parseIt(valueElement, valueExpectedClass);
+
+      map.set(key, value);
+    }
+
+    ret = map;
+    return ret;
+  }
+
   private Object createObjectInstanceByElement(Element el, Class c) throws XmlDeserializationException {
 
     Class customType = tryGetCustomTypeByElement(el);
@@ -391,17 +497,31 @@ class Parser {
   }
 
   private Class tryGetArrayItemTypeByElement(Element el) throws XmlDeserializationException {
+    Class ret = tryExtractTypeFromAttribute(el, Shared.TYPE_MAP_ITEM_OF_ATTRIBUTE_NAME);
+    return ret;
+  }
+
+  private Class tryGetKeyItemTypeByElement(Element el) throws XmlDeserializationException {
+    Class ret = tryExtractTypeFromAttribute(el, Shared.TYPE_MAP_KEY_OF_ATTRIBUTE_NAME);
+    return ret;
+  }
+
+  private Class tryGetValueItemTypeByElement(Element el) throws XmlDeserializationException {
+    Class ret = tryExtractTypeFromAttribute(el, Shared.TYPE_MAP_VALUE_OF_ATTRIBUTE_NAME);
+    return ret;
+  }
+
+  private Class tryExtractTypeFromAttribute(Element el, String attributeName) throws XmlDeserializationException {
     Class ret;
     String tmp;
-    if (el.hasAttribute(Shared.TYPE_MAP_ITEM_OF_ATTRIBUTE_NAME)) {
-      tmp = el.getAttribute(Shared.TYPE_MAP_ITEM_OF_ATTRIBUTE_NAME);
+    if (el.hasAttribute(attributeName)) {
+      tmp = el.getAttribute(attributeName);
       try {
         ret = loadClass(tmp);
       } catch (Exception ex) {
         throw new XmlDeserializationException(ex,
             "Failed to load class for element item-class defined in %s.", Shared.getElementInfoString(el));
       }
-
     } else
       ret = null;
 
@@ -613,6 +733,14 @@ class Parser {
           case "int":
           case "java.lang.Integer":
             ret = Integer.parseInt(value);
+            break;
+          case "long":
+          case "java.lang.Long":
+            ret = Long.parseLong(value);
+            break;
+          case "float":
+          case "java.lang.Float":
+            ret = Float.parseFloat(value);
             break;
           case "double":
           case "java.lang.Double":
