@@ -16,32 +16,14 @@ import com.sun.istack.internal.Nullable;
  *   (or one of its descendants), it will create a new list (according to settings in {@linkplain Settings#getDefaultListTypeImplementation()}).
  *   Then, to fill the list, it will take all sub-elements of the element as an object in the list. As Java is using
  *   "generic type erasure", during runtime there is not information what the type in the list should be put.
- *   This mapping defines, that for specific element ({@linkplain #listElementXPathRegex}) when used as list, (and optionally
+ *   This mapping defines, that for specific element ({@linkplain #collectionElementXPathRegex}) when used as list, (and optionally
  *   for specific sub-element in the list named to {@linkplain #itemElementName}) the instance of class
  *   {@linkplain #itemType} will be used.
  * </p>
  * @author Marek
  * @see Settings
  */
-public class XmlListItemMapping {
-  /**
-   * Represents an XML path to list.
-   * Note that this is a regex, xml sub-elements are divided by a dot ".".
-   * This should contain either full name to element name containing list, like "^person.addresses" or
-   * just regex like "person.addresses".
-   */
-  @NotNull
-  public final String listElementXPathRegex;
-  /**
-   * Represents element name inside list if requested.
-   * This is used when there is a need to map different items in the list to different classes
-   * according to the element names. If empty, all elements in the list
-   * specified by {@linkplain listElementXPathRegex} will be mapped to type {@linkplain itemType}.
-   * If specified, only elements inside list {@linkplain listElementXPathRegex} with this tag will be mapped to
-   * {@linkplain itemType}.
-   */
-  @Nullable
-  public final String itemElementName;
+public class XmlListItemMapping extends XmlItemMapping {
   /**
    * Target class to which the element should be mapped into.
    */
@@ -53,13 +35,12 @@ public class XmlListItemMapping {
    * <p>For principle look at the {@link XmlListItemMapping class definition}.
    * This constructor is used when a specific class should be used for specific xml-element (according to its name)
    * in the list xml-element.</p>
-   * @param listElementXPathRegex The regex defining the name of xml-element which contains list items.
+   * @param collectionElementXPathRegex The regex defining the name of xml-element which contains list items.
    * @param itemElementName The regex defining the name of xml-subelement inside the list xml-element.
    * @param itemType The class used to represent item in the list.
    */
-  public XmlListItemMapping(@NotNull String listElementXPathRegex, @Nullable String itemElementName, @NotNull Class itemType) {
-    this.listElementXPathRegex = listElementXPathRegex;
-    this.itemElementName = itemElementName;
+  public XmlListItemMapping(@NotNull String collectionElementXPathRegex, @Nullable String itemElementName, @NotNull Class itemType) {
+    super(collectionElementXPathRegex, itemElementName);
     this.itemType = itemType;
   }
 
@@ -68,12 +49,11 @@ public class XmlListItemMapping {
    * <p>For principle look at the {@link XmlListItemMapping class definition}.
    * This constructor is used when all elements in the list has the same
    * instance type.</p>
-   * @param listElementXPathRegex The regex defining the name of xml-element which contains list items.
+   * @param collectionElementXPathRegex The regex defining the name of xml-element which contains list items.
    * @param itemType The class used to represent item in the list.
    */
-  public XmlListItemMapping(@NotNull String listElementXPathRegex, @NotNull Class itemType) {
-    this.listElementXPathRegex = listElementXPathRegex;
-    this.itemElementName = null;
+  public XmlListItemMapping(@NotNull String collectionElementXPathRegex, @NotNull Class itemType) {
+    super(collectionElementXPathRegex);
     this.itemType = itemType;
   }
 
@@ -81,7 +61,7 @@ public class XmlListItemMapping {
   public String toString() {
     StringBuilder ret = new StringBuilder();
     ret.append("XmlListItemMapping{");
-    ret.append(listElementXPathRegex).append("\\");
+    ret.append(collectionElementXPathRegex).append("\\");
     if (itemElementName == null)
       ret.append("*");
     else

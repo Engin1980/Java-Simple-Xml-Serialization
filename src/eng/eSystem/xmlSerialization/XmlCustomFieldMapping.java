@@ -11,7 +11,7 @@ public class XmlCustomFieldMapping {
   /**
    * Creates a new instance of declaration.
    * @param fieldName Name of mapped field. Mandatory.
-   * @param declaredFieldClass Class of value of mapped field. Mandatory.
+   * @param declaredFieldClass Class of declared value of mapped field. Mandatory.
    * @param classDeclaringField Class declaring field, or null. Optional.
    * @param targetFieldClass Class of instance in field value (real value), or null. Optional.
    * @param xmlElementName Element name with serialized field data. Mandatory.

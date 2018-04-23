@@ -117,6 +117,7 @@ public class XmlSerializer {
   public Object deserialize(@NotNull String xmlFileName, @NotNull Class objectType) {
     InputStream is = openFileForReading(xmlFileName);
     Object ret = deserialize(is, objectType);
+    closeFile(is);
     return ret;
   }
 
@@ -156,6 +157,15 @@ public class XmlSerializer {
   public void serialize(@NotNull String xmlFileName, @NotNull Object sourceObject) {
     OutputStream os = openFileForWriting(xmlFileName);
     this.serialize(os, sourceObject);
+    closeFile(os);
+  }
+
+  private void closeFile(Closeable os) {
+    try {
+      os.close();
+    } catch (IOException ex) {
+      throw new RuntimeException("Failed to close source file.", ex);
+    }
   }
 
   /**

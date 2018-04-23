@@ -327,7 +327,7 @@ class Parser {
 
   private Object parseMap(Element mapElement, Class c) throws XmlDeserializationException {
     Object ret;
-//    List<String> elementsWithObjectWarningLogged = new ArrayList<>();
+    List<String> elementsWithObjectWarningLogged = new ArrayList<>();
 
     Map map = (Map) createObjectInstanceByElement(mapElement, c);
 
@@ -348,19 +348,19 @@ class Parser {
       keyExpectedClass = keyAttExpectedClass;
       valueExpectedClass = valueAttExpectedClass;
 
-//      XmlListItemMapping map = tryGetListElementMapping(e);
-//      if (map != null) {
-//        itemExpectedClass = map.itemType;
-//      } else {
-//        itemExpectedClass = expectedClass;
-//        if (itemExpectedClass.equals(Object.class) && elementsWithObjectWarningLogged.contains(e.getNodeName()) == false) {
-//          elementsWithObjectWarningLogged.add(e.getNodeName());
-//          Shared.log(
-//              Shared.eLogType.warning,
-//              "List item from element <%s> for list '%s' is deserialized as 'Object' class. Probably missing custom list mapping. Full node info: %s",
-//              e.getNodeName(), lst.getClass().getName(), Shared.getElementInfoString(e));
-//        }
-//      }
+      XmlMapItemMapping mem = tryGetMapElementMapping(e);
+      if (mem != null) {
+        keyExpectedClass = mem.keyType;
+        valueExpectedClass = mem.valueType;
+      } else {
+        if (keyExpectedClass.equals(Object.class) && valueExpectedClass.equals(Object.class) && elementsWithObjectWarningLogged.contains(e.getNodeName()) == false) {
+          elementsWithObjectWarningLogged.add(e.getNodeName());
+          Shared.log(
+              Shared.eLogType.warning,
+              "Map item from element <%s> for map '%s' is deserialized as 'Object' class for key and value too. Probably missing custom map mapping. Full node info: %s",
+              e.getNodeName(), map.getClass().getName(), Shared.getElementInfoString(e));
+        }
+      }
 
 
       Element keyElement = (Element) e.getElementsByTagName("key").item(0);
@@ -378,7 +378,7 @@ class Parser {
 
   private Object parseIMap(Element mapElement, Class c) throws XmlDeserializationException {
     Object ret;
-//    List<String> elementsWithObjectWarningLogged = new ArrayList<>();
+    List<String> elementsWithObjectWarningLogged = new ArrayList<>();
 
     IMap map = (IMap) createObjectInstanceByElement(mapElement, c);
 
@@ -399,19 +399,19 @@ class Parser {
       keyExpectedClass = keyAttExpectedClass;
       valueExpectedClass = valueAttExpectedClass;
 
-//      XmlListItemMapping map = tryGetListElementMapping(e);
-//      if (map != null) {
-//        itemExpectedClass = map.itemType;
-//      } else {
-//        itemExpectedClass = expectedClass;
-//        if (itemExpectedClass.equals(Object.class) && elementsWithObjectWarningLogged.contains(e.getNodeName()) == false) {
-//          elementsWithObjectWarningLogged.add(e.getNodeName());
-//          Shared.log(
-//              Shared.eLogType.warning,
-//              "List item from element <%s> for list '%s' is deserialized as 'Object' class. Probably missing custom list mapping. Full node info: %s",
-//              e.getNodeName(), lst.getClass().getName(), Shared.getElementInfoString(e));
-//        }
-//      }
+      XmlMapItemMapping mem = tryGetMapElementMapping(e);
+      if (mem != null) {
+        keyExpectedClass = mem.keyType;
+        valueExpectedClass = mem.valueType;
+      } else {
+        if (keyExpectedClass.equals(Object.class) && valueExpectedClass.equals(Object.class) && elementsWithObjectWarningLogged.contains(e.getNodeName()) == false) {
+          elementsWithObjectWarningLogged.add(e.getNodeName());
+          Shared.log(
+              Shared.eLogType.warning,
+              "Map item from element <%s> for map '%s' is deserialized as 'Object' class for key and value too. Probably missing custom map mapping. Full node info: %s",
+              e.getNodeName(), map.getClass().getName(), Shared.getElementInfoString(e));
+        }
+      }
 
 
       Element keyElement = (Element) e.getElementsByTagName("key").item(0);
@@ -875,7 +875,22 @@ class Parser {
 
     XmlListItemMapping ret = null;
     for (XmlListItemMapping mi : settings.getListItemMappings()) {
-      if (isRegexMatch(mi.listElementXPathRegex, parentXPath) && (mi.itemElementName == null || mi.itemElementName.equals(itemElement.getNodeName()))) {
+      if (isRegexMatch(mi.collectionElementXPathRegex, parentXPath) && (mi.itemElementName == null || mi.itemElementName.equals(itemElement.getNodeName()))) {
+        ret = mi;
+        break;
+      }
+    }
+
+    return ret;
+  }
+
+  private XmlMapItemMapping tryGetMapElementMapping(Element itemElement) {
+    Element parentElement = (Element) itemElement.getParentNode();
+    String parentXPath = Shared.getElementXPath(parentElement);
+
+    XmlMapItemMapping ret = null;
+    for (XmlMapItemMapping mi : settings.getMapItemMappings()) {
+      if (isRegexMatch(mi.collectionElementXPathRegex, parentXPath) && (mi.itemElementName == null || mi.itemElementName.equals(itemElement.getNodeName()))) {
         ret = mi;
         break;
       }

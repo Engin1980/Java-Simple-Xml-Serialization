@@ -294,8 +294,12 @@ public class Formatter {
     addValueTypeAttribute(el, valueItemType);
 
     for (Object key : map.keySet()) {
-      String tagName = "item";
       Object value = map.get(key);
+
+      XmlMapItemMapping mem = tryGetMapItemMapping(el, key, value);
+      String tagName = (mem == null || mem.itemElementName == null) ?
+          "item" :
+          mem.itemElementName;
 
       Element itemElement = createElementForObject(el, tagName);
 
@@ -309,14 +313,17 @@ public class Formatter {
 
   private void storeIMap(Element el, IMap map) throws XmlSerializationException {
 
-    Class keyItemType = deriveIterableItemType(map.keySet());
+    Class keyItemType = deriveIterableItemType(map.getKeys());
     addKeyTypeAttribute(el, keyItemType);
-    Class valueItemType = deriveIterableItemType(map.values());
+    Class valueItemType = deriveIterableItemType(map.getValues());
     addValueTypeAttribute(el, valueItemType);
 
-    for (Object key : map.keySet()) {
-      String tagName = "item";
+    for (Object key : map.getKeys()) {
       Object value = map.get(key);
+      XmlMapItemMapping mem = tryGetMapItemMapping(el, key, value);
+      String tagName = (mem == null || mem.itemElementName == null) ?
+          "item" :
+          mem.itemElementName;
 
       Element itemElement = createElementForObject(el, tagName);
 
@@ -333,9 +340,34 @@ public class Formatter {
     String listElementXPath = Shared.getElementXPath(listElement);
 
     for (XmlListItemMapping map : settings.getListItemMappings()) {
-      if (Shared.isRegexMatch(map.listElementXPathRegex, listElementXPath)
+      if (Shared.isRegexMatch(map.collectionElementXPathRegex, listElementXPath)
           &&
           itemClass.equals(map.itemType)
+          ) {
+        ret = map;
+        break;
+      }
+    }
+    return ret;
+  }
+
+  private XmlMapItemMapping tryGetMapItemMapping(Element listElement, Object key, Object value) {
+    XmlMapItemMapping ret = null;
+    String listElementXPath = Shared.getElementXPath(listElement);
+
+    Class keyClass = key.getClass();
+    Class valueClass;
+    if (value == null)
+      valueClass = null;
+    else
+      valueClass = value.getClass();
+
+    for (XmlMapItemMapping map : settings.getMapItemMappings()) {
+      if (Shared.isRegexMatch(map.collectionElementXPathRegex, listElementXPath)
+          &&
+          keyClass.equals(map.keyType)
+          &&
+          (valueClass == null || valueClass.equals(map.valueType))
           ) {
         ret = map;
         break;

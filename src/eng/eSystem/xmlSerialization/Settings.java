@@ -1,6 +1,8 @@
 package eng.eSystem.xmlSerialization;
 
 import com.sun.istack.internal.NotNull;
+import eng.eSystem.collections.EList;
+import eng.eSystem.collections.IList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +17,7 @@ public class Settings {
   private final List<IValueParser> valueParsers = new ArrayList<>();
   private final List<IElementParser> elementParsers = new ArrayList<>();
   private final List<XmlListItemMapping> listItemMapping = new ArrayList();
+  private final List<XmlMapItemMapping> mapItemMaping = new ArrayList<>();
   private final List<XmlCustomFieldMapping> customFieldMappings = new ArrayList<>();
   private boolean verbose = false;
   private String nullString = "(null)";
@@ -34,6 +37,7 @@ public class Settings {
    * List of mappings defines which datatype will be used for element during deserialization of the list.
    * The mappings are used in the order specified in this list (first matching will be used).
    * For more info look for the explanation of {@linkplain XmlListItemMapping}.
+   *
    * @return List of mappings.
    * @see XmlListItemMapping
    */
@@ -43,7 +47,22 @@ public class Settings {
   }
 
   /**
+   * Gets list of mappings defining how map in deserialized class will be handled. <br />
+   * List of mappings defines which datatype will be used for element during deserialization of the map.
+   * The mappings are used in the order specified in this list (first matching will be used).
+   * For more info look for the explanation of {@linkplain XmlMapItemMapping}.
+   *
+   * @return List of mappings.
+   * @see XmlListItemMapping
+   */
+  @NotNull
+  public List<XmlMapItemMapping> getMapItemMappings() {
+    return mapItemMaping;
+  }
+
+  /**
    * If true, verbose info is printed into console during operation.
+   *
    * @return true/false
    */
   public boolean isVerbose() {
@@ -52,6 +71,7 @@ public class Settings {
 
   /**
    * Sets verbose parameter.
+   *
    * @param verbose
    * @see #isVerbose()
    */
@@ -63,6 +83,7 @@ public class Settings {
    * Contains list of regexes. If field name match one of the regexes, then will be skipped. <br />
    * This list is used to skip processing of specified fields regardless their class. Only field names
    * are tested against regexes. If field name matches any of the regex in the list, will be skipped.
+   *
    * @return List of regexes to be matched against field name.
    */
   @NotNull
@@ -75,6 +96,7 @@ public class Settings {
    * During deserialization, when list is found, it is needed to be created an instance. However,
    * java.util.List is abstract and offers a set of different implementations. Class in this property
    * says which implementation will be used for the list.
+   *
    * @return Class used to instantiate java.util.List object.
    */
   @NotNull
@@ -84,13 +106,14 @@ public class Settings {
 
   /**
    * See {@linkplain #getDefaultListTypeImplementation()} .
+   *
    * @param defaultListTypeImplementation
    */
   public void setDefaultListTypeImplementation(@NotNull Class defaultListTypeImplementation) {
     if (defaultListTypeImplementation == null) {
-        throw new IllegalArgumentException("Value of {defaultListTypeImplementation} cannot not be null.");
+      throw new IllegalArgumentException("Value of {defaultListTypeImplementation} cannot not be null.");
     }
-    
+
     this.defaultListTypeImplementation = defaultListTypeImplementation;
   }
 
@@ -101,6 +124,7 @@ public class Settings {
    * Otherwise, public parameter-less constructor will be invoked, what can
    * cause an error if an instantiated type has no such constructor.
    * For more info see {@linkplain IInstanceCreator}.
+   *
    * @return List of classes instantiating specified types.
    * @see IInstanceCreator
    */
@@ -117,6 +141,7 @@ public class Settings {
    * an implementation for that type is in this list, this parser will be used
    * instead of default parsing of the attribute value. For more info about
    * parsers see {@linkplain IValueParser}.
+   *
    * @return
    * @see IValueParser
    * @see IElementParser
@@ -134,6 +159,7 @@ public class Settings {
    * an implementation for that type is in this list, this parser will be used
    * instead of default parsing of the element. For more info about
    * parsers see {@linkplain IElementParser}.
+   *
    * @return
    * @see IElementParser
    * @see IValueParser
@@ -145,6 +171,7 @@ public class Settings {
   /**
    * Returns the string representing "null" when found as xml-attribute value or as xml-element text. Default
    * value is '(null)'.
+   *
    * @return
    */
   @NotNull
@@ -154,12 +181,13 @@ public class Settings {
 
   /**
    * See {@linkplain #getNullString()}.
+   *
    * @param nullString
    * @see #getNullString()
    */
   public void setNullString(@NotNull String nullString) {
     if (nullString == null) {
-        throw new IllegalArgumentException("Value of {nullString} cannot not be null.");
+      throw new IllegalArgumentException("Value of {nullString} cannot not be null.");
     }
 
     this.nullString = nullString;
@@ -170,6 +198,7 @@ public class Settings {
    * This is mainly used for inheritance. If a instance of a specific class should be used instead of parent class, this mapping must be
    * defined in this list. For <i>abstract</i> classes it is required as it is not possible to create
    * an instance of abstract class. How element is defined see {@linkplain XmlCustomFieldMapping}.
+   *
    * @return
    * @see XmlCustomFieldMapping
    */

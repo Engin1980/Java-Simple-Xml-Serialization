@@ -59,8 +59,8 @@ public class Tests {
           String.format("Maps size differ. Expected. %d, actual %d.",src.size(), trg.size()),
           src.size(), trg.size());
 
-      ISet<T> srcKeys = src.keySet();
-      ISet<T> trgKeys = trg.keySet();
+      ISet<T> srcKeys = src.getKeys();
+      ISet<T> trgKeys = trg.getKeys();
 
       for (T srcKey : srcKeys) {
         T trgKey = null;
