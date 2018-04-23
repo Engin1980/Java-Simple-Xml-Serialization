@@ -1,5 +1,6 @@
 package eng.eSystem.xmlSerialization;
 
+import eng.eSystem.eXml.XElement;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -41,12 +42,12 @@ class Shared {
     return ret;
   }
 
-  public static String getElementXPath(Element el) {
+  public static String getElementXPath(XElement el) {
     String ret = getElementInfoText(el, false, false);
     return ret;
   }
 
-  public static String getElementInfoString(Element el) {
+  public static String getElementInfoString(XElement el) {
     String ret = getElementInfoText(el, true, true);
     return ret;
   }
@@ -107,41 +108,19 @@ class Shared {
     return ret;
   }
 
-  private static String getElementInfoText(Element el, boolean appendAttributes, boolean addBrackets) {
-    StringBuilder sb = new StringBuilder();
+  private static String getElementInfoText(XElement el, boolean appendAttributes, boolean addBrackets) {
+
+    String ret;
 
     if (el == null)
-      return "null";
-
-    if (addBrackets)
-      sb.append("<");
-    sb.append(el.getTagName());
-    if (appendAttributes) {
-      sb.append(" ");
-      NamedNodeMap nnm = el.getAttributes();
-      for (int i = 0; i < nnm.getLength(); i++) {
-        Node n = nnm.item(i);
-        sb.append(String.format("%s=\"%s\" ", n.getNodeName(), n.getNodeValue()));
-      }
-    }
-    if (sb.charAt(sb.length() - 1) == ' ')
-      sb.deleteCharAt(sb.length() - 1);
-    if (addBrackets)
-      sb.append(">");
-
-    Node n = el.getParentNode();
-    while (n != null && n.getNodeType() != Node.DOCUMENT_NODE) {
-      sb.insert(0, "/");
-      String tmp;
+      ret = "null";
+    else{
       if (addBrackets)
-        tmp = "<" + n.getNodeName() + ">";
+        ret = el.toXmlPath(appendAttributes);
       else
-        tmp = n.getNodeName();
-      sb.insert(0, tmp);
-      n = n.getParentNode();
+        ret = el.toXPath();
     }
-
-    return sb.toString();
+    return ret;
   }
 
 }

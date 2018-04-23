@@ -1,9 +1,11 @@
 package eng.eSystem.xmlSerialization;
 
+import eng.eSystem.eXml.XElement;
+
 public interface IElementParser<T> {
   Class getType();
 
-  T parse(org.w3c.dom.Element element) throws XmlDeserializationException;
+  T parse(XElement element) throws XmlDeserializationException;
 
-  void format(T value, org.w3c.dom.Element element) throws XmlSerializationException;
+  void format(T value, XElement element) throws XmlSerializationException;
 }

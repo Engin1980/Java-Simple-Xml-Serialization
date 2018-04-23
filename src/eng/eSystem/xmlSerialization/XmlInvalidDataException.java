@@ -5,6 +5,7 @@
  */
 package eng.eSystem.xmlSerialization;
 
+import eng.eSystem.eXml.XElement;
 import org.w3c.dom.Element;
 
 import java.util.List;
@@ -18,7 +19,7 @@ public class XmlInvalidDataException extends XmlSerializationException {
     super(message);
   }
 
-  public static XmlInvalidDataException createNoSuchElement(Element parentElement, String fieldName, Class<? extends Object> targetClass) {
+  public static XmlInvalidDataException createNoSuchElement(XElement parentElement, String fieldName, Class<? extends Object> targetClass) {
     StringBuilder sb = new StringBuilder();
 
     sb.append("Value for property not found in XML data. ");
@@ -33,7 +34,7 @@ public class XmlInvalidDataException extends XmlSerializationException {
     return new XmlInvalidDataException(sb.toString());
   }
 
-  public static XmlInvalidDataException createNoSuchElementInMappings(Element parentElement, String fieldName, Class<? extends Object> targetClass,
+  public static XmlInvalidDataException createNoSuchElementInMappings(XElement parentElement, String fieldName, Class<? extends Object> targetClass,
                                                                       List<XmlCustomFieldMapping>usedCustomMappings) {
     StringBuilder sb = new StringBuilder();
 
@@ -59,7 +60,7 @@ public class XmlInvalidDataException extends XmlSerializationException {
 
 
   public static XmlInvalidDataException createAttributeInsteadOfElementFound(
-      Element parentElement, String fieldName, Class<? extends Object> targetClass) {
+      XElement parentElement, String fieldName, Class<? extends Object> targetClass) {
     StringBuilder sb = new StringBuilder();
 
     sb.append("Value of type found as attribute, however an sub-element was expected. Probably missing custom parser? ");

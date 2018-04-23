@@ -5,12 +5,9 @@ import com.sun.istack.internal.Nullable;
 import eng.eSystem.collections.IList;
 import eng.eSystem.collections.IMap;
 import eng.eSystem.collections.ISet;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import eng.eSystem.eXml.XDocument;
+import eng.eSystem.eXml.XElement;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.*;
@@ -26,41 +23,28 @@ public class Formatter {
     this.settings = settings;
   }
 
-  public synchronized Document saveObject(Object source) throws XmlSerializationException {
-    Document doc;
-    DocumentBuilderFactory dbFactory;
-    DocumentBuilder dBuilder;
-    Element el;
-    try {
+  public synchronized XDocument saveObject(Object source) throws XmlSerializationException {
+    XElement root = new XElement("root");
+    XDocument doc = new XDocument(root);
 
-      dbFactory = DocumentBuilderFactory.newInstance();
-      dBuilder = dbFactory.newDocumentBuilder();
-      doc = dBuilder.newDocument();
-
-
-      el = doc.createElement("root");
-      doc.appendChild(el);
-    } catch (ParserConfigurationException ex) {
-      throw new XmlSerializationException("Failed to create w3c document. Internal error.", ex);
-    }
 
     if (settings.isUseSimpleTypeNamesInReferences()) {
       this.typeMap.clear();
     }
 
     if (source == null)
-      storeIt(el, null, Object.class);
+      storeIt(root, null, Object.class);
     else
-      storeIt(el, source, source.getClass());
+      storeIt(root, source, source.getClass());
 
     if (settings.isUseSimpleTypeNamesInReferences()) {
-      appendTypeMap(el);
+      appendTypeMap(root);
     }
 
     return doc;
   }
 
-  public void storeField(Element parentElement, Object source, Field f) throws XmlSerializationException {
+  public void storeField(XElement parentElement, Object source, Field f) throws XmlSerializationException {
     logIndent++;
     logVerbose("serialize field %s.%s into %s",
         f.getDeclaringClass().getName(),
@@ -96,7 +80,7 @@ public class Formatter {
           elementName = map.getXmlElementName();
           c = map.getTargetFieldClass();
         }
-        Element el = createElementForObject(parentElement, elementName);
+        XElement el = createElementForObject(parentElement, elementName);
         storeIt(el, value, c);
       }
     } catch (XmlSerializationException ex) {
@@ -107,9 +91,9 @@ public class Formatter {
     logIndent--;
   }
 
-  public void storeIt(Element el, Object value, Class declaredType) throws XmlSerializationException {
+  public void storeIt(XElement el, Object value, Class declaredType) throws XmlSerializationException {
     logIndent++;
-    logVerbose("serialize %s (%s) -> <%s>", value, declaredType.getClass().getName(), el.getNodeName());
+    logVerbose("serialize %s (%s) -> <%s>", value, declaredType.getClass().getName(), el.getName());
 
     try {
       if (value == null) {
@@ -152,12 +136,12 @@ public class Formatter {
     logIndent--;
   }
 
-  private void storeISet(Element el, ISet iset) throws XmlSerializationException {
+  private void storeISet(XElement el, ISet iset) throws XmlSerializationException {
     Set set = iset.toSet();
     storeSet(el, set);
   }
 
-  private void storeSet(Element el, Set set) throws XmlSerializationException {
+  private void storeSet(XElement el, Set set) throws XmlSerializationException {
     Class listItemType = deriveIterableItemType(set);
     addItemTypeAttribute(el, listItemType);
 
@@ -173,12 +157,12 @@ public class Formatter {
             map.itemElementName;
       }
 
-      Element itemElement = createElementForObject(el, tagName);
+      XElement itemElement = createElementForObject(el, tagName);
       storeIt(itemElement, item, listItemType);
     }
   }
 
-  private void storeIList(Element el, IList list) throws XmlSerializationException {
+  private void storeIList(XElement el, IList list) throws XmlSerializationException {
     List lst = list.toList();
     storeList(el, lst);
   }
@@ -226,22 +210,22 @@ public class Formatter {
     return false;
   }
 
-  private void appendTypeMap(Element el) {
+  private void appendTypeMap(XElement el) {
     el = createElementForObject(el, Shared.TYPE_MAP_ELEMENT_NAME);
     for (Class key : typeMap.keySet()) {
-      Element sel = createElementForObject(el, Shared.TYPE_MAP_ITEM_ELEMENT_NAME);
+      XElement sel = createElementForObject(el, Shared.TYPE_MAP_ITEM_ELEMENT_NAME);
       sel.setAttribute(Shared.TYPE_MAP_KEY_ATTRIBUTE_NAME, typeMap.get(key));
       sel.setAttribute(Shared.TYPE_MAP_FULL_ATTRIBUTE_NAME, key.getName());
     }
   }
 
-  private Element createElementForObject(Element parent, String elementName) {
-    Element ret = parent.getOwnerDocument().createElement(elementName);
-    parent.appendChild(ret);
+  private XElement createElementForObject(XElement parent, String elementName) {
+    XElement ret = new XElement(elementName);
+    parent.addElement(ret);
     return ret;
   }
 
-  private void convertAndStoreFieldComplexByCustomParser(Element el, Object value, IElementParser parser) throws XmlSerializationException {
+  private void convertAndStoreFieldComplexByCustomParser(XElement el, Object value, IElementParser parser) throws XmlSerializationException {
     try {
       parser.format(value, el);
     } catch (Exception ex) {
@@ -264,7 +248,7 @@ public class Formatter {
     return s;
   }
 
-  private void storeList(Element el, List list) throws XmlSerializationException {
+  private void storeList(XElement el, List list) throws XmlSerializationException {
 
     Class listItemType = deriveIterableItemType(list);
     addItemTypeAttribute(el, listItemType);
@@ -281,12 +265,12 @@ public class Formatter {
             map.itemElementName;
       }
 
-      Element itemElement = createElementForObject(el, tagName);
+      XElement itemElement = createElementForObject(el, tagName);
       storeIt(itemElement, item, listItemType);
     }
   }
 
-  private void storeMap(Element el, Map map) throws XmlSerializationException {
+  private void storeMap(XElement el, Map map) throws XmlSerializationException {
 
     Class keyItemType = deriveIterableItemType(map.keySet());
     addKeyTypeAttribute(el, keyItemType);
@@ -301,17 +285,17 @@ public class Formatter {
           "item" :
           mem.itemElementName;
 
-      Element itemElement = createElementForObject(el, tagName);
+      XElement itemElement = createElementForObject(el, tagName);
 
-      Element keyElement = createElementForObject(itemElement, "key");
+      XElement keyElement = createElementForObject(itemElement, "key");
       storeIt(keyElement, key, keyItemType);
 
-      Element valueElement = createElementForObject(itemElement, "value");
+      XElement valueElement = createElementForObject(itemElement, "value");
       storeIt(valueElement, value, valueItemType);
     }
   }
 
-  private void storeIMap(Element el, IMap map) throws XmlSerializationException {
+  private void storeIMap(XElement el, IMap map) throws XmlSerializationException {
 
     Class keyItemType = deriveIterableItemType(map.getKeys());
     addKeyTypeAttribute(el, keyItemType);
@@ -325,17 +309,17 @@ public class Formatter {
           "item" :
           mem.itemElementName;
 
-      Element itemElement = createElementForObject(el, tagName);
+      XElement itemElement = createElementForObject(el, tagName);
 
-      Element keyElement = createElementForObject(itemElement, "key");
+      XElement keyElement = createElementForObject(itemElement, "key");
       storeIt(keyElement, key, keyItemType);
 
-      Element valueElement = createElementForObject(itemElement, "value");
+      XElement valueElement = createElementForObject(itemElement, "value");
       storeIt(valueElement, value, valueItemType);
     }
   }
 
-  private XmlListItemMapping tryGetListItemMapping(Element listElement, Class itemClass) {
+  private XmlListItemMapping tryGetListItemMapping(XElement listElement, Class itemClass) {
     XmlListItemMapping ret = null;
     String listElementXPath = Shared.getElementXPath(listElement);
 
@@ -351,7 +335,7 @@ public class Formatter {
     return ret;
   }
 
-  private XmlMapItemMapping tryGetMapItemMapping(Element listElement, Object key, Object value) {
+  private XmlMapItemMapping tryGetMapItemMapping(XElement listElement, Object key, Object value) {
     XmlMapItemMapping ret = null;
     String listElementXPath = Shared.getElementXPath(listElement);
 
@@ -435,7 +419,7 @@ public class Formatter {
     return ret;
   }
 
-  private void storeArray(Element el, Object value) throws XmlSerializationException {
+  private void storeArray(XElement el, Object value) throws XmlSerializationException {
     int cnt = Array.getLength(value);
     Class itemType = value.getClass().getComponentType();
     for (int i = 0; i < cnt; i++) {
@@ -444,20 +428,20 @@ public class Formatter {
       while (itemElementName.endsWith("[]")) {
         itemElementName = itemElementName.substring(0, itemElementName.length() - 2) + "_arr";
       }
-      Element itemElement = createElementForObject(el, itemElementName);
+      XElement itemElement = createElementForObject(el, itemElementName);
       storeIt(itemElement, item, itemType);
     }
   }
 
-  private void storeNullElement(Element element) {
-    element.setTextContent(settings.getNullString());
+  private void storeNullElement(XElement element) {
+    element.setContent(settings.getNullString());
   }
 
-  private void storeNullAttribute(Element element, String attributeName) {
+  private void storeNullAttribute(XElement element, String attributeName) {
     element.setAttribute(attributeName, settings.getNullString());
   }
 
-  private void storeObject(Element el, Object value) throws XmlSerializationException {
+  private void storeObject(XElement el, Object value) throws XmlSerializationException {
     Class c = value.getClass();
     Field[] fields = Shared.getDeclaredFields(c);
 
@@ -466,12 +450,12 @@ public class Formatter {
         continue; // statické přeskakujem
       } else if (f.getAnnotation(XmlIgnore.class) != null) {
         if (settings.isVerbose()) {
-          System.out.println("  " + el.getNodeName() + "." + f.getName() + " field skipped due to @XmlIgnored annotation.");
+          System.out.println("  " + el.getName() + "." + f.getName() + " field skipped due to @XmlIgnored annotation.");
         }
         continue; // skipped due to annotation
       } else if (Shared.isSkippedBySettings(f, settings)) {
         if (settings.isVerbose()) {
-          System.out.println("  " + el.getNodeName() + "." + f.getName() + " field skipped due to settings-ignoredFieldsRegex list.");
+          System.out.println("  " + el.getName() + "." + f.getName() + " field skipped due to settings-ignoredFieldsRegex list.");
         }
         continue;
       }
@@ -486,21 +470,21 @@ public class Formatter {
     }
   }
 
-  private void storePrimitive(Element element, Object value) {
+  private void storePrimitive(XElement element, Object value) {
     if (value == null)
       storeNullElement(element);
     else {
-      element.setTextContent(value.toString());
+      element.setContent(value.toString());
     }
   }
 
-  private void addClassAttributeIfRequired(Element el, Class realType, Class declaredType) {
+  private void addClassAttributeIfRequired(XElement el, Class realType, Class declaredType) {
     if (declaredType != null && realType.equals(declaredType) == false) {
       addClassAttribute(el, realType);
     }
   }
 
-  private void addClassAttribute(Element element, Class<?> realType) {
+  private void addClassAttribute(XElement element, Class<?> realType) {
     String attributeTypeName = registerAndGetTypeForAttribute(realType);
     element.setAttribute(Shared.TYPE_MAP_OF_ATTRIBUTE_NAME, attributeTypeName);
   }
@@ -519,17 +503,17 @@ public class Formatter {
     return ret;
   }
 
-  private void addItemTypeAttribute(Element element, Class<?> realType) {
+  private void addItemTypeAttribute(XElement element, Class<?> realType) {
     String attributeTypeName = registerAndGetTypeForAttribute(realType);
     element.setAttribute(Shared.TYPE_MAP_ITEM_OF_ATTRIBUTE_NAME, attributeTypeName);
   }
 
-  private void addKeyTypeAttribute(Element element, Class<?> realType) {
+  private void addKeyTypeAttribute(XElement element, Class<?> realType) {
     String attributeTypeName = registerAndGetTypeForAttribute(realType);
     element.setAttribute(Shared.TYPE_MAP_KEY_OF_ATTRIBUTE_NAME, attributeTypeName);
   }
 
-  private void addValueTypeAttribute(Element element, Class<?> realType) {
+  private void addValueTypeAttribute(XElement element, Class<?> realType) {
     String attributeTypeName = registerAndGetTypeForAttribute(realType);
     element.setAttribute(Shared.TYPE_MAP_VALUE_OF_ATTRIBUTE_NAME, attributeTypeName);
   }
@@ -548,7 +532,7 @@ public class Formatter {
     return simple;
   }
 
-  private void storePrimitive(Element element, String attributeName, Object value) {
+  private void storePrimitive(XElement element, String attributeName, Object value) {
     if (value == null)
       storeNullAttribute(element, attributeName);
     else

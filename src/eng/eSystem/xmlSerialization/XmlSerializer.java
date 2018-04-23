@@ -6,6 +6,9 @@
 package eng.eSystem.xmlSerialization;
 
 import com.sun.istack.internal.NotNull;
+import eng.eSystem.eXml.XDocument;
+import eng.eSystem.eXml.XElement;
+import eng.eSystem.exceptions.EXmlException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -134,7 +137,7 @@ public class XmlSerializer {
    * @return Object deserialized from the class.
    */
   public Object deserialize(@NotNull InputStream xmlFileName, @NotNull Class objectType) {
-    Element el;
+    XElement el;
     Object ret;
     try {
       el = loadXmlAndGetRootElement(xmlFileName);
@@ -178,12 +181,14 @@ public class XmlSerializer {
    * @param sourceObject Object to be stored.
    */
   public void serialize(@NotNull OutputStream outputStream, @NotNull Object sourceObject) {
-    Document doc;
+    XDocument doc;
     try {
       doc = this.formatter.saveObject(sourceObject);
-      saveXmlDocument(outputStream, doc);
+      doc.save(outputStream);
     } catch (XmlSerializationException ex){
       throw new XmlException(ex);
+    } catch (EXmlException ex){
+      throw new XmlException(new XmlSerializationException("Failed to save the document.", ex));
     }
   }
 
@@ -284,27 +289,20 @@ public class XmlSerializer {
     }
   }
 
-  private Element loadXmlAndGetRootElement(InputStream xmlFileName) throws XmlDeserializationException {
-    Document doc = readXmlDocument(xmlFileName);
-    Element el = doc.getDocumentElement();
+  private XElement loadXmlAndGetRootElement(InputStream xmlFileName) throws XmlDeserializationException {
+    XDocument doc = readXmlDocument(xmlFileName);
+    XElement el = doc.getRoot();
     return el;
   }
 
-  private Document readXmlDocument(InputStream inputStream) throws XmlDeserializationException {
-    Document doc = null;
+  private XDocument readXmlDocument(InputStream inputStream) throws XmlDeserializationException {
+    XDocument ret;
     try {
-      DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-      DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-      doc = dBuilder.parse(inputStream);
-
-      //optional, but recommended
-      //read this - http://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
-      doc.getDocumentElement().normalize();
-    } catch (ParserConfigurationException | SAXException | IOException ex) {
+      ret = XDocument.load(inputStream);
+    } catch (EXmlException ex) {
       throw new XmlDeserializationException(ex, "Failed to load XML file from stream.");
     }
-
-    return doc;
+    return ret;
   }
 
   public InputStream openFileForReading(String fileName){
