@@ -90,7 +90,7 @@ public class Tests {
 
     ser.serialize(bos, src);
 
-    //System.out.println(new String(bos.toByteArray()));
+    System.out.println(new String(bos.toByteArray()));
 
     ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
 

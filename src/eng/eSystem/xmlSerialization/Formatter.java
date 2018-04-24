@@ -16,7 +16,6 @@ public class Formatter {
 
   private static final String SEPARATOR = "\t";
   private final Settings settings;
-  private Map<Class, String> typeMap = new HashMap<>();
   private int logIndent = 0;
 
   public Formatter(Settings settings) {
@@ -28,23 +27,19 @@ public class Formatter {
     XDocument doc = new XDocument(root);
 
 
-    if (settings.isUseSimpleTypeNamesInReferences()) {
-      this.typeMap.clear();
-    }
-
     if (source == null)
       storeIt(root, null, Object.class);
     else
       storeIt(root, source, source.getClass());
 
     if (settings.isUseSimpleTypeNamesInReferences()) {
-      appendTypeMap(root);
+      Shared.applyTypeMappingShortening(root);
     }
 
     return doc;
   }
 
-  public void storeField(XElement parentElement, Object source, Field f) throws XmlSerializationException {
+  private void storeField(XElement parentElement, Object source, Field f) throws XmlSerializationException {
     logIndent++;
     logVerbose("serialize field %s.%s into %s",
         f.getDeclaringClass().getName(),
@@ -91,7 +86,7 @@ public class Formatter {
     logIndent--;
   }
 
-  public void storeIt(XElement el, Object value, Class declaredType) throws XmlSerializationException {
+  private void storeIt(XElement el, Object value, Class declaredType) throws XmlSerializationException {
     logIndent++;
     logVerbose("serialize %s (%s) -> <%s>", value, declaredType.getClass().getName(), el.getName());
 
@@ -208,15 +203,6 @@ public class Formatter {
         return true;
     }
     return false;
-  }
-
-  private void appendTypeMap(XElement el) {
-    el = createElementForObject(el, Shared.TYPE_MAP_ELEMENT_NAME);
-    for (Class key : typeMap.keySet()) {
-      XElement sel = createElementForObject(el, Shared.TYPE_MAP_ITEM_ELEMENT_NAME);
-      sel.setAttribute(Shared.TYPE_MAP_KEY_ATTRIBUTE_NAME, typeMap.get(key));
-      sel.setAttribute(Shared.TYPE_MAP_FULL_ATTRIBUTE_NAME, key.getName());
-    }
   }
 
   private XElement createElementForObject(XElement parent, String elementName) {
@@ -485,52 +471,21 @@ public class Formatter {
   }
 
   private void addClassAttribute(XElement element, Class<?> realType) {
-    String attributeTypeName = registerAndGetTypeForAttribute(realType);
-    element.setAttribute(Shared.TYPE_MAP_OF_ATTRIBUTE_NAME, attributeTypeName);
-  }
-
-  private String registerAndGetTypeForAttribute(Class<?> type) {
-    String ret;
-    if (settings.isUseSimpleTypeNamesInReferences()) {
-
-      if (typeMap.containsKey(type) == false) {
-        String simple = generateTypeSimpleName(type);
-        typeMap.put(type, simple);
-      }
-      ret = typeMap.get(type);
-    } else
-      ret = type.getName();
-    return ret;
+    element.setAttribute(Shared.TYPE_MAP_OF_ATTRIBUTE_NAME, realType.getName());
   }
 
   private void addItemTypeAttribute(XElement element, Class<?> realType) {
-    String attributeTypeName = registerAndGetTypeForAttribute(realType);
-    element.setAttribute(Shared.TYPE_MAP_ITEM_OF_ATTRIBUTE_NAME, attributeTypeName);
+    element.setAttribute(Shared.TYPE_MAP_ITEM_OF_ATTRIBUTE_NAME, realType.getName());
   }
 
   private void addKeyTypeAttribute(XElement element, Class<?> realType) {
-    String attributeTypeName = registerAndGetTypeForAttribute(realType);
-    element.setAttribute(Shared.TYPE_MAP_KEY_OF_ATTRIBUTE_NAME, attributeTypeName);
+    element.setAttribute(Shared.TYPE_MAP_KEY_OF_ATTRIBUTE_NAME, realType.getName());
   }
 
   private void addValueTypeAttribute(XElement element, Class<?> realType) {
-    String attributeTypeName = registerAndGetTypeForAttribute(realType);
-    element.setAttribute(Shared.TYPE_MAP_VALUE_OF_ATTRIBUTE_NAME, attributeTypeName);
+    element.setAttribute(Shared.TYPE_MAP_VALUE_OF_ATTRIBUTE_NAME, realType.getName());
   }
 
-  private String generateTypeSimpleName(Class<?> realType) {
-    String orig = realType.getSimpleName();
-    String simple = orig;
-    if (typeMap.containsValue(simple)) {
-      int index = 'A';
-      simple = orig + (char) index;
-      while (typeMap.containsValue(simple)) {
-        index++;
-        simple = orig + (char) index;
-      }
-    }
-    return simple;
-  }
 
   private void storePrimitive(XElement element, String attributeName, Object value) {
     if (value == null)

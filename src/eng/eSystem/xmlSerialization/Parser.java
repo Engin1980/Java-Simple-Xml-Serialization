@@ -7,9 +7,6 @@ package eng.eSystem.xmlSerialization;
 
 import eng.eSystem.collections.*;
 import eng.eSystem.eXml.XElement;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
@@ -28,7 +25,6 @@ class Parser {
   private static final Object UNSET = new Object();
   private static final String SEPARATOR = "\t";
   private final Settings settings;
-  private Map<String, String> typeMap = new HashMap<>();
   private int logIndent = 0;
 
   Parser(Settings settings) {
@@ -43,7 +39,7 @@ class Parser {
       throw new IllegalArgumentException("Value of {objectType} cannot not be null.");
     }
 
-    loadTypeMaps(root);
+    Shared.applyTypeMappingExpansion(root);
 
     Class c = objectType;
     Object ret;
@@ -52,7 +48,7 @@ class Parser {
     return ret;
   }
 
-  public Object parseArray(XElement el, Class c) throws XmlDeserializationException {
+  private Object parseArray(XElement el, Class c) throws XmlDeserializationException {
 
     Object ret;
     IList<XElement> children = new EList<>(el.getChildren());
@@ -88,24 +84,6 @@ class Parser {
   private void logVerbose(String format, Object... params) {
     if (settings.isVerbose())
       Shared.log(Shared.eLogType.info, format, params);
-  }
-
-  private void loadTypeMaps(XElement el) {
-    typeMap.clear();
-
-    XElement elm;
-    try {
-      elm = getElement(el, Shared.TYPE_MAP_ELEMENT_NAME, false);
-    } catch (Exception ex) {
-      elm = null;
-    }
-    if (elm != null) {
-      for (XElement type : elm.getChildren()) {
-        String key = type.getAttributes().get(Shared.TYPE_MAP_KEY_ATTRIBUTE_NAME);
-        String fullName = type.getAttributes().get(Shared.TYPE_MAP_FULL_ATTRIBUTE_NAME);
-        typeMap.put(key, fullName);
-      }
-    }
   }
 
   private Object parseIt(XElement el, Class type) throws XmlDeserializationException {
@@ -530,24 +508,11 @@ class Parser {
   private Class loadClass(String className) throws XmlDeserializationException {
     Class ret;
 
-    String tmp = tryGetMappedType(className);
-    if (tmp != null)
-      className = tmp;
-
     try {
       ret = Class.forName(className);
     } catch (ClassNotFoundException e) {
       throw new XmlDeserializationException(e, "Failed to load class '%s' from JVM.", className);
     }
-    return ret;
-  }
-
-  private String tryGetMappedType(String className) {
-    String ret;
-    if (this.typeMap.containsKey(className))
-      ret = this.typeMap.get(className);
-    else
-      ret = null;
     return ret;
   }
 
@@ -663,9 +628,9 @@ class Parser {
   }
 
   private void removeTypeMapElementIfExist(IList<XElement> lst) {
-    lst.remove(q->q.getName().equals(Shared.TYPE_MAP_ELEMENT_NAME));
+    lst.remove(q->q.getName().equals(Shared.TYPE_MAP_DEFINITION_ELEMENT_NAME));
 //    for (int i = 0; i < lst.size(); i++) {
-//      if (lst.get(i).getName().equals(Shared.TYPE_MAP_ELEMENT_NAME)) {
+//      if (lst.get(i).getName().equals(Shared.TYPE_MAP_DEFINITION_ELEMENT_NAME)) {
 //        lst.remove(lst.get(i));
 //        i--;
 //      }
