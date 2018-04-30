@@ -5,7 +5,9 @@ import eng.eSystem.eXml.XElement;
 public interface IElementParser<T> {
   Class getType();
 
-  T parse(XElement element) throws XmlDeserializationException;
+  T parse(XElement element, XmlSerializer.Deserializer source) throws XmlDeserializationException;
 
-  void format(T value, XElement element) throws XmlSerializationException;
+  void format(T value, XElement element, XmlSerializer.Serializer source) throws XmlSerializationException;
+
+  boolean isApplicableOnDescendants();
 }

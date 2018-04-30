@@ -88,10 +88,18 @@ class Shared {
     IElementParser ret = null;
 
     for (IElementParser iElementParser : settings.getElementParsers()) {
-      if (iElementParser.getType().equals(c)) {
-        ret = iElementParser;
-        break;
+      if (!iElementParser.isApplicableOnDescendants()) {
+        if (iElementParser.getType().equals(c)) {
+          ret = iElementParser;
+          break;
+        }
+      } else {
+        if (iElementParser.getType().isAssignableFrom(c)){
+          ret = iElementParser;
+          break;
+        }
       }
+
     }
 
     return ret;

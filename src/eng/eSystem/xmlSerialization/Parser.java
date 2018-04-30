@@ -8,10 +8,7 @@ package eng.eSystem.xmlSerialization;
 import eng.eSystem.collections.*;
 import eng.eSystem.eXml.XElement;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.*;
 import java.util.*;
 
 import static eng.eSystem.xmlSerialization.Shared.getDeclaredFields;
@@ -25,10 +22,12 @@ class Parser {
   private static final Object UNSET = new Object();
   private static final String SEPARATOR = "\t";
   private final Settings settings;
+  private final XmlSerializer parent;
   private int logIndent = 0;
 
-  Parser(Settings settings) {
-    this.settings = settings;
+  Parser(XmlSerializer parent) {
+    this.parent = parent;
+    this.settings = parent.getSettings();
   }
 
   public synchronized Object deserialize(XElement root, Class objectType) throws XmlDeserializationException {
@@ -39,13 +38,17 @@ class Parser {
       throw new IllegalArgumentException("Value of {objectType} cannot not be null.");
     }
 
-    Shared.applyTypeMappingExpansion(root);
 
     Class c = objectType;
     Object ret;
     ret = parseIt(root, c);
 
     return ret;
+  }
+
+  public synchronized void deserializeContent(XElement root, Object target) throws XmlDeserializationException {
+    if (target != null)
+      fillObjectInstanceByElement(root, target, target.getClass());
   }
 
   private Object parseArray(XElement el, Class c) throws XmlDeserializationException {
@@ -101,6 +104,9 @@ class Parser {
         } else if (Mapping.isSimpleTypeOrEnum(type)) {
           // jednoduchý typ
           ret = parsePrimitiveFromElement(el, type);
+        } else if (isInnerInstanceClass(type)) {
+          throw new XmlDeserializationException((Throwable) null,
+              "Deserialization of inner instance class (%s) is not supported.", type.getName());
         } else if (List.class.isAssignableFrom(type)) {
           ret = parseList(el, type);
         } else if (IList.class.isAssignableFrom(type)) {
@@ -127,6 +133,11 @@ class Parser {
 
     logVerbose("... result = " + ret);
     logIndent--;
+    return ret;
+  }
+
+  private boolean isInnerInstanceClass(Class type) {
+    boolean ret = type.getEnclosingClass() != null && !Modifier.isStatic(type.getModifiers());
     return ret;
   }
 
@@ -253,8 +264,8 @@ class Parser {
   private Object convertElementByElementParser(XElement el, IElementParser customElementParser) throws XmlDeserializationException {
     Object ret;
     try {
-      ret = customElementParser.parse(el);
-    } catch (Exception ex) {
+      ret = customElementParser.parse(el, this.parent.new Deserializer());
+    } catch (Throwable ex) {
       throw new XmlDeserializationException(
           ex, "Failed to parse instance of class %s from %s using parser %s.",
           customElementParser.getType().getName(),
@@ -343,7 +354,7 @@ class Parser {
 
 
       XElement keyElement = getElement(e, "key", true); // (XElement) e.getElementsByTagName("key").item(0);
-      XElement valueElement = getElement (e, "value", true); //XElement) e.getElementsByTagName("value").item(0);
+      XElement valueElement = getElement(e, "value", true); //XElement) e.getElementsByTagName("value").item(0);
 
       Object key = parseIt(keyElement, keyExpectedClass);
       Object value = parseIt(valueElement, valueExpectedClass);
@@ -394,7 +405,7 @@ class Parser {
 
 
       XElement keyElement = getElement(e, "key", true); // (XElement) e.getElementsByTagName("key").item(0);
-      XElement valueElement = getElement (e, "value", true); //XElement) e.getElementsByTagName("value").item(0);
+      XElement valueElement = getElement(e, "value", true); //XElement) e.getElementsByTagName("value").item(0);
 
       Object key = parseIt(keyElement, keyExpectedClass);
       Object value = parseIt(valueElement, valueExpectedClass);
@@ -421,7 +432,13 @@ class Parser {
 
     Object ret = createObjectInstanceByElement(el, c);
 
-    Field[] fields = getDeclaredFields(ret.getClass());
+    fillObjectInstanceByElement(el, ret, c);
+
+    return ret;
+  }
+
+  private void fillObjectInstanceByElement(XElement el, Object trg, Class c) throws XmlDeserializationException {
+    Field[] fields = getDeclaredFields(trg.getClass());
 
     for (Field f : fields) {
       if (java.lang.reflect.Modifier.isStatic(f.getModifiers())) {
@@ -445,7 +462,7 @@ class Parser {
       try {
         if (tmp != UNSET) {
           f.setAccessible(true);
-          f.set(ret, tmp);
+          f.set(trg, tmp);
         }
       } catch (Exception ex) {
         String tmpType = tmp == null ? "null" : tmp.getClass().getName();
@@ -455,8 +472,6 @@ class Parser {
             Shared.getElementInfoString(el));
       }
     }
-
-    return ret;
   }
 
   private Class tryGetCustomTypeByElement(XElement el) throws XmlDeserializationException {
@@ -492,7 +507,7 @@ class Parser {
   private Class tryExtractTypeFromAttribute(XElement el, String attributeName) throws XmlDeserializationException {
     Class ret;
     String tmp = el.getAttributes().tryGet(attributeName);
-    if (tmp != null){
+    if (tmp != null) {
       try {
         ret = loadClass(tmp);
       } catch (Exception ex) {
@@ -599,7 +614,7 @@ class Parser {
   }
 
   private boolean containsElementWithName(XElement parentElement, String xmlElementName) {
-    boolean ret = parentElement.getChildren().isAny(q->q.getName().equals(xmlElementName));
+    boolean ret = parentElement.getChildren().isAny(q -> q.getName().equals(xmlElementName));
     return ret;
   }
 
@@ -618,7 +633,7 @@ class Parser {
 
   private XElement getElement(XElement parentElement, String name, boolean required) throws XmlDeserializationException {
 
-    XElement ret = parentElement.getChildren().tryGetFirst(q->q.getName().equals(name));
+    XElement ret = parentElement.getChildren().tryGetFirst(q -> q.getName().equals(name));
     if (ret == null && required) {
       throw new XmlDeserializationException("Unable to find sub-element '%s' in element %s.",
           name,
@@ -628,7 +643,7 @@ class Parser {
   }
 
   private void removeTypeMapElementIfExist(IList<XElement> lst) {
-    lst.remove(q->q.getName().equals(Shared.TYPE_MAP_DEFINITION_ELEMENT_NAME));
+    lst.remove(q -> q.getName().equals(Shared.TYPE_MAP_DEFINITION_ELEMENT_NAME));
 //    for (int i = 0; i < lst.size(); i++) {
 //      if (lst.get(i).getName().equals(Shared.TYPE_MAP_DEFINITION_ELEMENT_NAME)) {
 //        lst.remove(lst.get(i));
@@ -651,8 +666,8 @@ class Parser {
 
   private String readAttributeValue(XElement el, String key, boolean isRequired) throws XmlDeserializationException {
     String ret = el.getAttributes().tryGet(key);
-    if (ret == null){
-      XElement tmp = el.getChildren().tryGetFirst(q->q.getName().equals(key));
+    if (ret == null) {
+      XElement tmp = el.getChildren().tryGetFirst(q -> q.getName().equals(key));
       if (tmp != null) ret = tmp.getContent();
     }
 
@@ -748,7 +763,7 @@ class Parser {
         Constructor constructor;
         constructor = type.getDeclaredConstructor(new Class[0]);
         constructor.setAccessible(true);
-        ret = constructor.newInstance((Object[])null);
+        ret = constructor.newInstance((Object[]) null);
         // ret = type.newInstance(); // old solution
       } catch (InstantiationException | IllegalAccessException ex) {
         throw new XmlDeserializationException(

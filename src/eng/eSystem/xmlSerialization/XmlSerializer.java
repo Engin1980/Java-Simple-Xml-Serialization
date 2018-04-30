@@ -10,43 +10,33 @@ import eng.eSystem.eXml.XDocument;
 import eng.eSystem.eXml.XElement;
 import eng.eSystem.exceptions.EXmlException;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
-import java.util.List;
 
 /**
  * Instance used to serialize and deserialize objects from/to xml.
- * <p>
- * For parsing object from XML, use:
- * <ul>
- * <li>
- * For Arrays use method {@linkplain #fillArray(String, Class)}
- * </li>
- * <li>
- * For implementation of java.util.List use method {@linkplain #fillList(String, List)}
- * </li>
- * <li>
- * For common class use method {@linkplain #fillObject(String, Object)}
- * </li>
- * </ul>
- * </p>
- * <p>
- * For formatting object to XML, use {@linkplain #serialize(String, Object)}.
- * </p>
  *
  * @author Marek
  */
 public class XmlSerializer {
+
+  public class Serializer {
+    public void serialize(Object obj, XElement elm) throws XmlSerializationException {
+      XmlSerializer.this.formatter.saveObject(obj, elm, false);
+    }
+
+  }
+
+  public class Deserializer {
+    public Object deserialize(XElement src, Class targetType) throws XmlDeserializationException {
+      throw new UnsupportedOperationException();
+    }
+  }
 
   private final Settings settings;
   private final Parser parser;
@@ -74,36 +64,9 @@ public class XmlSerializer {
     }
 
     this.settings = settings;
-    this.parser = new Parser(settings);
-    this.formatter = new Formatter(settings);
+    this.parser = new Parser(this);
+    this.formatter = new Formatter(this);
   }
-
-//  /**
-//   * Fills the specified object with the data from XMl file. Don't use this method for Lists and Arrays !!!
-//   *
-//   * @param xmlFileName  XML file to be used as a source. Must exist and be accessible.
-//   * @param targetObject Object which will be filled. Cannot be null.
-//   * @see #fillList(String, List)
-//   * @see #fillArray(String, Class)
-//   */
-//  public void fillObject(@NotNull String xmlFileName, @NotNull Object targetObject) {
-//    InputStream is = openFileForReading(xmlFileName);
-//    this.fillObject(is, targetObject);
-//  }
-//
-//  /**
-//   * Fills the specified object with the data from XMl file. Don't use this method for Lists and Arrays !!!
-//   *
-//   * @param xmlFileName  XML file to be used as a source. Must exist and be accessible.
-//   * @param targetObject Object which will be filled. Cannot be null.
-//   * @see #fillList(String, List)
-//   * @see #fillArray(String, Class)
-//   */
-//  public void fillObject(@NotNull InputStream xmlFileName, @NotNull Object targetObject) {
-//    Element el = loadXmlAndGetRootElement(xmlFileName);
-//    this.parser.fillObject(el, targetObject);
-//  }
-
 
   /**
    * Deserializes an instance of the objectType from xmlFileName.
@@ -141,11 +104,32 @@ public class XmlSerializer {
     Object ret;
     try {
       el = loadXmlAndGetRootElement(xmlFileName);
-      ret = this.parser.deserialize(el, objectType);
-    } catch (XmlDeserializationException ex){
+
+      Shared.applyTypeMappingExpansion(el);
+
+      ret = this.deserialize(el, objectType);
+    } catch (XmlDeserializationException ex) {
       throw new XmlException(ex);
     }
     return ret;
+  }
+
+  public Object deserialize(@NotNull XElement sourceElement, @NotNull Class objectType) {
+    Object ret;
+    try {
+      ret = this.parser.deserialize(sourceElement, objectType);
+    } catch (XmlDeserializationException ex) {
+      throw new XmlException(ex);
+    }
+    return ret;
+  }
+
+  public void deserializeContent(@NotNull XElement sourceElement, @NotNull Object targetObject){
+    try {
+      this.parser.deserializeContent(sourceElement, targetObject);
+    } catch (XmlDeserializationException e) {
+      throw new XmlException(e);
+    }
   }
 
   /**
@@ -163,33 +147,48 @@ public class XmlSerializer {
     closeFile(os);
   }
 
-  private void closeFile(Closeable os) {
-    try {
-      os.close();
-    } catch (IOException ex) {
-      throw new RuntimeException("Failed to close source file.", ex);
-    }
-  }
-
   /**
    * Saves an object into specified XMl file.
    * <p>
    * Object should not be null. If XMl file exists, it will be overwritten.
    * </p>
    *
-   * @param outputStream  Target stream
+   * @param outputStream Target stream
    * @param sourceObject Object to be stored.
    */
   public void serialize(@NotNull OutputStream outputStream, @NotNull Object sourceObject) {
-    XDocument doc;
+    XElement elm;
     try {
-      doc = this.formatter.saveObject(sourceObject);
+      elm = new XElement("root");
+      serialize(elm, sourceObject);
+
+      if (settings.isUseSimpleTypeNamesInReferences()) {
+        Shared.applyTypeMappingShortening(elm);
+      }
+
+      XDocument doc = new XDocument(elm);
       doc.save(outputStream);
-    } catch (XmlSerializationException ex){
+    } catch (XmlSerializationException ex) {
       throw new XmlException(ex);
-    } catch (EXmlException ex){
+    } catch (EXmlException ex) {
       throw new XmlException(new XmlSerializationException("Failed to save the document.", ex));
     }
+  }
+
+  public void serialize(@NotNull XElement targetElement, @NotNull Object sourceObject) throws XmlSerializationException {
+    this.formatter.saveObject(sourceObject, targetElement, true);
+  }
+
+  /**
+   * Returns an instance of current {@linkplain Settings}. Setting's properties can be adjusted,
+   * setting object is read-only.
+   *
+   * @return Instance of settings.
+   * @see Settings
+   */
+  @NotNull
+  public Settings getSettings() {
+    return settings;
   }
 
 //  /**
@@ -258,16 +257,32 @@ public class XmlSerializer {
 //    return ret;
 //  }
 
-  /**
-   * Returns an instance of current {@linkplain Settings}. Setting's properties can be adjusted,
-   * setting object is read-only.
-   *
-   * @return Instance of settings.
-   * @see Settings
-   */
-  @NotNull
-  public Settings getSettings() {
-    return settings;
+  public InputStream openFileForReading(String fileName) {
+    InputStream is;
+    try {
+      is = new FileInputStream(fileName);
+    } catch (FileNotFoundException ex) {
+      throw new RuntimeException("Failed to open file " + fileName + ". " + ex.getMessage(), ex);
+    }
+    return is;
+  }
+
+  public OutputStream openFileForWriting(String fileName) {
+    OutputStream is;
+    try {
+      is = new FileOutputStream(fileName);
+    } catch (FileNotFoundException ex) {
+      throw new RuntimeException("Failed to open file " + fileName + ". " + ex.getMessage(), ex);
+    }
+    return is;
+  }
+
+  private void closeFile(Closeable os) {
+    try {
+      os.close();
+    } catch (IOException ex) {
+      throw new RuntimeException("Failed to close source file.", ex);
+    }
   }
 
   private void saveXmlDocument(OutputStream os, Document doc) throws XmlSerializationException {
@@ -303,25 +318,5 @@ public class XmlSerializer {
       throw new XmlDeserializationException(ex, "Failed to load XML file from stream.");
     }
     return ret;
-  }
-
-  public InputStream openFileForReading(String fileName){
-    InputStream is;
-    try {
-      is = new FileInputStream(fileName);
-    } catch (FileNotFoundException ex) {
-      throw new RuntimeException("Failed to open file " + fileName + ". " + ex.getMessage(), ex);
-    }
-    return is;
-  }
-
-  public OutputStream openFileForWriting(String fileName){
-    OutputStream is;
-    try {
-      is = new FileOutputStream(fileName);
-    } catch (FileNotFoundException ex) {
-      throw new RuntimeException("Failed to open file " + fileName + ". " + ex.getMessage(), ex);
-    }
-    return is;
   }
 }

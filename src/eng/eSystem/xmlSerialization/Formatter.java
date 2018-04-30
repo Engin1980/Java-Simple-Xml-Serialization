@@ -17,26 +17,19 @@ public class Formatter {
   private static final String SEPARATOR = "\t";
   private final Settings settings;
   private int logIndent = 0;
+  private XmlSerializer parent;
 
-  public Formatter(Settings settings) {
-    this.settings = settings;
+  public Formatter(XmlSerializer parent) {
+    this.parent = parent;
+    this.settings = parent.getSettings();
   }
 
-  public synchronized XDocument saveObject(Object source) throws XmlSerializationException {
-    XElement root = new XElement("root");
-    XDocument doc = new XDocument(root);
-
+  public synchronized void saveObject(Object source, XElement root, boolean useCustomPIElementParsers) throws XmlSerializationException {
 
     if (source == null)
-      storeIt(root, null, Object.class);
+      storeIt(root, null, Object.class, useCustomPIElementParsers);
     else
-      storeIt(root, source, source.getClass());
-
-    if (settings.isUseSimpleTypeNamesInReferences()) {
-      Shared.applyTypeMappingShortening(root);
-    }
-
-    return doc;
+      storeIt(root, source, Object.class, useCustomPIElementParsers);
   }
 
   private void storeField(XElement parentElement, Object source, Field f) throws XmlSerializationException {
@@ -76,7 +69,7 @@ public class Formatter {
           c = map.getTargetFieldClass();
         }
         XElement el = createElementForObject(parentElement, elementName);
-        storeIt(el, value, c);
+        storeIt(el, value, c, true);
       }
     } catch (XmlSerializationException ex) {
       throw new XmlSerializationException(ex,
@@ -86,7 +79,7 @@ public class Formatter {
     logIndent--;
   }
 
-  private void storeIt(XElement el, Object value, Class declaredType) throws XmlSerializationException {
+  private void storeIt(XElement el, Object value, Class declaredType, boolean useCustomIElementParsers) throws XmlSerializationException {
     logIndent++;
     logVerbose("serialize %s (%s) -> <%s>", value, declaredType.getClass().getName(), el.getName());
 
@@ -98,7 +91,7 @@ public class Formatter {
         addClassAttributeIfRequired(el, value.getClass(), declaredType);
 
         IElementParser customElementParser = Shared.tryGetCustomElementParser(realType, settings);
-        if (customElementParser != null) {
+        if (useCustomIElementParsers && customElementParser != null) {
           convertAndStoreFieldComplexByCustomParser(el, value, customElementParser);
         } else if (Mapping.isSimpleTypeOrEnum(realType)) {
           // jednoduchý typ
@@ -153,7 +146,7 @@ public class Formatter {
       }
 
       XElement itemElement = createElementForObject(el, tagName);
-      storeIt(itemElement, item, listItemType);
+      storeIt(itemElement, item, listItemType, true);
     }
   }
 
@@ -213,7 +206,7 @@ public class Formatter {
 
   private void convertAndStoreFieldComplexByCustomParser(XElement el, Object value, IElementParser parser) throws XmlSerializationException {
     try {
-      parser.format(value, el);
+      parser.format(value, el, parent.new Serializer());
     } catch (Exception ex) {
       throw new XmlSerializationException(ex,
           "Failed to format value '%s' (%s) by custom element parser '%s'.",
@@ -252,7 +245,7 @@ public class Formatter {
       }
 
       XElement itemElement = createElementForObject(el, tagName);
-      storeIt(itemElement, item, listItemType);
+      storeIt(itemElement, item, listItemType, true);
     }
   }
 
@@ -274,10 +267,10 @@ public class Formatter {
       XElement itemElement = createElementForObject(el, tagName);
 
       XElement keyElement = createElementForObject(itemElement, "key");
-      storeIt(keyElement, key, keyItemType);
+      storeIt(keyElement, key, keyItemType, true);
 
       XElement valueElement = createElementForObject(itemElement, "value");
-      storeIt(valueElement, value, valueItemType);
+      storeIt(valueElement, value, valueItemType, true);
     }
   }
 
@@ -298,10 +291,10 @@ public class Formatter {
       XElement itemElement = createElementForObject(el, tagName);
 
       XElement keyElement = createElementForObject(itemElement, "key");
-      storeIt(keyElement, key, keyItemType);
+      storeIt(keyElement, key, keyItemType, true);
 
       XElement valueElement = createElementForObject(itemElement, "value");
-      storeIt(valueElement, value, valueItemType);
+      storeIt(valueElement, value, valueItemType, true);
     }
   }
 
@@ -415,7 +408,7 @@ public class Formatter {
         itemElementName = itemElementName.substring(0, itemElementName.length() - 2) + "_arr";
       }
       XElement itemElement = createElementForObject(el, itemElementName);
-      storeIt(itemElement, item, itemType);
+      storeIt(itemElement, item, itemType, true);
     }
   }
 

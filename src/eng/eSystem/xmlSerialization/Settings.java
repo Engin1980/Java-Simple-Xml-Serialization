@@ -5,20 +5,19 @@ import eng.eSystem.collections.EList;
 import eng.eSystem.collections.IList;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Contains setting used during deserialization.
  */
 public class Settings {
 
-  private final List<String> ignoredFieldsRegex = new ArrayList<>();
-  private final List<IInstanceCreator> instanceCreators = new ArrayList<>();
-  private final List<IValueParser> valueParsers = new ArrayList<>();
-  private final List<IElementParser> elementParsers = new ArrayList<>();
-  private final List<XmlListItemMapping> listItemMapping = new ArrayList();
-  private final List<XmlMapItemMapping> mapItemMaping = new ArrayList<>();
-  private final List<XmlCustomFieldMapping> customFieldMappings = new ArrayList<>();
+  private final IList<String> ignoredFieldsRegex = new EList<>();
+  private final IList<IInstanceCreator> instanceCreators = new EList<>();
+  private final IList<IValueParser> valueParsers = new EList<>();
+  private final IList<IElementParser> elementParsers = new EList<>();
+  private final IList<XmlListItemMapping> listItemMapping = new EList<>();
+  private final IList<XmlMapItemMapping> mapItemMaping = new EList<>();
+  private final IList<XmlCustomFieldMapping> customFieldMappings = new EList<>();
   private boolean verbose = false;
   private String nullString = "(null)";
   private Class defaultListTypeImplementation = ArrayList.class;
@@ -42,7 +41,7 @@ public class Settings {
    * @see XmlListItemMapping
    */
   @NotNull
-  public List<XmlListItemMapping> getListItemMappings() {
+  public IList<XmlListItemMapping> getListItemMappings() {
     return listItemMapping;
   }
 
@@ -56,7 +55,7 @@ public class Settings {
    * @see XmlListItemMapping
    */
   @NotNull
-  public List<XmlMapItemMapping> getMapItemMappings() {
+  public IList<XmlMapItemMapping> getMapItemMappings() {
     return mapItemMaping;
   }
 
@@ -87,7 +86,7 @@ public class Settings {
    * @return List of regexes to be matched against field name.
    */
   @NotNull
-  public List<String> getIgnoredFieldsRegex() {
+  public IList<String> getIgnoredFieldsRegex() {
     return ignoredFieldsRegex;
   }
 
@@ -128,7 +127,7 @@ public class Settings {
    * @return List of classes instantiating specified types.
    * @see IInstanceCreator
    */
-  public List<IInstanceCreator> getInstanceCreators() {
+  public IList<IInstanceCreator> getInstanceCreators() {
     return instanceCreators;
   }
 
@@ -146,7 +145,7 @@ public class Settings {
    * @see IValueParser
    * @see IElementParser
    */
-  public List<IValueParser> getValueParsers() {
+  public IList<IValueParser> getValueParsers() {
     return valueParsers;
   }
 
@@ -164,7 +163,7 @@ public class Settings {
    * @see IElementParser
    * @see IValueParser
    */
-  public List<IElementParser> getElementParsers() {
+  public IList<IElementParser> getElementParsers() {
     return elementParsers;
   }
 
@@ -202,7 +201,7 @@ public class Settings {
    * @return
    * @see XmlCustomFieldMapping
    */
-  public List<XmlCustomFieldMapping> getCustomFieldMappings() {
+  public IList<XmlCustomFieldMapping> getCustomFieldMappings() {
     return customFieldMappings;
   }
 }

@@ -4,6 +4,7 @@ import eng.eSystem.eXml.XElement;
 import eng.eSystem.xmlSerialization.IElementParser;
 import eng.eSystem.xmlSerialization.XmlDeserializationException;
 import eng.eSystem.xmlSerialization.XmlSerializationException;
+import eng.eSystem.xmlSerialization.XmlSerializer;
 import org.w3c.dom.Element;
 
 import java.awt.*;
@@ -26,7 +27,7 @@ public class AwtFontElementParser implements IElementParser<Font> {
   }
 
   @Override
-  public Font parse(XElement element) throws XmlDeserializationException {
+  public Font parse(XElement element, XmlSerializer.Deserializer parent) throws XmlDeserializationException {
     String familyName = element.getAttributes().get(ATTR_FAMILY);
     String styleS = element.getAttributes().get(ATTR_STYLE);
     String sizeS = element.getAttributes().get(ATTR_SIZE);
@@ -39,10 +40,15 @@ public class AwtFontElementParser implements IElementParser<Font> {
   }
 
   @Override
-  public void format(Font value, XElement element) {
+  public void format(Font value, XElement element, XmlSerializer.Serializer parent) {
     element.setAttribute(ATTR_FAMILY, value.getName());
     element.setAttribute(ATTR_STYLE, Integer.toString(value.getStyle()));
     element.setAttribute(ATTR_SIZE, Integer.toString(value.getSize()));
+  }
+
+  @Override
+  public boolean isApplicableOnDescendants() {
+    return false;
   }
 
   private int toInt(String value, String key) throws XmlDeserializationException {
