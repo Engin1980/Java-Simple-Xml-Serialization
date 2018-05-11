@@ -98,6 +98,11 @@ class Parser {
       if (isNullValuedElement(el))
         ret = null;
       else {
+        // custom type defined in element
+        Class customType = tryGetCustomTypeByElement(el);
+        if (customType != null)
+          type = customType;
+
         IElementParser customElementParser = Shared.tryGetCustomElementParser(type, settings);
         if (customElementParser != null) {
           ret = convertElementByElementParser(el, customElementParser);
@@ -419,9 +424,9 @@ class Parser {
 
   private Object createObjectInstanceByElement(XElement el, Class c) throws XmlDeserializationException {
 
-    Class customType = tryGetCustomTypeByElement(el);
-    if (customType != null)
-      c = customType;
+//    Class customType = tryGetCustomTypeByElement(el);
+//    if (customType != null)
+//      c = customType;
 
     Object ret = createObjectInstance(c);
 

@@ -26,6 +26,8 @@ public class Formatter {
 
   public synchronized void saveObject(Object source, XElement root, boolean useCustomPIElementParsers) throws XmlSerializationException {
 
+    recursionDetecter = new RecursionDetecter();
+
     if (source == null)
       storeIt(root, null, Object.class, useCustomPIElementParsers);
     else
@@ -79,9 +81,13 @@ public class Formatter {
     logIndent--;
   }
 
+  private RecursionDetecter recursionDetecter;
+
   private void storeIt(XElement el, Object value, Class declaredType, boolean useCustomIElementParsers) throws XmlSerializationException {
     logIndent++;
     logVerbose("serialize %s (%s) -> <%s>", value, declaredType.getClass().getName(), el.getName());
+
+    recursionDetecter.check(value);
 
     try {
       if (value == null) {
@@ -121,6 +127,7 @@ public class Formatter {
           value, valueTypeName, Shared.getElementInfoString(el));
     }
 
+    recursionDetecter.uncheck(value);
     logIndent--;
   }
 
