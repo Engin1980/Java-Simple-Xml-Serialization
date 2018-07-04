@@ -424,10 +424,6 @@ class Parser {
 
   private Object createObjectInstanceByElement(XElement el, Class c) throws XmlDeserializationException {
 
-//    Class customType = tryGetCustomTypeByElement(el);
-//    if (customType != null)
-//      c = customType;
-
     Object ret = createObjectInstance(c);
 
     return ret;
