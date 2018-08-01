@@ -22,7 +22,7 @@ public class Tests {
     XmlSerializer ser = new XmlSerializer(sett);
 
     ser.serialize(bos, src);
-    System.out.println(new String(bos.toByteArray()));
+    //System.out.println(new String(bos.toByteArray()));
 
     ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
 

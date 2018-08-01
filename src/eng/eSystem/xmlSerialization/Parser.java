@@ -761,11 +761,12 @@ class Parser {
 
     if (creator == null)
       try {
-        Constructor constructor;
-        constructor = type.getDeclaredConstructor(new Class[0]);
-        constructor.setAccessible(true);
-        ret = constructor.newInstance((Object[]) null);
-        // ret = type.newInstance(); // old solution
+        ret = createInstanceByConstructor(type);
+//        Constructor constructor;
+//        constructor = type.getDeclaredConstructor(new Class[0]);
+//        constructor.setAccessible(true);
+//        ret = constructor.newInstance((Object[]) null);
+//        // ret = type.newInstance(); // old solution
       } catch (InstantiationException | IllegalAccessException ex) {
         throw new XmlDeserializationException(
             ex,
@@ -792,6 +793,51 @@ class Parser {
             type.getName(), creator.getClass().getName());
       }
     }
+    return ret;
+  }
+
+  private Object createInstanceByConstructor(Class<?> type) throws IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException {
+    IList<Constructor> constructors = new EList<>(type.getDeclaredConstructors());
+
+    if (constructors.isAny(q->q.getAnnotation(XmlConstructor.class) != null))
+      constructors = constructors.where(q->q.getAnnotation(XmlConstructor.class) != null);
+
+    int minParams = constructors.min(q -> q.getParameterCount(), Integer.MAX_VALUE);
+    constructors = constructors.where(q -> q.getParameterCount() == minParams);
+    if (constructors.isEmpty()) {
+      throw new NoSuchMethodException();
+    }
+    Constructor constructor = constructors.getRandom();
+    Object[] params = new Object[constructor.getParameterCount()];
+    for (int i = 0; i < constructor.getParameterCount(); i++) {
+      Parameter par = constructor.getParameters()[i];
+      Type parType = par.getType();
+      if (parType.equals(int.class) ||
+          parType.equals(Integer.class) ||
+          parType.equals(byte.class) ||
+          parType.equals(Byte.class) ||
+          parType.equals(short.class) ||
+          parType.equals(Short.class) ||
+          parType.equals(long.class) ||
+          parType.equals(Long.class) ||
+          parType.equals(float.class) ||
+          parType.equals(Float.class) ||
+          parType.equals(double.class) ||
+          parType.equals(Double.class))
+        params[i] = 0;
+      else if (parType.equals(boolean.class) ||
+          parType.equals(Boolean.class))
+        params[i] = false;
+      else if (parType.equals(char.class) ||
+          parType.equals(Character.class))
+        params[i] = 'a';
+      else
+        params[i] = null;
+    }
+
+    Object ret;
+    constructor.setAccessible(true);
+    ret = constructor.newInstance(params);
     return ret;
   }
 
