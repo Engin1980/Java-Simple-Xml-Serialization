@@ -1,0 +1,14 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Single test" type="JUnit" factoryName="JUnit">
+    <module name="EXmlSerialization" />
+    <option name="PACKAGE_NAME" value="eng.eSystem.xmlSerialization.testConstructors" />
+    <option name="MAIN_CLASS_NAME" value="eng.eSystem.xmlSerialization.testConstructors.Tests" />
+    <option name="METHOD_NAME" value="testC" />
+    <option name="TEST_OBJECT" value="method" />
+    <option name="PARAMETERS" value="" />
+    <option name="WORKING_DIRECTORY" value="%MODULE_WORKING_DIR%" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

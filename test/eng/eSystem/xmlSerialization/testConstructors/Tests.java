@@ -46,7 +46,6 @@ public class Tests {
   @Test
   public void testC() {
     DemoC a = new DemoC(1,1,1);
-    a.ok = false;
 
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
     Settings sett = new Settings();
@@ -58,7 +57,5 @@ public class Tests {
     ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
 
     a = (DemoC) ser.deserialize(bis, DemoC.class);
-
-    Assert.assertTrue(a.ok );
   }
 }
