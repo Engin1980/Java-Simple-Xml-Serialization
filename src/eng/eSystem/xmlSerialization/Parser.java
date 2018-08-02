@@ -762,11 +762,6 @@ class Parser {
     if (creator == null)
       try {
         ret = createInstanceByConstructor(type);
-//        Constructor constructor;
-//        constructor = type.getDeclaredConstructor(new Class[0]);
-//        constructor.setAccessible(true);
-//        ret = constructor.newInstance((Object[]) null);
-//        // ret = type.newInstance(); // old solution
       } catch (InstantiationException | IllegalAccessException ex) {
         throw new XmlDeserializationException(
             ex,
@@ -808,6 +803,9 @@ class Parser {
       throw new NoSuchMethodException();
     }
     Constructor constructor = constructors.getRandom();
+    if (constructor.getParameterCount() == 0 && Modifier.isPrivate(constructor.getModifiers())){
+      System.out.println("REP:: Private parameter-less constructor used for " + type.getName());
+    }
     Object[] params = new Object[constructor.getParameterCount()];
     for (int i = 0; i < constructor.getParameterCount(); i++) {
       Parameter par = constructor.getParameters()[i];

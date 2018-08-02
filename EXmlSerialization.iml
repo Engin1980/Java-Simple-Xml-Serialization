@@ -19,6 +19,14 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="eng.eSystem" level="project" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="file://$MODULE_DIR$/../eng.eSystem/out/production/eng.eSystem" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>
