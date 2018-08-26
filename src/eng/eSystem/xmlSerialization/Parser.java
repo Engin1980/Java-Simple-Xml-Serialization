@@ -91,7 +91,7 @@ class Parser {
 
   private Object parseIt(XElement el, Class type) throws XmlDeserializationException {
     logIndent++;
-    logVerbose("deserialize <%s> --> %s", el.getName(), type.getName());
+    logVerbose("deserializing <%s> --> %s", el.getName(), type.getName());
 
     Object ret;
     try {
