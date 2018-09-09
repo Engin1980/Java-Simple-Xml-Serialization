@@ -1,26 +1,15 @@
 package eng.eSystem.xmlSerialization.common.parsers;
 
-import eng.eSystem.xmlSerialization.IValueParser;
-import eng.eSystem.xmlSerialization.XmlDeserializationException;
-import eng.eSystem.xmlSerialization.XmlSerializationException;
+import eng.eSystem.xmlSerialization.exceptions.XmlSerializationException;
+import eng.eSystem.xmlSerialization.supports.IValueParser;
 
 import java.awt.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Parses HEX color value to AWT color. Only R-G-B channels, ignores alpha channel.
- * @see java.awt.Color
- * @see IValueParser
- */
 public class HexToAwtColorValueParser implements IValueParser<java.awt.Color> {
   @Override
-  public Class getType() {
-    return java.awt.Color.class;
-  }
-
-  @Override
-  public java.awt.Color parse(String value) throws XmlDeserializationException {
+  public Color parse(String value) {
     Color ret = null;
     String ps = "(..)(..)(..)";
     Pattern p = Pattern.compile(ps);
@@ -39,7 +28,7 @@ public class HexToAwtColorValueParser implements IValueParser<java.awt.Color> {
       }
     }
     if (ret == null) {
-      throw new XmlDeserializationException("Unable to parse \"" + value + "\" into color.");
+      throw new XmlSerializationException("Unable to parse \"" + value + "\" into color.");
     }
 
     return ret;

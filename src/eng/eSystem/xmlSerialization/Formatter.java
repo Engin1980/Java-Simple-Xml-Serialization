@@ -1,375 +1,288 @@
 package eng.eSystem.xmlSerialization;
 
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
-import eng.eSystem.collections.IList;
-import eng.eSystem.collections.IMap;
-import eng.eSystem.collections.ISet;
-import eng.eSystem.eXml.XDocument;
+import eng.eSystem.collections.*;
 import eng.eSystem.eXml.XElement;
+import eng.eSystem.exceptions.EXmlRuntimeException;
+import eng.eSystem.xmlSerialization.exceptions.XmlSerializationException;
+import eng.eSystem.xmlSerialization.meta.newe.Applicator;
+import eng.eSystem.xmlSerialization.meta.FieldMetaInfo;
+import eng.eSystem.xmlSerialization.meta.MetaManager;
+import eng.eSystem.xmlSerialization.meta.TypeMetaInfo;
+import eng.eSystem.xmlSerialization.supports.IElementParser;
+import eng.eSystem.xmlSerialization.supports.IValueParser;
 
 import java.lang.reflect.Array;
-import java.lang.reflect.Field;
-import java.util.*;
+import java.util.Map;
 
-public class Formatter {
+import static eng.eSystem.utilites.FunctionShortcuts.sf;
 
-  private static final String SEPARATOR = "\t";
-  private final Settings settings;
-  private int logIndent = 0;
+class Formatter {
+
+  private final XmlSettings settings;
   private XmlSerializer parent;
+  private RecursionDetector recursionDetector;
+  private MetaManager metaManager;
+  private Log log;
 
   public Formatter(XmlSerializer parent) {
     this.parent = parent;
     this.settings = parent.getSettings();
+    //TODO the following line must be the clone
+    this.metaManager = this.settings.getMetaManager();
+    this.log = new Log(this.settings.getLogLevel());
   }
 
-  public synchronized void saveObject(Object source, XElement root, boolean useCustomPIElementParsers) throws XmlSerializationException {
+  public synchronized void saveObject(Object source, XElement root, boolean ignoreCustomParser) {
 
-    recursionDetecter = new RecursionDetecter();
+    this.recursionDetector = new RecursionDetector();
 
-    if (source == null)
-      storeIt(root, null, Object.class, useCustomPIElementParsers);
-    else
-      storeIt(root, source, Object.class, useCustomPIElementParsers);
+    Applicator app = metaManager.getEmptyElementApplicator("root", Object.class); //source == null ? Object.class : source.getClass());
+
+    yStoreInstanceToElement(root, source, app, null);
   }
 
-  private void storeField(XElement parentElement, Object source, Field f) throws XmlSerializationException {
-    logIndent++;
-    logVerbose("serialize field %s.%s into %s",
-        f.getDeclaringClass().getName(),
-        f.getName(),
-        Shared.getElementInfoString(parentElement)
-    );
+  private void yStoreInstanceToAttribute(XElement element, Object value, Applicator app) {
+    log.increaseIndent();
+    String valueTypeName = value == null ? "null" : value.getClass().getName();
+    log.log(Log.LogLevel.verbose, "%s (%s) => ... %s=\"...\"", value, valueTypeName, element.getName());
 
-    if (isIgnoredFieldName(f.getName())) {
-      logVerbose("... ignored, skipped");
-      return;
-    }
-
-    try {
-      Class c = f.getType();
-      Object value = getFieldValue(source, f);
-
-      IValueParser customValueParser = Shared.tryGetCustomValueParser(c, settings);
-
-      boolean storedInAttribute =
-          Mapping.isSimpleTypeOrEnum(c) || customValueParser != null;
-
-      if (storedInAttribute) {
-        if (customValueParser != null) {
-          logVerbose("... applied custom value parser %s ", customValueParser.getClass().getName());
-          value = convertUsingCustomValueParser(value, customValueParser);
-        }
-        storePrimitive(parentElement, f.getName(), value);
-      } else {
-        String elementName = f.getName();
-        XmlCustomFieldMapping map = tryGetCustomFieldMapping(f, value);
-        if (map != null) {
-          logVerbose("... custom field mapping applied %s", map);
-          elementName = map.getXmlElementName();
-          c = map.getTargetFieldClass();
-        }
-        XElement el = createElementForObject(parentElement, elementName);
-        storeIt(el, value, c, true);
-      }
-    } catch (XmlSerializationException ex) {
-      throw new XmlSerializationException(ex,
-          "Failed to store field '%s.%s' ('%s') into %s.",
-          f.getDeclaringClass().getName(), f.getName(), f.getType().getName(), Shared.getElementInfoString(parentElement));
-    }
-    logIndent--;
-  }
-
-  private RecursionDetecter recursionDetecter;
-
-  private void storeIt(XElement el, Object value, Class declaredType, boolean useCustomIElementParsers) throws XmlSerializationException {
-    logIndent++;
-    logVerbose("serialize %s (%s) -> <%s>", value, declaredType.getClass().getName(), el.getName());
-
-    recursionDetecter.check(value);
-
-    try {
-      if (value == null) {
-        storeNullElement(el);
-      } else {
-        Class realType = value.getClass();
-        addClassAttributeIfRequired(el, value.getClass(), declaredType);
-
-        IElementParser customElementParser = Shared.tryGetCustomElementParser(realType, settings);
-        if (useCustomIElementParsers && customElementParser != null) {
-          convertAndStoreFieldComplexByCustomParser(el, value, customElementParser);
-        } else if (Mapping.isSimpleTypeOrEnum(realType)) {
-          // jednoduchý typ
-          storePrimitive(el, value);
-        } else if (List.class.isAssignableFrom(realType)) {
-          storeList(el, (List) value);
-        } else if (IList.class.isAssignableFrom(realType)) {
-          storeIList(el, (IList) value);
-        } else if (Set.class.isAssignableFrom(realType)) {
-          storeSet(el, (Set) value);
-        } else if (ISet.class.isAssignableFrom(realType)) {
-          storeISet(el, (ISet) value);
-        } else if (Map.class.isAssignableFrom(realType)) {
-          storeMap(el, (Map) value);
-        } else if (IMap.class.isAssignableFrom(realType)) {
-          storeIMap(el, (IMap) value);
-        } else if (realType.isArray()) {
-          storeArray(el, value);
-        } else {
-          storeObject(el, value);
-        }
-      }
-    } catch (XmlSerializationException ex) {
-      String valueTypeName = value == null ? "null" : value.getClass().getName();
-      throw new XmlSerializationException(ex,
-          "Failed to store '%s' (%s) into element %s.",
-          value, valueTypeName, Shared.getElementInfoString(el));
-    }
-
-    recursionDetecter.uncheck(value);
-    logIndent--;
-  }
-
-  private void storeISet(XElement el, ISet iset) throws XmlSerializationException {
-    Set set = iset.toSet();
-    storeSet(el, set);
-  }
-
-  private void storeSet(XElement el, Set set) throws XmlSerializationException {
-    Class listItemType = deriveIterableItemType(set);
-    addItemTypeAttribute(el, listItemType);
-
-    for (Object item : set) {
-
-      String tagName;
-      if (item == null)
-        tagName = "item";
-      else {
-        XmlListItemMapping map = tryGetListItemMapping(el, item.getClass());
-        tagName = (map == null || map.itemElementName == null) ?
-            item.getClass().getSimpleName() :
-            map.itemElementName;
-      }
-
-      XElement itemElement = createElementForObject(el, tagName);
-      storeIt(itemElement, item, listItemType, true);
-    }
-  }
-
-  private void storeIList(XElement el, IList list) throws XmlSerializationException {
-    List lst = list.toList();
-    storeList(el, lst);
-  }
-
-  private void logVerbose(String format, Object... params) {
-    if (settings.isVerbose())
-      Shared.log(Shared.eLogType.info, format, params);
-  }
-
-  private XmlCustomFieldMapping tryGetCustomFieldMapping(Field f, Object value) {
-    XmlCustomFieldMapping ret = null;
-    if (value != null) {
-      for (XmlCustomFieldMapping mapping : settings.getCustomFieldMappings()) {
-        if (isMappingFitting(mapping, f, value)) {
-          ret = mapping;
-          break;
-        }
-      }
-    }
-
-    return ret;
-  }
-
-  private boolean isMappingFitting(XmlCustomFieldMapping mapping, Field f, Object value) {
-    if (!mapping.getFieldName().equals(f.getName()))
-      return false;
-
-    if (!(mapping.getTargetFieldClass().equals(value.getClass())))
-      return false;
-
-    if (mapping.getClassDeclaringField() != null && !(mapping.getClassDeclaringField().equals(f.getDeclaringClass())))
-      return false;
-
-    if (mapping.getDeclaredFieldClass() != null && !(mapping.getDeclaredFieldClass().equals(f.getType())))
-      return false;
-
-    return true;
-  }
-
-  private boolean isIgnoredFieldName(String fieldName) {
-    for (String s : settings.getIgnoredFieldsRegex()) {
-      if (Shared.isRegexMatch(s, fieldName))
-        return true;
-    }
-    return false;
-  }
-
-  private XElement createElementForObject(XElement parent, String elementName) {
-    XElement ret = new XElement(elementName);
-    parent.addElement(ret);
-    return ret;
-  }
-
-  private void convertAndStoreFieldComplexByCustomParser(XElement el, Object value, IElementParser parser) throws XmlSerializationException {
-    try {
-      parser.format(value, el, parent.new Serializer());
-    } catch (Exception ex) {
-      throw new XmlSerializationException(ex,
-          "Failed to format value '%s' (%s) by custom element parser '%s'.",
-          value.toString(), value.getClass().getName(), parser.getClass().getName());
-    }
-  }
-
-  private Object convertUsingCustomValueParser(Object value, IValueParser parser) throws XmlSerializationException {
-    String s;
-    try {
-      s = parser.format(value);
-    } catch (Exception ex) {
-      throw new XmlSerializationException(ex,
-          "Failed to format value '%s' (%s) by custom value parser '%s'.",
-          value.toString(), value.getClass().getName(), parser.getClass().getName());
-    }
-
-    return s;
-  }
-
-  private void storeList(XElement el, List list) throws XmlSerializationException {
-
-    Class listItemType = deriveIterableItemType(list);
-    addItemTypeAttribute(el, listItemType);
-
-    for (Object item : list) {
-
-      String tagName;
-      if (item == null)
-        tagName = "item";
-      else {
-        XmlListItemMapping map = tryGetListItemMapping(el, item.getClass());
-        tagName = (map == null || map.itemElementName == null) ?
-            item.getClass().getSimpleName() :
-            map.itemElementName;
-      }
-
-      XElement itemElement = createElementForObject(el, tagName);
-      storeIt(itemElement, item, listItemType, true);
-    }
-  }
-
-  private void storeMap(XElement el, Map map) throws XmlSerializationException {
-
-    Class keyItemType = deriveIterableItemType(map.keySet());
-    addKeyTypeAttribute(el, keyItemType);
-    Class valueItemType = deriveIterableItemType(map.values());
-    addValueTypeAttribute(el, valueItemType);
-
-    for (Object key : map.keySet()) {
-      Object value = map.get(key);
-
-      XmlMapItemMapping mem = tryGetMapItemMapping(el, key, value);
-      String tagName = (mem == null || mem.itemElementName == null) ?
-          "item" :
-          mem.itemElementName;
-
-      XElement itemElement = createElementForObject(el, tagName);
-
-      XElement keyElement = createElementForObject(itemElement, "key");
-      storeIt(keyElement, key, keyItemType, true);
-
-      XElement valueElement = createElementForObject(itemElement, "value");
-      storeIt(valueElement, value, valueItemType, true);
-    }
-  }
-
-  private void storeIMap(XElement el, IMap map) throws XmlSerializationException {
-
-    Class keyItemType = deriveIterableItemType(map.getKeys());
-    addKeyTypeAttribute(el, keyItemType);
-    Class valueItemType = deriveIterableItemType(map.getValues());
-    addValueTypeAttribute(el, valueItemType);
-
-    for (Object key : map.getKeys()) {
-      Object value = map.get(key);
-      XmlMapItemMapping mem = tryGetMapItemMapping(el, key, value);
-      String tagName = (mem == null || mem.itemElementName == null) ?
-          "item" :
-          mem.itemElementName;
-
-      XElement itemElement = createElementForObject(el, tagName);
-
-      XElement keyElement = createElementForObject(itemElement, "key");
-      storeIt(keyElement, key, keyItemType, true);
-
-      XElement valueElement = createElementForObject(itemElement, "value");
-      storeIt(valueElement, value, valueItemType, true);
-    }
-  }
-
-  private XmlListItemMapping tryGetListItemMapping(XElement listElement, Class itemClass) {
-    XmlListItemMapping ret = null;
-    String listElementXPath = Shared.getElementXPath(listElement);
-
-    for (XmlListItemMapping map : settings.getListItemMappings()) {
-      if (Shared.isRegexMatch(map.collectionElementXPathRegex, listElementXPath)
-          &&
-          itemClass.equals(map.itemType)
-          ) {
-        ret = map;
-        break;
-      }
-    }
-    return ret;
-  }
-
-  private XmlMapItemMapping tryGetMapItemMapping(XElement listElement, Object key, Object value) {
-    XmlMapItemMapping ret = null;
-    String listElementXPath = Shared.getElementXPath(listElement);
-
-    Class keyClass = key.getClass();
-    Class valueClass;
+    String attributeName = app.getName();
+    String attributeValue;
     if (value == null)
-      valueClass = null;
-    else
-      valueClass = value.getClass();
+      attributeValue = settings.getNullString();
+    else {
+      assert value.getClass().equals(app.getType()) || app.getCustomParser() != null;
 
-    for (XmlMapItemMapping map : settings.getMapItemMappings()) {
-      if (Shared.isRegexMatch(map.collectionElementXPathRegex, listElementXPath)
-          &&
-          keyClass.equals(map.keyType)
-          &&
-          (valueClass == null || valueClass.equals(map.valueType))
-          ) {
-        ret = map;
-        break;
-      }
+      IValueParser customParser = app.getCustomParser(IValueParser.class);
+      if (customParser != null)
+        attributeValue = yGetValueFromIValueParser(value, customParser);
+      else
+        attributeValue = value.toString();
     }
+
+    element.setAttribute(attributeName, attributeValue);
+
+    log.decreaseIndent();
+  }
+
+  private void yStoreInstanceToElement(XElement element, Object value, Applicator app, FieldMetaInfo relativeFmi) {
+    log.increaseIndent();
+    String valueTypeName = value == null ? "null" : value.getClass().getName();
+    log.log(Log.LogLevel.verbose, "%s (%s) => <%s>", value, valueTypeName, element.getName());
+    recursionDetector.check(value);
+
+    TypeMappingManager.addClassTypeAttribute(element,
+        value == null ? Object.class : value.getClass(),
+        app.getType());
+
+    try {
+      this.yStoreInstanceToElementInner(element, value, app, relativeFmi);
+    } catch (Exception ex) {
+      throw new XmlSerializationException(sf("Failed to store '%s' (%s) into element %s.",
+          value, valueTypeName, Shared.getElementInfoString(element)), ex);
+    }
+
+    recursionDetector.uncheck(value);
+    log.decreaseIndent();
+  }
+
+  private void yStoreInstanceToElementInner(XElement element, Object value, Applicator app, FieldMetaInfo relativeFmi) {
+    if (value == null) {
+      element.setContent(settings.getNullString());
+    } else {
+      IElementParser customParser = app.getCustomParser(IElementParser.class);
+      final boolean ignoreCustomParser = false;
+      final Class realType = value.getClass();
+
+      if (!ignoreCustomParser && customParser != null)
+        this.yStoreInstanceToElementUsingCustomElementParser(element, value, customParser);
+      else if (TypeMappingManager.isSimpleTypeOrEnum(realType))
+        this.yStorePrimitiveToElement(element, value);
+      else if (TypeMappingManager.isMap(realType))
+        yStoreMap(element, value, relativeFmi);
+      else if (TypeMappingManager.isIterable(realType))
+        yStoreIterable(element, value, relativeFmi);
+      else if (realType.isArray())
+        yStoreArray(element, value, relativeFmi);
+      else
+        yStoreClass(element, value);
+    }
+  }
+
+  private XElement yCreateInstanceWithElement(Object value, Applicator app, FieldMetaInfo relativeFmi) {
+    XElement ret = new XElement(app.getName());
+    yStoreInstanceToElement(ret, value, app, relativeFmi);
     return ret;
   }
 
-  private Class deriveIterableItemType(Iterable value) {
-    Class ret;
-    List<Class> topTypes = new ArrayList<>(1);
+  private void yStoreClass(XElement element, Object value) throws XmlSerializationException {
+    log.increaseIndent();
+    log.log(Log.LogLevel.info, sf("%s => <%s>", value.getClass().getName(), element.getName()));
 
-    for (Object o : value) {
-      if (o == null) continue;
-      Class c = o.getClass();
+    Class realValueType = value.getClass();
+    TypeMetaInfo tmi = metaManager.getTypeMetaInfo(realValueType);
 
-      if (topTypes.contains(c) == false)
-        topTypes.add(c);
+    for (FieldMetaInfo fmi : tmi.getFields()) {
+      if (fmi.getNecessity() == FieldMetaInfo.eNecessity.ignore) {
+        log.log(Log.LogLevel.info, fmi.getLocation(false) + " field skipped due to @XmlIgnore annotation.");
+        continue; // skipped due to annotation
+      }
+      try {
+        yStoreClassField(element, value, fmi);
+      } catch (Exception ex) {
+        throw new XmlSerializationException(sf(
+            "Failed to store field '%s' into the element '%s'.",
+            fmi.getLocation(false),
+            Shared.getElementInfoString(element)), ex);
+      }
     }
+
+    log.decreaseIndent();
+  }
+
+  private void yStoreClassField(XElement element, Object source, FieldMetaInfo fmi) {
+    log.increaseIndent();
+
+    try {
+      Object value = getFieldValue(source, fmi);
+      Applicator app = metaManager.getFieldApplicator(fmi, value);
+
+
+      log.log(Log.LogLevel.info, ".%s -> %s (%s)",
+          fmi.getField().getName(), app.getName(), app.isAttribute() ? "att" : "elm"
+      );
+
+
+      if (app.isAttribute()) {
+        yStoreInstanceToAttribute(element, value, app);
+      } else {
+        XElement newElement = yCreateInstanceWithElement(value, app, fmi);
+        element.addElement(newElement);
+      }
+
+    } catch (XmlSerializationException ex) {
+      throw new XmlSerializationException(sf(
+          "Failed to store field '%s' ('%s') into %s.",
+          fmi.getLocation(true), fmi.getField().getType().getName(), Shared.getElementInfoString(element)), ex);
+    }
+    log.decreaseIndent();
+  }
+
+  private void yStoreMap(XElement element, Object value, FieldMetaInfo relativeFmi) {
+    TypeMetaInfo parentMapTmi = metaManager.getTypeMetaInfo(value.getClass());
+
+    IList<MapEntry> entries = getMapEntries(value);
+    Class declaredKeyType = yDeriveSuperTypeOfElements(entries.select(q -> q.key));
+    Class declaredValueType = yDeriveSuperTypeOfElements(entries.select(q -> q.value));
+
+    TypeMappingManager.addKeyTypeAttribute(element, declaredKeyType);
+    TypeMappingManager.addValueTypeAttribute(element, declaredValueType);
+
+    for (MapEntry entry : entries) {
+      XElement entryElement = new XElement("entry");
+
+      // key stuff
+      {
+        Object item = entry.key;
+        Class declaredItemType = declaredKeyType;
+        Applicator app = metaManager.getMapKeyApplicator(item, declaredItemType, parentMapTmi, relativeFmi);
+
+        if (app.isAttribute()) {
+          yStoreInstanceToAttribute(entryElement, item, app);
+        } else {
+          XElement itemElement = new XElement(app.getName());
+          yStoreInstanceToElement(itemElement, item, app, relativeFmi);
+          entryElement.addElement(itemElement);
+        }
+      }
+
+      // value stuff
+      {
+        Object item = entry.value;
+        Class declaredItemType = declaredValueType;
+        Applicator app = metaManager.getMapValueApplicator(item, declaredItemType, parentMapTmi, relativeFmi);
+
+        if (app.isAttribute()) {
+          yStoreInstanceToAttribute(entryElement, item, app);
+        } else {
+          XElement itemElement = new XElement(app.getName());
+          yStoreInstanceToElement(itemElement, item, app, relativeFmi);
+          entryElement.addElement(itemElement);
+        }
+      }
+
+      element.addElement(entryElement);
+    }
+
+  }
+
+  private IList<MapEntry> getMapEntries(Object value) {
+    IList<MapEntry> entries = new EList<>();
+
+    if (value instanceof Map) {
+      Map map = (Map) value;
+      for (Object key : map.keySet()) {
+        eng.eSystem.xmlSerialization.MapEntry me = new eng.eSystem.xmlSerialization.MapEntry(key, map.get(key));
+        entries.add(me);
+      }
+    } else if (value instanceof IMap) {
+      IMap map = (IMap) value;
+      for (Object key : map.getKeys()) {
+        eng.eSystem.xmlSerialization.MapEntry me = new eng.eSystem.xmlSerialization.MapEntry(key, map.get(key));
+        entries.add(me);
+      }
+    }
+    return entries;
+  }
+
+  private void yStoreIterable(XElement element, Object value, FieldMetaInfo relativeFmi) {
+    IList items = new EList();
+    Iterable iterable = (Iterable) value;
+    items.add(iterable);
+
+    TypeMetaInfo iterableTmi = metaManager.getTypeMetaInfo(value.getClass());
+
+    Class declaredItemType = yDeriveSuperTypeOfElements(items);
+    TypeMappingManager.addItemTypeAttribute(element, declaredItemType);
+
+    yStoreIterableItems(element, items, declaredItemType, iterableTmi, relativeFmi);
+  }
+
+  private void yStoreIterableItems(XElement element, Iterable items, Class declaredItemType, TypeMetaInfo parentIterableTmi, FieldMetaInfo relativeFmi) {
+    for (Object item : items) {
+
+      Applicator app = metaManager.getItemApplicator(item, declaredItemType, parentIterableTmi, relativeFmi);
+
+      XElement itemElement = new XElement(app.getName());
+      if (app.isAttribute()) {
+        yStoreInstanceToAttribute(itemElement, item, app);
+      } else {
+        yStoreInstanceToElement(itemElement, item, app, relativeFmi);
+      }
+      element.addElement(itemElement);
+    }
+  }
+
+  private Class yDeriveSuperTypeOfElements(IList value) {
+    Class ret;
+    ISet<Class> topTypes = new ESet<>();
+    topTypes.add(value
+        .where(q -> q != null)
+        .select(q -> q.getClass()));
 
     if (topTypes.isEmpty())
       ret = Object.class;
     else {
-      ret = topTypes.get(0);
+      ret = topTypes.getFirst();
+      //TODO This can really be done in some better way
       for (Class topType : topTypes) {
-        ret = getBestParent(ret, topType);
+        ret = yGetBestParent(ret, topType);
       }
     }
     return ret;
   }
 
-  private Class getBestParent(Class a, Class b) {
+  private Class yGetBestParent(Class a, Class b) {
     Class ret;
     if (a.equals(b))
       ret = a;
@@ -390,6 +303,7 @@ public class Formatter {
   }
 
   private Class tryGetSomeSuperInterface(Class a, Class b) {
+    log.log(Log.LogLevel.info, "Formatter.tryGetSomeSuperInterface(...) not supported.");
     return null;
   }
 
@@ -405,109 +319,98 @@ public class Formatter {
     return ret;
   }
 
-  private void storeArray(XElement el, Object value) throws XmlSerializationException {
-    int cnt = Array.getLength(value);
-    Class itemType = value.getClass().getComponentType();
-    for (int i = 0; i < cnt; i++) {
-      Object item = Array.get(value, i);
-      String itemElementName = itemType.getSimpleName();
-      while (itemElementName.endsWith("[]")) {
-        itemElementName = itemElementName.substring(0, itemElementName.length() - 2) + "_arr";
-      }
-      XElement itemElement = createElementForObject(el, itemElementName);
-      storeIt(itemElement, item, itemType, true);
+  private String yGetValueFromIValueParser(Object value, IValueParser parser) throws XmlSerializationException {
+    String s;
+    try {
+      s = parser.format(value);
+    } catch (Exception ex) {
+      throw new XmlSerializationException(sf(
+          "Failed to format value '%s' (%s) by custom value parser '%s'.",
+          value.toString(), value.getClass().getName(), parser.getClass().getName()), ex);
     }
+
+    return s;
   }
 
-  private void storeNullElement(XElement element) {
-    element.setContent(settings.getNullString());
-  }
-
-  private void storeNullAttribute(XElement element, String attributeName) {
-    element.setAttribute(attributeName, settings.getNullString());
-  }
-
-  private void storeObject(XElement el, Object value) throws XmlSerializationException {
-    Class c = value.getClass();
-    Field[] fields = Shared.getDeclaredFields(c);
-
-    for (Field f : fields) {
-      if (java.lang.reflect.Modifier.isStatic(f.getModifiers())) {
-        continue; // statické přeskakujem
-      } else if (f.getAnnotation(XmlIgnore.class) != null) {
-        if (settings.isVerbose()) {
-          System.out.println("  " + el.getName() + "." + f.getName() + " field skipped due to @XmlIgnored annotation.");
-        }
-        continue; // skipped due to annotation
-      } else if (Shared.isSkippedBySettings(f, settings)) {
-        if (settings.isVerbose()) {
-          System.out.println("  " + el.getName() + "." + f.getName() + " field skipped due to settings-ignoredFieldsRegex list.");
-        }
-        continue;
-      }
-      try {
-        storeField(el, value, f);
-      } catch (Exception ex) {
-        throw new XmlSerializationException(ex,
-            "Failed to store field '%s.%s' into the element '%s'.",
-            c.getName(), f.getName(),
-            Shared.getElementInfoString(el));
-      }
-    }
-  }
-
-  private void storePrimitive(XElement element, Object value) {
-    if (value == null)
-      storeNullElement(element);
-    else {
-      element.setContent(value.toString());
-    }
-  }
-
-  private void addClassAttributeIfRequired(XElement el, Class realType, Class declaredType) {
-    if (declaredType != null && realType.equals(declaredType) == false) {
-      addClassAttribute(el, realType);
-    }
-  }
-
-  private void addClassAttribute(XElement element, Class<?> realType) {
-    element.setAttribute(Shared.TYPE_MAP_OF_ATTRIBUTE_NAME, realType.getName());
-  }
-
-  private void addItemTypeAttribute(XElement element, Class<?> realType) {
-    element.setAttribute(Shared.TYPE_MAP_ITEM_OF_ATTRIBUTE_NAME, realType.getName());
-  }
-
-  private void addKeyTypeAttribute(XElement element, Class<?> realType) {
-    element.setAttribute(Shared.TYPE_MAP_KEY_OF_ATTRIBUTE_NAME, realType.getName());
-  }
-
-  private void addValueTypeAttribute(XElement element, Class<?> realType) {
-    element.setAttribute(Shared.TYPE_MAP_VALUE_OF_ATTRIBUTE_NAME, realType.getName());
-  }
-
-
-  private void storePrimitive(XElement element, String attributeName, Object value) {
-    if (value == null)
-      storeNullAttribute(element, attributeName);
-    else
-      element.setAttribute(attributeName, value.toString());
-  }
-
-  @Nullable
-  private Object getFieldValue(@NotNull Object sourceObject, @NotNull Field f) throws XmlSerializationException {
+  private Object getFieldValue(Object sourceObject, FieldMetaInfo fmi) throws XmlSerializationException {
     Object value;
     try {
-      f.setAccessible(true);
-      value = f.get(sourceObject);
-      f.setAccessible(false);
+      fmi.getField().setAccessible(true);
+      value = fmi.getField().get(sourceObject);
+      fmi.getField().setAccessible(false);
     } catch (IllegalAccessException ex) {
-      throw new XmlSerializationException(ex,
-          "Failed to get value of field '%s.%s'.",
-          sourceObject.getClass().getName(), f.getName()
-      );
+      throw new XmlSerializationException(sf(
+          "Failed to read value of field '%s'.",
+          fmi.getLocation(false)), ex);
     }
     return value;
   }
 
+  private void yStoreArray(XElement element, Object value, FieldMetaInfo relativeFmi) throws XmlSerializationException {
+    int cnt = Array.getLength(value);
+    Class itemType = value.getClass().getComponentType();
+    TypeMetaInfo parentIterableTmi = metaManager.getTypeMetaInfo(value.getClass());
+
+    IList items = new EList();
+    for (int i = 0; i < cnt; i++) {
+      Object item = Array.get(value, i);
+      items.add(item);
+    }
+
+    yStoreIterableItems(element, items, itemType, parentIterableTmi, relativeFmi);
+  }
+
+  private void yStorePrimitiveToElement(XElement element, Object value) {
+    element.setContent(value.toString());
+  }
+
+  private void yStoreInstanceToElementUsingCustomElementParser(XElement el, Object value, IElementParser parser) {
+    try {
+      parser.format(value, el, parent.new Serializer());
+    } catch (Exception ex) {
+      throw new XmlSerializationException(sf(
+          "Failed to format value '%s' (%s) by custom element parser '%s'.",
+          value.toString(), value.getClass().getName(), parser.getClass().getName()), ex);
+    }
+  }
+
+}
+
+class RecursionDetector {
+
+  private static final int MAX_CHECK_COUNT = 5;
+  private IMap<Object, Integer> map = new EMap<>();
+
+  public void check(Object item) {
+    if (item == null) {
+      return;
+    } else {
+      if (map.containsKey(item)) {
+        Integer val = map.get(item) + 1;
+        map.set(item, val);
+        if (val >= MAX_CHECK_COUNT)
+          throw new EXmlRuntimeException("Infinite recursive call over object {" + item.getClass().getName() + "}: " + item.toString());
+      } else
+        map.set(item, 1);
+    }
+  }
+
+  public void uncheck(Object item) {
+    if (item == null)
+      return;
+    else {
+      Integer val = map.get(item) - 1;
+      map.set(item, val);
+    }
+  }
+}
+
+class MapEntry {
+  Object key;
+  Object value;
+
+  public MapEntry(Object key, Object value) {
+    this.key = key;
+    this.value = value;
+  }
 }

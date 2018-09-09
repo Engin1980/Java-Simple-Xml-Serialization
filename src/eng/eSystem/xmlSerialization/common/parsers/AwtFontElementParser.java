@@ -1,11 +1,9 @@
 package eng.eSystem.xmlSerialization.common.parsers;
 
 import eng.eSystem.eXml.XElement;
-import eng.eSystem.xmlSerialization.IElementParser;
-import eng.eSystem.xmlSerialization.XmlDeserializationException;
-import eng.eSystem.xmlSerialization.XmlSerializationException;
 import eng.eSystem.xmlSerialization.XmlSerializer;
-import org.w3c.dom.Element;
+import eng.eSystem.xmlSerialization.exceptions.XmlSerializationException;
+import eng.eSystem.xmlSerialization.supports.IElementParser;
 
 import java.awt.*;
 
@@ -22,12 +20,7 @@ public class AwtFontElementParser implements IElementParser<Font> {
   public final static String ATTR_SIZE = "size";
 
   @Override
-  public Class getType() {
-    return java.awt.Font.class;
-  }
-
-  @Override
-  public Font parse(XElement element, XmlSerializer.Deserializer parent) throws XmlDeserializationException {
+  public Font parse(XElement element, XmlSerializer.Deserializer source) {
     String familyName = element.getAttributes().get(ATTR_FAMILY);
     String styleS = element.getAttributes().get(ATTR_STYLE);
     String sizeS = element.getAttributes().get(ATTR_SIZE);
@@ -40,31 +33,27 @@ public class AwtFontElementParser implements IElementParser<Font> {
   }
 
   @Override
-  public void format(Font value, XElement element, XmlSerializer.Serializer parent) {
+  public void format(Font value, XElement element, XmlSerializer.Serializer source) {
     element.setAttribute(ATTR_FAMILY, value.getName());
     element.setAttribute(ATTR_STYLE, Integer.toString(value.getStyle()));
     element.setAttribute(ATTR_SIZE, Integer.toString(value.getSize()));
   }
 
-  @Override
-  public boolean isApplicableOnDescendants() {
-    return false;
-  }
-
-  private int toInt(String value, String key) throws XmlDeserializationException {
+  private int toInt(String value, String key) {
     int ret;
     try{
       ret = Integer.parseInt(value);
-     } catch (Exception ex){
-      throw new XmlDeserializationException("Failed to convert attribute " + key + " value " + value + " to {int} in " + this.getClass().getName() + " parsing.");
+    } catch (Exception ex){
+      throw new XmlSerializationException("Failed to convert attribute " + key + " value " + value + " to {int} in " + this.getClass().getName() + " parsing.");
     }
     return ret;
   }
 
-  private String getAttributeValue(Element el, String key) throws XmlDeserializationException{
-    if (el.hasAttribute(key) == false)
-      throw new XmlDeserializationException("Failed to find required attribute " + key + " for " + this.getClass().getName() + " parsing.");
-    String ret = el.getAttribute(key);
+  private String getAttributeValue(XElement el, String key) {
+    String ret = el.tryGetAttribute(key);
+    if (ret == null){
+      throw new XmlSerializationException("Failed to find required attribute " + key + " for " + this.getClass().getName() + " parsing.");
+    }
     return ret;
   }
 }
