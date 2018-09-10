@@ -53,7 +53,7 @@ class Parser {
 
   private Object yReadInstanceFromAttribute(XElement element, Applicator app) {
     log.increaseIndent();
-    log.log(Log.LogLevel.verbose, "%s <= ... %s=\"...\" from {%s}", app.getType().getName(), app.getName(),
+    log.log(Log.LogLevel.verbose, "%s <= ... %s=\"...\" from {%s}", app.getNormalizedType().getName(), app.getName(),
         Shared.getElementInfoString(element));
 
     Object ret;
@@ -67,7 +67,7 @@ class Parser {
       if (customParser != null)
         ret = this.convertValueByCustomParser(attributeValue, customParser);
       else
-        ret = this.convertToType(attributeValue, app.getType());
+        ret = this.convertToType(attributeValue, app.getNormalizedType());
     }
     log.log(Log.LogLevel.verbose, "{%s}", ret);
 
@@ -77,7 +77,7 @@ class Parser {
 
   private Object yReadInstanceFromElement(XElement element, Applicator app, FieldMetaInfo relativeFmi) {
     log.increaseIndent();
-    log.log(Log.LogLevel.verbose, "%s <= <%s> from {%s}", app.getType().getName(), element.getName(),
+    log.log(Log.LogLevel.verbose, "%s <= <%s> from {%s}", app.getNormalizedType().getName(), element.getName(),
         Shared.getElementInfoString(element));
 
     Object ret;
@@ -86,7 +86,7 @@ class Parser {
     } catch (Exception ex) {
       throw new XmlSerializationException(
           sf("Failed to parse class '%s' from element %s",
-              app.getType().getName(), Shared.getElementInfoString(element)), ex);
+              app.getNormalizedType().getName(), Shared.getElementInfoString(element)), ex);
     }
 
     log.decreaseIndent();
@@ -95,6 +95,7 @@ class Parser {
 
   private Object yReadInstanceFromElementInner(XElement element, Applicator app, FieldMetaInfo relativeFmi) {
     Object ret;
+    IValueParser locallyStoredValueParserForSpecialCases = null;
 
     if (settings.getNullString().equals(element.getContent()))
       ret = null;
@@ -103,23 +104,24 @@ class Parser {
         Class realType = TypeMappingManager.tryGetCustomTypeByElement(element);
         if (realType != null)
           app.updateType(realType);
-        TypeMetaInfo tmi = metaManager.getTypeMetaInfo(app.getType());
+        TypeMetaInfo tmi = metaManager.getTypeMetaInfo(app.getOriginalType());
         app.updateParserIfRequired(tmi);
+        locallyStoredValueParserForSpecialCases = tmi.getCustomValueParser();
       }
       IElementParser customParser = app.getCustomParser(IElementParser.class);
 
       if (customParser != null)
         ret = this.yReadElementUsingCustomParser(element, customParser);
-      else if (TypeMappingManager.isSimpleTypeOrEnum(app.getType()))
-        ret = yReadElementToPrimitive(element, app);
-      else if (TypeMappingManager.isInnerInstanceClass(app.getType()))
+      else if (TypeMappingManager.isSimpleTypeOrEnum(app.getNormalizedType()))
+        ret = yReadElementToPrimitive(element, app, locallyStoredValueParserForSpecialCases);
+      else if (TypeMappingManager.isInnerInstanceClass(app.getNormalizedType()))
         throw new XmlSerializationException(sf(
-            "Deserialization of inner instance class (%s) is not supported.", app.getType().getName()));
-      else if (TypeMappingManager.isMap(app.getType()))
+            "Deserialization of inner instance class (%s) is not supported.", app.getNormalizedType().getName()));
+      else if (TypeMappingManager.isMap(app.getNormalizedType()))
         ret = yReadMap(element, app, relativeFmi);
-      else if (TypeMappingManager.isIterable(app.getType()))
+      else if (TypeMappingManager.isIterable(app.getNormalizedType()))
         ret = yReadIterable(element, app, relativeFmi);
-      else if (app.getType().isArray())
+      else if (app.getNormalizedType().isArray())
         ret = yReadArray(element, app, relativeFmi);
       else
         ret = yReadClass(element, app);
@@ -133,12 +135,12 @@ class Parser {
 
     Class expectedClass = TypeMappingManager.tryGetCustomTypeByElement(element);
     Class expectedItemClass = coalesce(TypeMappingManager.tryGetItemTypeByElement(element), Object.class);
-    if (expectedClass == null) expectedClass = app.getType();
+    if (expectedClass == null) expectedClass = app.getNormalizedType();
     TypeMetaInfo tmi = metaManager.getTypeMetaInfo(expectedClass);
 
     IList lst = yReadItems(children, expectedItemClass, app, relativeFmi);
 
-    Class retType = app.getType();
+    Class retType = app.getNormalizedType();
     Object ret = yCreateObjectInstance(tmi);
     if (Set.class.isAssignableFrom(retType)) {
       Set tmp = (Set) ret;
@@ -170,7 +172,7 @@ class Parser {
 
     IList<MapEntry> lst = yReadMapItems(children, keyExpectedClass, valueExpectedClass, app, relativeFmi);
 
-    TypeMetaInfo tmi = metaManager.getTypeMetaInfo(app.getType());
+    TypeMetaInfo tmi = metaManager.getTypeMetaInfo(app.getNormalizedType());
     Object ret = yCreateObjectInstance(tmi);
     if (Map.class.isAssignableFrom(tmi.getType())) {
       Map tmp = (Map) ret;
@@ -193,7 +195,7 @@ class Parser {
 
     IList<MapEntry> ret = new EList();
     IList<String> elementsWithObjectWarningLogged = new EList<>();
-    TypeMetaInfo parentTmi = metaManager.getTypeMetaInfo(parentApp.getType());
+    TypeMetaInfo parentTmi = metaManager.getTypeMetaInfo(parentApp.getNormalizedType());
 
 
     for (XElement entryElement : children) {
@@ -205,7 +207,7 @@ class Parser {
       {
         Applicator app = metaManager.getMapKeyApplicator2(entryElement, keyExpectedType, relativeFmi, parentTmi);
 
-        if (app.isAttribute() == false && settings.getNullString().equals(entryElement.getChild(app.getName()).getContent()) == false && app.getType().equals(Object.class) && elementsWithObjectWarningLogged.contains(entryElement.getName()) == false) {
+        if (app.isAttribute() == false && settings.getNullString().equals(entryElement.getChild(app.getName()).getContent()) == false && app.getNormalizedType().equals(Object.class) && elementsWithObjectWarningLogged.contains(entryElement.getName()) == false) {
           elementsWithObjectWarningLogged.add(entryElement.getName());
           log.log(
               Log.LogLevel.warning,
@@ -229,7 +231,7 @@ class Parser {
       {
         Applicator app = metaManager.getMapValueApplicator2(entryElement, valueExpectedType, relativeFmi, parentTmi);
 
-        if (app.isAttribute() == false && settings.getNullString().equals(entryElement.getChild(app.getName()).getContent()) == false && app.getType().equals(Object.class) && elementsWithObjectWarningLogged.contains(entryElement.getName()) == false) {
+        if (app.isAttribute() == false && settings.getNullString().equals(entryElement.getChild(app.getName()).getContent()) == false && app.getNormalizedType().equals(Object.class) && elementsWithObjectWarningLogged.contains(entryElement.getName()) == false) {
           elementsWithObjectWarningLogged.add(entryElement.getName());
           log.log(
               Log.LogLevel.warning,
@@ -258,14 +260,14 @@ class Parser {
   private IList yReadItems(IReadOnlyList<XElement> children, Class expectedItemType, Applicator parentApp, FieldMetaInfo relativeFmi) {
     IList ret = new EList();
     IList<String> elementsWithObjectWarningLogged = new EList<>();
-    TypeMetaInfo parentTmi = metaManager.getTypeMetaInfo(parentApp.getType());
+    TypeMetaInfo parentTmi = metaManager.getTypeMetaInfo(parentApp.getNormalizedType());
     for (XElement itemElement : children) {
       IList<String> elementNames = new EList();
       elementNames.add(itemElement.getName());
 
       Applicator app = metaManager.getItemApplicator2(itemElement, expectedItemType, relativeFmi, parentTmi);
 
-      if (app.isAttribute() == false && settings.getNullString().equals(itemElement.getContent()) == false && app.getType().equals(Object.class) && elementsWithObjectWarningLogged.contains(itemElement.getName()) == false) {
+      if (app.isAttribute() == false && settings.getNullString().equals(itemElement.getContent()) == false && app.getNormalizedType().equals(Object.class) && elementsWithObjectWarningLogged.contains(itemElement.getName()) == false) {
         elementsWithObjectWarningLogged.add(itemElement.getName());
         log.log(
             Log.LogLevel.warning,
@@ -288,14 +290,14 @@ class Parser {
 
     IList<XElement> children = new EList<>(element.getChildren());
     TypeMappingManager.tryRemoveTypeMapElement(children);
-    Class expectedItemType = app.getType().getComponentType();
+    Class expectedItemType = app.getNormalizedType().getComponentType();
 
     IList lst = yReadItems(children, expectedItemType, app, relativeFmi);
 
     Object ret;
     int cnt = lst.size();
 
-    ret = xeCreateArrayInstance(app.getType().getComponentType(), cnt);
+    ret = xeCreateArrayInstance(app.getNormalizedType().getComponentType(), cnt);
     for (int i = 0; i < children.size(); i++) {
       Array.set(ret, i, lst.get(i));
     }
@@ -317,7 +319,7 @@ class Parser {
   private Object yReadClass(XElement element, Applicator app) {
     log.increaseIndent();
 
-    TypeMetaInfo tmi = metaManager.getTypeMetaInfo(app.getType());
+    TypeMetaInfo tmi = metaManager.getTypeMetaInfo(app.getNormalizedType());
 
     log.log(Log.LogLevel.info, sf("%s <= <%s>", tmi.getType().getName(), element.getName()));
 
@@ -379,9 +381,14 @@ class Parser {
         else
           ret = yReadInstanceFromElement(element.getChildren(app.getName()).getFirst(), app, fmi);
       } else {
-        log.log(Log.LogLevel.info, ".%s skipped, no source found",
-            fmi.getField().getName());
-        ret = UNSET;
+        if (fmi.getNecessity() == FieldMetaInfo.eNecessity.mandatory) {
+          throw new XmlSerializationException(sf("Source for mandatory object '%s' not found. No required xml-element or attribute found.",
+              fmi.getLocation(false)));
+        } else {
+          log.log(Log.LogLevel.info, ".%s skipped, no source found",
+              fmi.getField().getName());
+          ret = UNSET;
+        }
       }
 
     } catch (Exception ex) {
@@ -494,10 +501,13 @@ class Parser {
     return ret;
   }
 
-  private Object yReadElementToPrimitive(XElement el, Applicator app) {
+  private Object yReadElementToPrimitive(XElement el, Applicator app, IValueParser customValueParser) {
     Object ret;
     String value = el.getContent().trim();
-    ret = this.convertToType(value, app.getType());
+    if (customValueParser != null)
+      ret = convertValueByCustomParser(value, customValueParser);
+    else
+      ret = this.convertToType(value, app.getNormalizedType());
     return ret;
   }
 

@@ -79,11 +79,7 @@ public class MetaManager {
         mapping = Mapping.createDefault(fmi.getField().getName(), fmi.getField().getType(), false);
       } else {
         // source not found
-        if (fmi.getNecessity() != FieldMetaInfo.eNecessity.mandatory)
-          return null;
-        else
-          throw new XmlSerializationException(sf("Source for mandatory object '%s' not found. No required xml-element or attribute found.",
-              fmi.getLocation(false)));
+        return null;
       }
     }
 
@@ -91,6 +87,12 @@ public class MetaManager {
     type = coalesce(mapping.getType(), fmi.getField().getType());
     isAttribute = mapping.isAttribute();
     parser = mapping.getCustomParser();
+
+    if (isAttribute) {
+      if (attNames.contains(name) == false) return null;
+    } else {
+      if (elmNames.contains(name) == false) return null;
+    }
 
     if (mapping.isElement()) {
       Class realType = TypeMappingManager.tryGetCustomTypeByElement(element.getChildren(name).getFirst());
@@ -163,9 +165,9 @@ public class MetaManager {
   private Applicator getComplexApplicator2(XElement element, IReadOnlyList<Mapping> fmiMappings, IReadOnlyList<Mapping> tmiMappings,
                                            String defaultElementName, String defaultAttributeName, Class expectedType, boolean isMap) {
     if (expectedType == null) {
-        throw new IllegalArgumentException("Value of {expectedType} cannot not be null.");
+      throw new IllegalArgumentException("Value of {expectedType} cannot not be null.");
     }
-    
+
     IList<String> attNames = element.getAttributes().getKeys().toList();
     IList<String> elmNames;
     if (isMap)

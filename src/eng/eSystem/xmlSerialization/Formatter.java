@@ -51,7 +51,7 @@ class Formatter {
     if (value == null)
       attributeValue = settings.getNullString();
     else {
-      assert value.getClass().equals(app.getType()) || app.getCustomParser() != null;
+      assert value.getClass().equals(app.getNormalizedType()) || app.getCustomParser() != null;
 
       IValueParser customParser = app.getCustomParser(IValueParser.class);
       if (customParser != null)
@@ -73,7 +73,7 @@ class Formatter {
 
     TypeMappingManager.addClassTypeAttribute(element,
         value == null ? Object.class : value.getClass(),
-        app.getType());
+        app.getNormalizedType());
 
     try {
       this.yStoreInstanceToElementInner(element, value, app, relativeFmi);
