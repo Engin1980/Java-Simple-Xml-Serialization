@@ -370,14 +370,19 @@ class Parser {
     try {
       Applicator app = this.metaManager.getFieldApplicator(element, fmi);
 
-      log.log(Log.LogLevel.info, ".%s <- %s (%s)",
-          fmi.getField().getName(), app.getName(), app.isAttribute() ? "att" : "elm"
-      );
-
-      if (app.isAttribute())
-        ret = yReadInstanceFromAttribute(element, app);
-      else
-        ret = yReadInstanceFromElement(element.getChildren(app.getName()).getFirst(), app, fmi);
+      if (app != null) {
+        log.log(Log.LogLevel.info, ".%s <- %s (%s)",
+            fmi.getField().getName(), app.getName(), app.isAttribute() ? "att" : "elm"
+        );
+        if (app.isAttribute())
+          ret = yReadInstanceFromAttribute(element, app);
+        else
+          ret = yReadInstanceFromElement(element.getChildren(app.getName()).getFirst(), app, fmi);
+      } else {
+        log.log(Log.LogLevel.info, ".%s skipped, no source found",
+            fmi.getField().getName());
+        ret = UNSET;
+      }
 
     } catch (Exception ex) {
       throw new XmlSerializationException(sf(
