@@ -1,4 +1,4 @@
-package eng.esystem.xmlSerialization.annotations.both.objectCustomParser;
+package eng.eSystem.xmlSerialization.annotations.both.objectCustomParser;
 
 import eng.eSystem.eXml.XDocument;
 import eng.eSystem.eXml.XElement;

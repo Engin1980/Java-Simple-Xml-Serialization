@@ -1,4 +1,4 @@
-package eng.esystem.xmlSerialization.annotations.both.externalSettings;
+package eng.eSystem.xmlSerialization.annotations.both.externalSettings;
 
 import eng.eSystem.eXml.XElement;
 import eng.eSystem.xmlSerialization.XmlSettings;

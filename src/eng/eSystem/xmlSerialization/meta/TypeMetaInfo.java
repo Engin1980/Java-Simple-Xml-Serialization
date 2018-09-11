@@ -86,9 +86,6 @@ public class TypeMetaInfo {
     return ret;
   }
 
-  private boolean customElementParserValidForSubclasses = false;
-  private boolean customValueParserValidForSubclasses = false;
-
   public IReadOnlyList<Mapping> getKeyMappings() {
     return keyMappings;
   }
@@ -322,13 +319,11 @@ public class TypeMetaInfo {
     this.valueMappings.add(m);
   }
 
-  public void updateCustomValueParser(IValueParser parser, boolean applyOnSubclasses) {
+  public void updateCustomValueParser(IValueParser parser) {
     this.customValueParser = parser;
-    this.customValueParserValidForSubclasses = applyOnSubclasses;
   }
 
-  public void updateCustomElementParser(IElementParser parser, boolean applyOnSubclasses) {
+  public void updateCustomElementParser(IElementParser parser) {
     this.customElementParser = parser;
-    this.customElementParserValidForSubclasses = applyOnSubclasses;
   }
 }

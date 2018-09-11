@@ -1,4 +1,4 @@
-package eng.esystem.xmlSerialization.annotations.deserialize.list;
+package eng.eSystem.xmlSerialization.annotations.deserialize.list;
 
 import eng.eSystem.collections.EList;
 import eng.eSystem.collections.IList;

@@ -1,4 +1,4 @@
-package eng.esystem.xmlSerialization.annotations.both.iterable;
+package eng.eSystem.xmlSerialization.annotations.both.iterable;
 
 import eng.eSystem.eXml.XDocument;
 import eng.eSystem.eXml.XElement;

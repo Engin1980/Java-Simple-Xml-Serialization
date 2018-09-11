@@ -354,16 +354,16 @@ public class XmlSettings {
     }
 
 
-    public void registerCustomParser(Class type, boolean applyOnSubclasses, IValueParser parser) {
+    public void registerCustomParser(Class type, IValueParser parser) {
       assert parser != null;
       TypeMetaInfo tmi = _getType(type);
-      tmi.updateCustomValueParser(parser, applyOnSubclasses);
+      tmi.updateCustomValueParser(parser);
     }
 
-    public void registerCustomParser(Class type, boolean applyOnSubclasses, IElementParser parser) {
+    public void registerCustomParser(Class type, IElementParser parser) {
       assert parser != null;
       TypeMetaInfo tmi = _getType(type);
-      tmi.updateCustomElementParser(parser, applyOnSubclasses);
+      tmi.updateCustomElementParser(parser);
     }
 
     public void registerXmlItemIgnoredElement(Class parentType, String itemElementName){

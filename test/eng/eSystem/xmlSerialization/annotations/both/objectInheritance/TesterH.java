@@ -1,4 +1,4 @@
-package eng.esystem.xmlSerialization.annotations.both.objectInheritance;
+package eng.eSystem.xmlSerialization.annotations.both.objectInheritance;
 
 import eng.eSystem.eXml.XDocument;
 import eng.eSystem.eXml.XElement;

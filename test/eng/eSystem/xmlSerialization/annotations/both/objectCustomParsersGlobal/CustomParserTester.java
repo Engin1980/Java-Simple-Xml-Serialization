@@ -1,4 +1,4 @@
-package eng.esystem.xmlSerialization.annotations.both.objectCustomParsersGlobal;
+package eng.eSystem.xmlSerialization.annotations.both.objectCustomParsersGlobal;
 
 import eng.eSystem.eXml.XDocument;
 import eng.eSystem.eXml.XElement;

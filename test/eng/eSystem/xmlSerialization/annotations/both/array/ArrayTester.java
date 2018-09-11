@@ -1,9 +1,9 @@
-package eng.esystem.xmlSerialization.annotations.both.array;
+package eng.eSystem.xmlSerialization.annotations.both.array;
 
 import eng.eSystem.eXml.XDocument;
 import eng.eSystem.eXml.XElement;
 import eng.eSystem.xmlSerialization.XmlSerializer;
-import eng.esystem.xmlSerialization.annotations.both.iterable.Shared;
+import eng.eSystem.xmlSerialization.annotations.both.iterable.Shared;
 import org.junit.Test;
 
 import java.util.ArrayList;

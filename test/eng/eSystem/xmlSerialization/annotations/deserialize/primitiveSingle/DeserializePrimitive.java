@@ -1,4 +1,4 @@
-package eng.esystem.xmlSerialization.annotations.deserialize.primitiveSingle;
+package eng.eSystem.xmlSerialization.annotations.deserialize.primitiveSingle;
 
 import eng.eSystem.eXml.XElement;
 import eng.eSystem.xmlSerialization.XmlSerializer;

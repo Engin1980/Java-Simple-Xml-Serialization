@@ -1,4 +1,4 @@
-package eng.esystem.xmlSerialization.annotations.deserialize.objectFieldInheritance;
+package eng.eSystem.xmlSerialization.annotations.deserialize.objectFieldInheritance;
 
 import eng.eSystem.eXml.XElement;
 import eng.eSystem.xmlSerialization.XmlSerializer;

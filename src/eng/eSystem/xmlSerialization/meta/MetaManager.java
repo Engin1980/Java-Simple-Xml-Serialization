@@ -1,11 +1,15 @@
 package eng.eSystem.xmlSerialization.meta;
 
 
+import eng.eSystem.Tuple;
 import eng.eSystem.collections.*;
 import eng.eSystem.eXml.XElement;
 import eng.eSystem.xmlSerialization.TypeMappingManager;
+import eng.eSystem.xmlSerialization.supports.IElementParser;
 import eng.eSystem.xmlSerialization.supports.IParser;
 import eng.eSystem.xmlSerialization.supports.IValueParser;
+
+import java.util.TimerTask;
 
 import static eng.eSystem.utilites.FunctionShortcuts.coalesce;
 
@@ -161,19 +165,34 @@ public class MetaManager {
 
   public boolean isIgnoredItemElement(XElement itemElement, FieldMetaInfo relativeFmi, TypeMetaInfo parentTmi, boolean isMap) {
     String name = itemElement.getName();
-    if (relativeFmi != null){
-      if (relativeFmi.getItemIgnores().getElements().isAny(q->q.getElementName().equals(name)))
+    if (relativeFmi != null) {
+      if (relativeFmi.getItemIgnores().getElements().isAny(q -> q.getElementName().equals(name)))
         return true;
       if (!isMap)
-        if (relativeFmi.getItemMappings().isAny(q->q.getName().equals(name)) ||
-            relativeFmi.getItemMappings().isAny(q->q.getName() == null))
+        if (relativeFmi.getItemMappings().isAny(q -> q.getName().equals(name)) ||
+            relativeFmi.getItemMappings().isAny(q -> q.getName() == null))
           return false;
     }
-    if (parentTmi != null){
-      if (parentTmi .getItemIgnores().getElements().isAny(q->q.getElementName().equals(name)))
-      return true;
+    if (parentTmi != null) {
+      if (parentTmi.getItemIgnores().getElements().isAny(q -> q.getElementName().equals(name)))
+        return true;
     }
     return false;
+  }
+
+  public Tuple<IValueParser, IElementParser> getCustomParsersByType(Class originalType) {
+    IValueParser vp = null;
+    IElementParser ep = null;
+
+    Class type = originalType;
+    while (type != null) {
+      TypeMetaInfo tmi = this.getTypeMetaInfo(type);
+      if (vp == null && tmi.getCustomValueParser() != null) vp = tmi.getCustomValueParser();
+      if (ep == null && tmi.getCustomElementParser() != null) ep = tmi.getCustomElementParser();
+      if (vp != null && ep != null) break;
+      type = type.getSuperclass();
+    }
+    return new Tuple<>(vp,ep);
   }
 
   private Applicator getComplexApplicator2(XElement element, IReadOnlyList<Mapping> fmiMappings, IReadOnlyList<Mapping> tmiMappings,
@@ -230,12 +249,12 @@ public class MetaManager {
         type = realType;
     }
 
-    TypeMetaInfo tmil = this.getTypeMetaInfo(type);
+    Tuple<IValueParser, IElementParser> customParser = this.getCustomParsersByType(type);
     if (parser == null)
       if (isAttribute)
-        parser = tmil.getCustomValueParser();
+        parser = customParser.getA();
       else
-        parser = tmil.getCustomElementParser();
+        parser = customParser.getB();
 
     app = new Applicator(name, type, parser, isAttribute);
     return app;
@@ -265,10 +284,11 @@ public class MetaManager {
       type = declaredObjectType;
       isAttribute = declaredObjectType.equals(realItemType) &&
           (TypeMappingManager.isSimpleTypeOrEnum(realItemType) || itemTmi.getCustomValueParser() != null);
+      Tuple<IValueParser, IElementParser> customParser = this.getCustomParsersByType(itemTmi.getType());
       if (isAttribute)
-        parser = itemTmi.getCustomValueParser();
+        parser = customParser.getA();
       else
-        parser = itemTmi.getCustomElementParser();
+        parser = customParser.getB();
     } else {
       name = coalesce(itemMapping.getName(), defaultName);
       type = coalesce(declaredObjectType, itemMapping.getType());

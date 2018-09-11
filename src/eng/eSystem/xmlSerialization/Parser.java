@@ -1,5 +1,6 @@
 package eng.eSystem.xmlSerialization;
 
+import eng.eSystem.Tuple;
 import eng.eSystem.collections.*;
 import eng.eSystem.eXml.XElement;
 import eng.eSystem.xmlSerialization.annotations.XmlConstructor;
@@ -104,9 +105,9 @@ class Parser {
         Class realType = TypeMappingManager.tryGetCustomTypeByElement(element);
         if (realType != null)
           app.updateType(realType);
-        TypeMetaInfo tmi = metaManager.getTypeMetaInfo(app.getOriginalType());
-        app.updateParserIfRequired(tmi);
-        locallyStoredValueParserForSpecialCases = tmi.getCustomValueParser();
+        Tuple<IValueParser, IElementParser> derivedParsers = metaManager.getCustomParsersByType(app.getOriginalType());
+        app.updateParserIfRequired(derivedParsers.getA(), derivedParsers.getB());
+        locallyStoredValueParserForSpecialCases = derivedParsers.getA();
       }
       IElementParser customParser = app.getCustomParser(IElementParser.class);
 

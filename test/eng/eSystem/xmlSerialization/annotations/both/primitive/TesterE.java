@@ -1,4 +1,4 @@
-package eng.esystem.xmlSerialization.annotations.both.primitive;
+package eng.eSystem.xmlSerialization.annotations.both.primitive;
 
 import eng.eSystem.eXml.XDocument;
 import eng.eSystem.eXml.XElement;

@@ -1,4 +1,4 @@
-package eng.esystem.xmlSerialization.settings.customElementParser;
+package eng.eSystem.xmlSerialization.settings.customElementParser;
 
 import eng.eSystem.eXml.XDocument;
 import eng.eSystem.eXml.XElement;
@@ -19,7 +19,7 @@ public class CustomElementParserTester {
     XDocument doc = new XDocument(new XElement("root"));
 
     XmlSettings sett = new XmlSettings();
-    sett.getMeta().registerCustomParser(Calendar.class, true, new CalendarParser());
+    sett.getMeta().registerCustomParser(Calendar.class, new CalendarParser());
     XmlSerializer ser = new XmlSerializer(sett);
 
     ser.serialize(doc, a);

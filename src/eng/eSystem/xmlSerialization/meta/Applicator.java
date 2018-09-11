@@ -2,7 +2,9 @@ package eng.eSystem.xmlSerialization.meta;
 
 import eng.eSystem.xmlSerialization.TypeMappingManager;
 import eng.eSystem.xmlSerialization.meta.TypeMetaInfo;
+import eng.eSystem.xmlSerialization.supports.IElementParser;
 import eng.eSystem.xmlSerialization.supports.IParser;
+import eng.eSystem.xmlSerialization.supports.IValueParser;
 
 public class Applicator {
   private String name;
@@ -60,8 +62,8 @@ public class Applicator {
       return realType;
   }
 
-  public void updateParserIfRequired(TypeMetaInfo tmi) {
+  public void updateParserIfRequired(IValueParser valueParser, IElementParser elementParser) {
     if (this.parser == null)
-      this.parser = this.isAttribute() ? tmi.getCustomValueParser() : tmi.getCustomElementParser();
+      this.parser = this.isAttribute() ? valueParser : elementParser;
   }
 }

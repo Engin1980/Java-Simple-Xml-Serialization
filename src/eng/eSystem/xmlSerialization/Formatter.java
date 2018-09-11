@@ -147,9 +147,9 @@ class Formatter {
       Object value = getFieldValue(source, fmi);
       Applicator app = metaManager.getFieldApplicator(fmi, value);
 
-
-      log.log(Log.LogLevel.info, ".%s -> %s (%s)",
-          fmi.getField().getName(), app.getName(), app.isAttribute() ? "att" : "elm"
+      log.log(Log.LogLevel.info, ".%s -> %s (%s) (using %s)",
+          fmi.getField().getName(), app.getName(), app.isAttribute() ? "att" : "elm",
+          app.getCustomParser() != null ? app.getCustomParser().getClass() : "default"
       );
 
 

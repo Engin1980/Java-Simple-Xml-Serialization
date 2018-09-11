@@ -19,7 +19,7 @@ public class CustomParser {
     root.setAttribute("altitude", "FL990");
 
     XmlSettings settings = new XmlSettings();
-    settings.getMeta().registerCustomParser(int.class, false, new AltitudeValueParser());
+    settings.getMeta().registerCustomParser(int.class, new AltitudeValueParser());
     XmlSerializer serializer = new XmlSerializer(settings);
 
     Data d = serializer.deserialize(root, Data.class);
@@ -33,7 +33,7 @@ public class CustomParser {
     root.setAttribute("altitude", "FL990");
 
     XmlSettings settings = new XmlSettings();
-    settings.getMeta().registerCustomParser(int.class, false, new AltitudeValueParser());
+    settings.getMeta().registerCustomParser(int.class, new AltitudeValueParser());
     XmlSerializer serializer = new XmlSerializer(settings);
 
     Dudu d = serializer.deserialize(root, Dudu.class);
@@ -55,7 +55,7 @@ public class CustomParser {
     root.addElement(elm);
 
     XmlSettings settings = new XmlSettings();
-    settings.getMeta().registerCustomParser(int.class, false, new AltitudeValueParser());
+    settings.getMeta().registerCustomParser(int.class, new AltitudeValueParser());
     XmlSerializer serializer = new XmlSerializer(settings);
 
     Data[] d = serializer.deserialize(root, Data[].class);
@@ -79,7 +79,7 @@ public class CustomParser {
 
     XmlSettings settings = new XmlSettings();
     settings.getMeta().registerXmlItemElement(EList.class, "item", Dudu.class, false, null);
-    settings.getMeta().registerCustomParser(int.class, false, new AltitudeValueParser());
+    settings.getMeta().registerCustomParser(int.class, new AltitudeValueParser());
     XmlSerializer serializer = new XmlSerializer(settings);
 
     IList<Dudu> d = serializer.deserialize(root, EList.class);
@@ -95,7 +95,7 @@ public class CustomParser {
     root.addElement(tmp);
 
     XmlSettings settings = new XmlSettings();
-    settings.getMeta().registerCustomParser(int.class, false, new AltitudeValueParser());
+    settings.getMeta().registerCustomParser(int.class, new AltitudeValueParser());
     XmlSerializer serializer = new XmlSerializer(settings);
 
     Data d = serializer.deserialize(root, Data.class);

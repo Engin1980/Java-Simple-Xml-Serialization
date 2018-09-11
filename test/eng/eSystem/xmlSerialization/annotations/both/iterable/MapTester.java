@@ -1,4 +1,4 @@
-package eng.esystem.xmlSerialization.annotations.both.iterable;
+package eng.eSystem.xmlSerialization.annotations.both.iterable;
 
 public class MapTester {
 //  @Test

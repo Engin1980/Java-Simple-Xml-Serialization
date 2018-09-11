@@ -1,4 +1,4 @@
-package eng.esystem.xmlSerialization.annotations.deserialize.objectCustomValueParser;
+package eng.eSystem.xmlSerialization.annotations.deserialize.objectCustomValueParser;
 
 import eng.eSystem.eXml.XElement;
 import eng.eSystem.xmlSerialization.XmlSerializer;
