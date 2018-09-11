@@ -5,10 +5,7 @@ import eng.eSystem.collections.IList;
 import eng.eSystem.collections.IReadOnlyList;
 import eng.eSystem.xmlSerialization.annotations.*;
 import eng.eSystem.xmlSerialization.exceptions.XmlSerializationException;
-import eng.eSystem.xmlSerialization.supports.IElementParser;
-import eng.eSystem.xmlSerialization.supports.IFactory;
-import eng.eSystem.xmlSerialization.supports.IParser;
-import eng.eSystem.xmlSerialization.supports.IValueParser;
+import eng.eSystem.xmlSerialization.supports.*;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -31,7 +28,7 @@ public class TypeMetaInfo {
   public static TypeMetaInfo decode(Class type) {
 
     if (type == null) {
-        throw new IllegalArgumentException("Value of {type} cannot not be null.");
+      throw new IllegalArgumentException("Value of {type} cannot not be null.");
     }
 
     TypeMetaInfo ret;
@@ -235,7 +232,10 @@ public class TypeMetaInfo {
   public TypeMetaInfo(Class type, IValueParser customValueParser, IElementParser customElementParser) {
     this.type = type;
     this.customValueParser = customValueParser;
-    this.customElementParser = customElementParser;
+    if (customValueParser != null && customElementParser == null)
+      this.customElementParser = new WrappedValueParser(this.customValueParser);
+    else
+      this.customElementParser = customElementParser;
     this.fields = null;
     this.customFactory = null;
     this.keyMappings = null;
@@ -321,9 +321,15 @@ public class TypeMetaInfo {
 
   public void updateCustomValueParser(IValueParser parser) {
     this.customValueParser = parser;
+    if (this.customElementParser == null)
+      this.customElementParser = new WrappedValueParser(parser);
   }
 
   public void updateCustomElementParser(IElementParser parser) {
     this.customElementParser = parser;
+  }
+
+  public void updateCustomFactory(IFactory factory) {
+    this.customFactory = factory;
   }
 }

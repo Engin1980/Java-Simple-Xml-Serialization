@@ -19,12 +19,13 @@ public class CustomParser {
     root.setAttribute("altitude", "FL990");
 
     XmlSettings settings = new XmlSettings();
-    settings.getMeta().registerCustomParser(int.class, new AltitudeValueParser());
+    settings.forType(int.class)
+        .setCustomParser(new AltitudeValueParser());
     XmlSerializer serializer = new XmlSerializer(settings);
 
     Data d = serializer.deserialize(root, Data.class);
 
-    assertEquals((int) 99000, (int) d.altitude);
+    assertEquals(99000, d.altitude);
   }
 
   @Test
@@ -33,12 +34,13 @@ public class CustomParser {
     root.setAttribute("altitude", "FL990");
 
     XmlSettings settings = new XmlSettings();
-    settings.getMeta().registerCustomParser(int.class, new AltitudeValueParser());
+    settings.forType(int.class)
+        .setCustomParser(new AltitudeValueParser());
     XmlSerializer serializer = new XmlSerializer(settings);
 
     Dudu d = serializer.deserialize(root, Dudu.class);
 
-    assertEquals((int) 99000, (int) d.altitude);
+    assertEquals(99000, d.altitude);
   }
 
   @Test
@@ -55,13 +57,14 @@ public class CustomParser {
     root.addElement(elm);
 
     XmlSettings settings = new XmlSettings();
-    settings.getMeta().registerCustomParser(int.class, new AltitudeValueParser());
+    settings.forType(int.class)
+        .setCustomParser(new AltitudeValueParser());
     XmlSerializer serializer = new XmlSerializer(settings);
 
     Data[] d = serializer.deserialize(root, Data[].class);
 
     assertEquals(2, d.length);
-    assertEquals((int) 99000, (int) d[0].altitude);
+    assertEquals(99000, d[0].altitude);
   }
 
   @Test
@@ -78,14 +81,16 @@ public class CustomParser {
     root.addElement(elm);
 
     XmlSettings settings = new XmlSettings();
-    settings.getMeta().registerXmlItemElement(EList.class, "item", Dudu.class, false, null);
-    settings.getMeta().registerCustomParser(int.class, new AltitudeValueParser());
+    settings.forType(EList.class)
+        .addXmlItemElement("item", Dudu.class, false, null);
+    settings.forType(int.class)
+        .setCustomParser(new AltitudeValueParser());
     XmlSerializer serializer = new XmlSerializer(settings);
 
     IList<Dudu> d = serializer.deserialize(root, EList.class);
 
     assertEquals(2, d.size());
-    assertEquals((int) 99000, (int) d.get(0).altitude);
+    assertEquals(99000, d.get(0).altitude);
   }
 
   @Test
@@ -95,7 +100,8 @@ public class CustomParser {
     root.addElement(tmp);
 
     XmlSettings settings = new XmlSettings();
-    settings.getMeta().registerCustomParser(int.class, new AltitudeValueParser());
+    settings.forType(int.class)
+        .setCustomParser(new AltitudeValueParser());
     XmlSerializer serializer = new XmlSerializer(settings);
 
     Data d = serializer.deserialize(root, Data.class);

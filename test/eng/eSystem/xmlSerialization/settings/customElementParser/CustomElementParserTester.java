@@ -19,12 +19,12 @@ public class CustomElementParserTester {
     XDocument doc = new XDocument(new XElement("root"));
 
     XmlSettings sett = new XmlSettings();
-    sett.getMeta().registerCustomParser(Calendar.class, new CalendarParser());
+    sett.forType(Calendar.class).setCustomParser(new CalendarParser());
     XmlSerializer ser = new XmlSerializer(sett);
 
     ser.serialize(doc, a);
 
-    System.out.println(doc.getRoot().toFullString());
+//    System.out.println(doc.getRoot().toFullString());
   }
 }
 

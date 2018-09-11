@@ -96,7 +96,6 @@ class Parser {
 
   private Object yReadInstanceFromElementInner(XElement element, Applicator app, FieldMetaInfo relativeFmi) {
     Object ret;
-    IValueParser locallyStoredValueParserForSpecialCases = null;
 
     if (settings.getNullString().equals(element.getContent()))
       ret = null;
@@ -107,14 +106,13 @@ class Parser {
           app.updateType(realType);
         Tuple<IValueParser, IElementParser> derivedParsers = metaManager.getCustomParsersByType(app.getOriginalType());
         app.updateParserIfRequired(derivedParsers.getA(), derivedParsers.getB());
-        locallyStoredValueParserForSpecialCases = derivedParsers.getA();
       }
       IElementParser customParser = app.getCustomParser(IElementParser.class);
 
       if (customParser != null)
         ret = this.yReadElementUsingCustomParser(element, customParser);
       else if (TypeMappingManager.isSimpleTypeOrEnum(app.getNormalizedType()))
-        ret = yReadElementToPrimitive(element, app, locallyStoredValueParserForSpecialCases);
+        ret = yReadElementToPrimitive(element, app);
       else if (TypeMappingManager.isInnerInstanceClass(app.getNormalizedType()))
         throw new XmlSerializationException(sf(
             "Deserialization of inner instance class (%s) is not supported.", app.getNormalizedType().getName()));
@@ -200,8 +198,8 @@ class Parser {
 
 
     for (XElement entryElement : children) {
-      if (metaManager.isIgnoredItemElement(entryElement, relativeFmi, parentTmi, true)){
-        log.log(Log.LogLevel.verbose  ,"Element <%s> skipped as ignored item-element.", entryElement.getName());
+      if (metaManager.isIgnoredItemElement(entryElement, relativeFmi, parentTmi, true)) {
+        log.log(Log.LogLevel.verbose, "Element <%s> skipped as ignored item-element.", entryElement.getName());
         continue;
       }
 
@@ -267,8 +265,8 @@ class Parser {
     IList<String> elementsWithObjectWarningLogged = new EList<>();
     TypeMetaInfo parentTmi = metaManager.getTypeMetaInfo(parentApp.getNormalizedType());
     for (XElement itemElement : children) {
-      if (metaManager.isIgnoredItemElement(itemElement, relativeFmi, parentTmi, false)){
-        log.log(Log.LogLevel.verbose  ,"Element <%s> skipped as ignored item-element.", itemElement.getName());
+      if (metaManager.isIgnoredItemElement(itemElement, relativeFmi, parentTmi, false)) {
+        log.log(Log.LogLevel.verbose, "Element <%s> skipped as ignored item-element.", itemElement.getName());
         continue;
       }
 
@@ -438,25 +436,20 @@ class Parser {
 
     // check if there is not an custom instance creator
 
-    IFactory customFactory;
-    customFactory = settings.getFactories().tryGetFirst(q -> q.getType().equals(tmi.getType()));
-    if (customFactory == null)
-      customFactory = tmi.getCustomFactory();
-
-
+    IFactory customFactory = tmi.getCustomFactory();
     if (customFactory == null)
       try {
         ret = createInstanceByConstructor(type);
       } catch (Exception ex) {
         throw new XmlSerializationException(
-            "Failed to create newe instance of " + type.getName() + " using constructor(s).", ex);
+            "Failed to create new instance of " + type.getName() + " using constructor(s).", ex);
       }
     else {
       try {
         ret = customFactory.createInstance();
       } catch (Exception ex) {
         throw new XmlSerializationException(sf(
-            "Failed to create a newe instance of '%s' using custom creator '%s'.",
+            "Failed to create a new instance of '%s' using custom creator '%s'.",
             type.getName(), customFactory.getClass().getName()), ex);
       }
     }
@@ -475,7 +468,9 @@ class Parser {
       throw new NoSuchMethodException();
     }
     Constructor constructor = constructors.getRandom();
-    if (constructor.getParameterCount() == 0 && Modifier.isPrivate(constructor.getModifiers())) {
+    if (constructor.getParameterCount() == 0
+        && Modifier.isPrivate(constructor.getModifiers())
+        && constructor.getAnnotation(XmlConstructor.class) == null) {
       System.out.println("REP:: Private parameter-less constructor used for " + type.getName());
     }
     Object[] params = new Object[constructor.getParameterCount()];
@@ -511,13 +506,10 @@ class Parser {
     return ret;
   }
 
-  private Object yReadElementToPrimitive(XElement el, Applicator app, IValueParser customValueParser) {
+  private Object yReadElementToPrimitive(XElement el, Applicator app) {
     Object ret;
     String value = el.getContent().trim();
-    if (customValueParser != null)
-      ret = convertValueByCustomParser(value, customValueParser);
-    else
-      ret = this.convertToType(value, app.getNormalizedType());
+    ret = this.convertToType(value, app.getNormalizedType());
     return ret;
   }
 

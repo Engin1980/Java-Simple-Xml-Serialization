@@ -20,7 +20,7 @@ public class FactoryTest {
     root.setAttribute("name", "John Doe");
 
     XmlSettings sett = new XmlSettings();
-    sett.getMeta().registerFactory(new PersonFactory());
+    sett.forType(Person.class).setFactory(new PersonFactory());
     XmlSerializer ser = new XmlSerializer(sett);
 
     p = ser.deserialize(root, Person.class);
@@ -44,12 +44,6 @@ class Employee extends Person{
 }
 
 class PersonFactory implements IFactory<Person>{
-
-  @Override
-  public Class<? extends Person> getType() {
-    return Person.class;
-  }
-
   @Override
   public Person createInstance() {
     return new Employee();

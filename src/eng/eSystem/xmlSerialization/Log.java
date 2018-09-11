@@ -46,7 +46,7 @@ public class Log {
     for (int i = 0; i < indent; i++) {
       ind += "  ";
     }
-    System.out.println(sf("EXmlSerialization :: %-8s :: %s %s", logType, ind, s));
+    System.out.println(sf("EXmlSerialization :: %-8s %02d :: %s %s", logType, indent, ind, s));
   }
 
   private boolean isAboveLogLevel(LogLevel logType) {

@@ -1,5 +1,6 @@
 package eng.eSystem.xmlSerialization;
 
+import eng.eSystem.Tuple;
 import eng.eSystem.collections.*;
 import eng.eSystem.eXml.XElement;
 import eng.eSystem.exceptions.EXmlRuntimeException;
@@ -36,7 +37,11 @@ class Formatter {
 
     this.recursionDetector = new RecursionDetector();
 
-    Applicator app = metaManager.getEmptyElementApplicator("root", Object.class); //source == null ? Object.class : source.getClass());
+    Applicator app = metaManager.getEmptyElementApplicator("root", Object.class);
+    if (source != null) {
+      Tuple<IValueParser, IElementParser> parser = metaManager.getCustomParsersByType(source.getClass());
+      app.updateParserIfRequired(parser.getA(), parser.getB());
+    }
 
     yStoreInstanceToElement(root, source, app, null);
   }
@@ -44,7 +49,8 @@ class Formatter {
   private void yStoreInstanceToAttribute(XElement element, Object value, Applicator app) {
     log.increaseIndent();
     String valueTypeName = value == null ? "null" : value.getClass().getName();
-    log.log(Log.LogLevel.verbose, "%s (%s) => ... %s=\"...\"", value, valueTypeName, element.getName());
+    log.log(Log.LogLevel.verbose, "%s (%s) => %s=\"..\" (using %s)", value, valueTypeName, element.getName(),
+        app.getCustomParser() != null ? app.getCustomParser().getClass() : "default");
 
     String attributeName = app.getName();
     String attributeValue;
@@ -68,7 +74,8 @@ class Formatter {
   private void yStoreInstanceToElement(XElement element, Object value, Applicator app, FieldMetaInfo relativeFmi) {
     log.increaseIndent();
     String valueTypeName = value == null ? "null" : value.getClass().getName();
-    log.log(Log.LogLevel.verbose, "%s (%s) => <%s>", value, valueTypeName, element.getName());
+    log.log(Log.LogLevel.verbose, "%s (%s) => <%s> (using %s)", value, valueTypeName, element.getName(),
+        app.getCustomParser() != null ? app.getCustomParser().getClass() : "default");
     recursionDetector.check(value);
 
     TypeMappingManager.addClassTypeAttribute(element,
@@ -123,8 +130,16 @@ class Formatter {
     TypeMetaInfo tmi = metaManager.getTypeMetaInfo(realValueType);
 
     for (FieldMetaInfo fmi : tmi.getFields()) {
+      if (fmi.getField().getName().equals("this$0")){
+        log.increaseIndent();
+        log.log(Log.LogLevel.info, ".%s skipped, its inner class to outer class reference", fmi.getField().getName());
+        log.decreaseIndent();
+        continue; // skipped due to annotation
+      }
       if (fmi.getNecessity() == FieldMetaInfo.eNecessity.ignore) {
-        log.log(Log.LogLevel.info, fmi.getLocation(false) + " field skipped due to @XmlIgnore annotation.");
+        log.increaseIndent();
+        log.log(Log.LogLevel.info, ".%s skipped due to @XmlIgnore", fmi.getField().getName());
+        log.decreaseIndent();
         continue; // skipped due to annotation
       }
       try {
@@ -147,10 +162,8 @@ class Formatter {
       Object value = getFieldValue(source, fmi);
       Applicator app = metaManager.getFieldApplicator(fmi, value);
 
-      log.log(Log.LogLevel.info, ".%s -> %s (%s) (using %s)",
-          fmi.getField().getName(), app.getName(), app.isAttribute() ? "att" : "elm",
-          app.getCustomParser() != null ? app.getCustomParser().getClass() : "default"
-      );
+      log.log(Log.LogLevel.info, ".%s -> %s (%s)",
+          fmi.getField().getName(), app.getName(), app.isAttribute() ? "att" : "elm");
 
 
       if (app.isAttribute()) {

@@ -33,7 +33,7 @@ public class ListDeserializeTester {
     e.setAttribute("id", "10");
     root.addElement(e);
 
-    System.out.println(root.toFullString());
+//    System.out.println(root.toFullString());
 
     XmlSerializer ser = new XmlSerializer();
 

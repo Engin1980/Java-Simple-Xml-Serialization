@@ -34,7 +34,7 @@ public class VerbosePrintingTester {
 
     {
       XmlSettings sett = new XmlSettings();
-      sett.setLogLevel(Log.LogLevel.warning);
+      sett.setLogLevel(Log.LogLevel.verbose);
       XmlSerializer ser = new XmlSerializer(sett);
       ser.serialize(doc, p);
     }
@@ -43,7 +43,7 @@ public class VerbosePrintingTester {
 
     {
       XmlSettings sett = new XmlSettings();
-      sett.setLogLevel(Log.LogLevel.warning);
+      sett.setLogLevel(Log.LogLevel.verbose);
       XmlSerializer ser = new XmlSerializer(sett);
 
       q = ser.deserialize(doc, Person.class);

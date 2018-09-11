@@ -1,7 +1,5 @@
 package eng.eSystem.xmlSerialization;
 
-import eng.eSystem.collections.EList;
-import eng.eSystem.collections.IList;
 import eng.eSystem.xmlSerialization.exceptions.XmlSerializationException;
 import eng.eSystem.xmlSerialization.meta.FieldMetaInfo;
 import eng.eSystem.xmlSerialization.meta.ItemIgnoreElement;
@@ -17,363 +15,181 @@ import static eng.eSystem.utilites.FunctionShortcuts.sf;
 
 public class XmlSettings {
 
-  private Log.LogLevel logLevel = Log.LogLevel.warning;
-  private String nullString = "(null)";
-  private boolean useSimpleTypeNamesInReferences = true;
-  private final IList<IFactory> factories = new EList<>();
-  private final MetaManager preparedMetaManager = new MetaManager();
-  private final MetaAcc metaAcc = this.new MetaAcc();
+  public class TypeMeta {
 
-  public class MetaAcc {
-    public void registerFieldNecessity(Field field, FieldMetaInfo.eNecessity necessity) {
-      FieldMetaInfo fmi = _getField(field);
-      fmi.updateNecessity(necessity);
+    private final TypeMetaInfo tmi;
+
+    TypeMeta(TypeMetaInfo tmi) {
+      assert tmi != null;
+      this.tmi = tmi;
     }
 
-    private FieldMetaInfo _getField(Field field) {
-      TypeMetaInfo tmi = preparedMetaManager.getTypeMetaInfo(field.getDeclaringClass());
-      FieldMetaInfo fmi;
-      try {
-        fmi = tmi.getFields().getFirst(q -> q.getField().equals(field));
-      } catch (Exception ex) {
-        throw new XmlSerializationException(sf("Field '%s' not found in type '%s'.", field.getName(), tmi.getType().getName()), ex);
+    public FieldMeta forField(String fieldName) {
+      FieldMetaInfo fmi = tmi.getFields().tryGetFirst(q -> q.getField().getName().equals(fieldName));
+      if (fmi == null)
+        throw new XmlSerializationException(sf("Unable to find field named '%s' in class '%s'.", fieldName, tmi.getType().getName()));
+      FieldMeta ret = new FieldMeta(fmi);
+      return ret;
+    }
+
+    public FieldMeta forField(Field field) {
+      if (field == null) {
+        throw new IllegalArgumentException("Value of {field} cannot not be null.");
       }
-      return fmi;
-    }
+      if (field.getDeclaringClass().equals(tmi.getType()) == false)
+        throw new IllegalArgumentException(sf("Value of {field} must refer to field of '%s' class.", tmi.getType().getName()));
 
-    public void registerXmlElement(Field field, String name) {
-      _registerXmlElement(field, name, null, true, null);
-    }
-
-    public void registerXmlElement(Field field, Class type, boolean isTypeSubtypeIncluded) {
-      _registerXmlElement(field, null, type, isTypeSubtypeIncluded, null);
-    }
-
-    public void registerXmlElement(Field field, Class type, boolean isTypeSubtypeIncluded, IElementParser parser) {
-      _registerXmlElement(field, null, type, isTypeSubtypeIncluded, parser);
-    }
-
-    public void registerXmlElement(Field field, String name, Class type, boolean isTypeSubtypeIncluded, IElementParser parser) {
-      _registerXmlElement(field, name, type, isTypeSubtypeIncluded, parser);
-    }
-
-    private void _registerXmlElement(Field field, String name, Class type, boolean isTypeSubtypeIncluded, IElementParser parser) {
-      FieldMetaInfo fmi = _getField(field);
-      fmi.updateXmlElementMapping(name, type, isTypeSubtypeIncluded, parser);
-    }
-
-    public void registerXmlAttribute(Field field, String name) {
-      _registerXmlAttribute(field, name, null, true, null);
-    }
-
-    public void registerXmlAttribute(Field field, Class type, boolean isTypeSubtypeIncluded) {
-      _registerXmlAttribute(field, null, type, isTypeSubtypeIncluded, null);
-    }
-
-    public void registerXmlAttribute(Field field, Class type, boolean isTypeSubtypeIncluded, IValueParser parser) {
-      _registerXmlAttribute(field, null, type, isTypeSubtypeIncluded, parser);
-    }
-
-    public void registerXmlAttribute(Field field, String name, Class type, boolean isTypeSubtypeIncluded, IValueParser parser) {
-      _registerXmlAttribute(field, name, type, isTypeSubtypeIncluded, parser);
-    }
-
-    private void _registerXmlAttribute(Field field, String name, Class type, boolean isTypeSubtypeIncluded, IValueParser parser) {
-      FieldMetaInfo fmi = _getField(field);
-      fmi.updateXmlAttributeMapping(name, type, isTypeSubtypeIncluded, parser);
-    }
-
-
-    public void registerXmlItemElement(Field field, String name) {
-      _registerXmlItemElement(field, name, null, true, null);
-    }
-
-    public void registerXmlItemElement(Field field, Class type, boolean isTypeSubtypeIncluded) {
-      _registerXmlItemElement(field, null, type, isTypeSubtypeIncluded, null);
-    }
-
-    public void registerXmlItemElement(Field field, Class type, boolean isTypeSubtypeIncluded, IElementParser parser) {
-      _registerXmlItemElement(field, null, type, isTypeSubtypeIncluded, parser);
-    }
-
-    public void registerXmlItemElement(Field field, String name, Class type, boolean isTypeSubtypeIncluded, IElementParser parser) {
-      _registerXmlItemElement(field, name, type, isTypeSubtypeIncluded, parser);
-    }
-
-    private void _registerXmlItemElement(Field field, String name, Class type, boolean isTypeSubtypeIncluded, IElementParser parser) {
-      FieldMetaInfo fmi = _getField(field);
-      fmi.updateXmlItemElementMapping(name, type, isTypeSubtypeIncluded, parser);
-    }
-
-    public void registerXmlItemAttribute(Field field, String name) {
-      _registerXmlItemAttribute(field, name, null, true, null);
-    }
-
-    public void registerXmlItemAttribute(Field field, Class type, boolean isTypeSubtypeIncluded) {
-      _registerXmlItemAttribute(field, null, type, isTypeSubtypeIncluded, null);
-    }
-
-    public void registerXmlItemAttribute(Field field, Class type, boolean isTypeSubtypeIncluded, IValueParser parser) {
-      _registerXmlItemAttribute(field, null, type, isTypeSubtypeIncluded, parser);
-    }
-
-    public void registerXmlItemAttribute(Field field, String name, Class type, boolean isTypeSubtypeIncluded, IValueParser parser) {
-      _registerXmlItemAttribute(field, name, type, isTypeSubtypeIncluded, parser);
-    }
-
-    private void _registerXmlItemAttribute(Field field, String name, Class type, boolean isTypeSubtypeIncluded, IValueParser parser) {
-      FieldMetaInfo fmi = _getField(field);
-      fmi.updateXmlItemAttributeMapping(name, type, isTypeSubtypeIncluded, parser);
-    }
-
-
-    public void registerXmlMapKeyElement(Field field, String name) {
-      _registerXmlMapKeyElement(field, name, null, true, null);
-    }
-
-    public void registerXmlMapKeyElement(Field field, Class type, boolean isTypeSubtypeIncluded) {
-      _registerXmlMapKeyElement(field, null, type, isTypeSubtypeIncluded, null);
-    }
-
-    public void registerXmlMapKeyElement(Field field, Class type, boolean isTypeSubtypeIncluded, IElementParser parser) {
-      _registerXmlMapKeyElement(field, null, type, isTypeSubtypeIncluded, parser);
-    }
-
-    public void registerXmlMapKeyElement(Field field, String name, Class type, boolean isTypeSubtypeIncluded, IElementParser parser) {
-      _registerXmlMapKeyElement(field, name, type, isTypeSubtypeIncluded, parser);
-    }
-
-    private void _registerXmlMapKeyElement(Field field, String name, Class type, boolean isTypeSubtypeIncluded, IElementParser parser) {
-      FieldMetaInfo fmi = _getField(field);
-      fmi.updateXmlMapKeyElementMapping(name, type, isTypeSubtypeIncluded, parser);
-    }
-
-    public void registerXmlMapKeyAttribute(Field field, String name) {
-      _registerXmlMapKeyAttribute(field, name, null, true, null);
-    }
-
-    public void registerXmlMapKeyAttribute(Field field, Class type, boolean isTypeSubtypeIncluded) {
-      _registerXmlMapKeyAttribute(field, null, type, isTypeSubtypeIncluded, null);
-    }
-
-    public void registerXmlMapKeyAttribute(Field field, Class type, boolean isTypeSubtypeIncluded, IValueParser parser) {
-      _registerXmlMapKeyAttribute(field, null, type, isTypeSubtypeIncluded, parser);
-    }
-
-    public void registerXmlMapKeyAttribute(Field field, String name, Class type, boolean isTypeSubtypeIncluded, IValueParser parser) {
-      _registerXmlMapKeyAttribute(field, name, type, isTypeSubtypeIncluded, parser);
-    }
-
-    private void _registerXmlMapKeyAttribute(Field field, String name, Class type, boolean isTypeSubtypeIncluded, IValueParser parser) {
-      FieldMetaInfo fmi = _getField(field);
-      fmi.updateXmlMapKeyAttributeMapping(name, type, isTypeSubtypeIncluded, parser);
-    }
-
-
-    public void registerXmlMapValueElement(Field field, String name) {
-      _registerXmlMapValueElement(field, name, null, true, null);
-    }
-
-    public void registerXmlMapValueElement(Field field, Class type, boolean isTypeSubtypeIncluded) {
-      _registerXmlMapValueElement(field, null, type, isTypeSubtypeIncluded, null);
-    }
-
-    public void registerXmlMapValueElement(Field field, Class type, boolean isTypeSubtypeIncluded, IElementParser parser) {
-      _registerXmlMapValueElement(field, null, type, isTypeSubtypeIncluded, parser);
-    }
-
-    public void registerXmlMapValueElement(Field field, String name, Class type, boolean isTypeSubtypeIncluded, IElementParser parser) {
-      _registerXmlMapValueElement(field, name, type, isTypeSubtypeIncluded, parser);
-    }
-
-    private void _registerXmlMapValueElement(Field field, String name, Class type, boolean isTypeSubtypeIncluded, IElementParser parser) {
-      FieldMetaInfo fmi = _getField(field);
-      fmi.updateXmlMapValueElementMapping(name, type, isTypeSubtypeIncluded, parser);
-    }
-
-    public void registerXmlMapValueAttribute(Field field, String name) {
-      _registerXmlMapValueAttribute(field, name, null, true, null);
-    }
-
-    public void registerXmlMapValueAttribute(Field field, Class type, boolean isTypeSubtypeIncluded) {
-      _registerXmlMapValueAttribute(field, null, type, isTypeSubtypeIncluded, null);
-    }
-
-    public void registerXmlMapValueAttribute(Field field, Class type, boolean isTypeSubtypeIncluded, IValueParser parser) {
-      _registerXmlMapValueAttribute(field, null, type, isTypeSubtypeIncluded, parser);
-    }
-
-    public void registerXmlMapValueAttribute(Field field, String name, Class type, boolean isTypeSubtypeIncluded, IValueParser parser) {
-      _registerXmlMapValueAttribute(field, name, type, isTypeSubtypeIncluded, parser);
-    }
-
-    private void _registerXmlMapValueAttribute(Field field, String name, Class type, boolean isTypeSubtypeIncluded, IValueParser parser) {
-      FieldMetaInfo fmi = _getField(field);
-      fmi.updateXmlMapValueAttributeMapping(name, type, isTypeSubtypeIncluded, parser);
-    }
-
-
-    public void registerXmlItemElement(Class parentType, String name) {
-      _registerXmlItemElement(parentType, name, null, true, null);
-    }
-
-    public void registerXmlItemElement(Class parentType, Class type, boolean isTypeSubtypeIncluded) {
-      _registerXmlItemElement(parentType, null, type, isTypeSubtypeIncluded, null);
-    }
-
-    public void registerXmlItemElement(Class parentType, Class type, boolean isTypeSubtypeIncluded, IElementParser parser) {
-      _registerXmlItemElement(parentType, null, type, isTypeSubtypeIncluded, parser);
-    }
-
-    public void registerXmlItemElement(Class parentType, String name, Class type, boolean isTypeSubtypeIncluded, IElementParser parser) {
-      _registerXmlItemElement(parentType, name, type, isTypeSubtypeIncluded, parser);
-    }
-
-    private void _registerXmlItemElement(Class parentType, String name, Class type, boolean isTypeSubtypeIncluded, IElementParser parser) {
-      TypeMetaInfo tmi = _getType(parentType);
-      tmi.updateXmlItemElementMapping(name, type, isTypeSubtypeIncluded, parser);
-    }
-
-    public void registerXmlItemAttribute(Class parentType, String name) {
-      _registerXmlItemAttribute(parentType, name, null, true, null);
-    }
-
-    public void registerXmlItemAttribute(Class parentType, Class type, boolean isTypeSubtypeIncluded) {
-      _registerXmlItemAttribute(parentType, null, type, isTypeSubtypeIncluded, null);
-    }
-
-    public void registerXmlItemAttribute(Class parentType, Class type, boolean isTypeSubtypeIncluded, IValueParser parser) {
-      _registerXmlItemAttribute(parentType, null, type, isTypeSubtypeIncluded, parser);
-    }
-
-    public void registerXmlItemAttribute(Class parentType, String name, Class type, boolean isTypeSubtypeIncluded, IValueParser parser) {
-      _registerXmlItemAttribute(parentType, name, type, isTypeSubtypeIncluded, parser);
-    }
-
-    private void _registerXmlItemAttribute(Class parentType, String name, Class type, boolean isTypeSubtypeIncluded, IValueParser parser) {
-      TypeMetaInfo tmi = _getType(parentType);
-      tmi.updateXmlItemAttributeMapping(name, type, isTypeSubtypeIncluded, parser);
-    }
-
-    private TypeMetaInfo _getType(Class type) {
-      TypeMetaInfo ret = preparedMetaManager.getTypeMetaInfo(type);
+      FieldMetaInfo fmi = tmi.getFields().getFirst(q -> q.getField().equals(field));
+      FieldMeta ret = new FieldMeta(fmi);
       return ret;
     }
 
 
-    public void registerXmlMapKeyElement(Class parentType, String name) {
-      _registerXmlMapKeyElement(parentType, name, null, true, null);
+    public TypeMeta addXmlItemElement(String name, Class type, boolean isTypeSubtypeIncluded, IElementParser parser) {
+      this.tmi.updateXmlItemElementMapping(name, type, isTypeSubtypeIncluded, parser);
+      return this;
+    }
+    public TypeMeta addXmlItemAttribute(String name, Class type, boolean isTypeSubtypeIncluded, IValueParser parser) {
+      this.tmi.updateXmlItemAttributeMapping(name, type, isTypeSubtypeIncluded, parser);
+      return this;
+    }
+    public TypeMeta addXmlMapKeyElement(String name, Class type, boolean isTypeSubtypeIncluded, IElementParser parser) {
+      this.tmi.updateXmlMapKeyElementMapping(name, type, isTypeSubtypeIncluded, parser);
+      return this;
+    }
+    public TypeMeta addXmlMapKeyAttribute(String name, Class type, boolean isTypeSubtypeIncluded, IValueParser parser) {
+      this.tmi.updateXmlMapKeyAttributeMapping(name, type, isTypeSubtypeIncluded, parser);
+      return this;
+    }
+    public TypeMeta addXmlMapValueElement(String name, Class type, boolean isTypeSubtypeIncluded, IElementParser parser) {
+      this.tmi.updateXmlMapValueElementMapping(name, type, isTypeSubtypeIncluded, parser);
+      return this;
+    }
+    public TypeMeta addXmlMapValueAttribute(String name, Class type, boolean isTypeSubtypeIncluded, IValueParser parser) {
+      this.tmi.updateXmlMapValueAttributeMapping(name, type, isTypeSubtypeIncluded, parser);
+      return this;
     }
 
-    public void registerXmlMapKeyElement(Class parentType, Class type, boolean isTypeSubtypeIncluded) {
-      _registerXmlMapKeyElement(parentType, null, type, isTypeSubtypeIncluded, null);
+    public TypeMeta setFactory(IFactory factory) {
+      this.tmi.updateCustomFactory(factory);
+      return this;
     }
 
-    public void registerXmlMapKeyElement(Class parentType, Class type, boolean isTypeSubtypeIncluded, IElementParser parser) {
-      _registerXmlMapKeyElement(parentType, null, type, isTypeSubtypeIncluded, parser);
+    public TypeMeta setCustomParser(IValueParser parser) {
+      this.tmi.updateCustomValueParser(parser);
+      return this;
     }
 
-    public void registerXmlMapKeyElement(Class parentType, String name, Class type, boolean isTypeSubtypeIncluded, IElementParser parser) {
-      _registerXmlMapKeyElement(parentType, name, type, isTypeSubtypeIncluded, parser);
+    public TypeMeta setCustomParser(IElementParser parser) {
+      this.tmi.updateCustomElementParser(parser);
+      return this;
     }
 
-    private void _registerXmlMapKeyElement(Class parentType, String name, Class type, boolean isTypeSubtypeIncluded, IElementParser parser) {
-      TypeMetaInfo tmi = _getType(parentType);
-      tmi.updateXmlMapKeyElementMapping(name, type, isTypeSubtypeIncluded, parser);
-    }
-
-    public void registerXmlMapKeyAttribute(Class parentType, String name) {
-      _registerXmlMapKeyAttribute(parentType, name, null, true, null);
-    }
-
-    public void registerXmlMapKeyAttribute(Class parentType, Class type, boolean isTypeSubtypeIncluded) {
-      _registerXmlMapKeyAttribute(parentType, null, type, isTypeSubtypeIncluded, null);
-    }
-
-    public void registerXmlMapKeyAttribute(Class parentType, Class type, boolean isTypeSubtypeIncluded, IValueParser parser) {
-      _registerXmlMapKeyAttribute(parentType, null, type, isTypeSubtypeIncluded, parser);
-    }
-
-    public void registerXmlMapKeyAttribute(Class parentType, String name, Class type, boolean isTypeSubtypeIncluded, IValueParser parser) {
-      _registerXmlMapKeyAttribute(parentType, name, type, isTypeSubtypeIncluded, parser);
-    }
-
-    private void _registerXmlMapKeyAttribute(Class parentType, String name, Class type, boolean isTypeSubtypeIncluded, IValueParser parser) {
-      TypeMetaInfo tmi = _getType(parentType);
-      tmi.updateXmlMapKeyAttributeMapping(name, type, isTypeSubtypeIncluded, parser);
-    }
-
-
-    public void registerXmlMapValueElement(Class parentType, String name) {
-      _registerXmlMapValueElement(parentType, name, null, true, null);
-    }
-
-    public void registerXmlMapValueElement(Class parentType, Class type, boolean isTypeSubtypeIncluded) {
-      _registerXmlMapValueElement(parentType, null, type, isTypeSubtypeIncluded, null);
-    }
-
-    public void registerXmlMapValueElement(Class parentType, Class type, boolean isTypeSubtypeIncluded, IElementParser parser) {
-      _registerXmlMapValueElement(parentType, null, type, isTypeSubtypeIncluded, parser);
-    }
-
-    public void registerXmlMapValueElement(Class parentType, String name, Class type, boolean isTypeSubtypeIncluded, IElementParser parser) {
-      _registerXmlMapValueElement(parentType, name, type, isTypeSubtypeIncluded, parser);
-    }
-
-    private void _registerXmlMapValueElement(Class parentType, String name, Class type, boolean isTypeSubtypeIncluded, IElementParser parser) {
-      TypeMetaInfo tmi = _getType(parentType);
-      tmi.updateXmlMapValueElementMapping(name, type, isTypeSubtypeIncluded, parser);
-    }
-
-    public void registerXmlMapValueAttribute(Class parentType, String name) {
-      _registerXmlMapValueAttribute(parentType, name, null, true, null);
-    }
-
-    public void registerXmlMapValueAttribute(Class parentType, Class type, boolean isTypeSubtypeIncluded) {
-      _registerXmlMapValueAttribute(parentType, null, type, isTypeSubtypeIncluded, null);
-    }
-
-    public void registerXmlMapValueAttribute(Class parentType, Class type, boolean isTypeSubtypeIncluded, IValueParser parser) {
-      _registerXmlMapValueAttribute(parentType, null, type, isTypeSubtypeIncluded, parser);
-    }
-
-    public void registerXmlMapValueAttribute(Class parentType, String name, Class type, boolean isTypeSubtypeIncluded, IValueParser parser) {
-      _registerXmlMapValueAttribute(parentType, name, type, isTypeSubtypeIncluded, parser);
-    }
-
-    private void _registerXmlMapValueAttribute(Class parentType, String name, Class type, boolean isTypeSubtypeIncluded, IValueParser parser) {
-      TypeMetaInfo tmi = _getType(parentType);
-      tmi.updateXmlMapValueAttributeMapping(name, type, isTypeSubtypeIncluded, parser);
-    }
-
-    public void registerFactory(IFactory factory) {
-      if (factory == null) {
-        throw new IllegalArgumentException("Value of {factory} cannot not be null.");
-      }
-      factories.add(factory);
-    }
-
-
-    public void registerCustomParser(Class type, IValueParser parser) {
-      assert parser != null;
-      TypeMetaInfo tmi = _getType(type);
-      tmi.updateCustomValueParser(parser);
-    }
-
-    public void registerCustomParser(Class type, IElementParser parser) {
-      assert parser != null;
-      TypeMetaInfo tmi = _getType(type);
-      tmi.updateCustomElementParser(parser);
-    }
-
-    public void registerXmlItemIgnoredElement(Class parentType, String itemElementName){
-      TypeMetaInfo tmi = _getType(parentType);
-      tmi.getItemIgnores().add(new ItemIgnoreElement(itemElementName));
+    public TypeMeta addXmlItemIgnoredElement(String itemElementName) {
+      this.tmi.getItemIgnores().add(new ItemIgnoreElement(itemElementName));
+      return this;
     }
   }
 
-  IList<IFactory> getFactories() {
-    return factories;
+  public class FieldMeta {
+    private final FieldMetaInfo fmi;
+
+    FieldMeta(FieldMetaInfo fmi) {
+      assert fmi != null;
+      this.fmi = fmi;
+    }
+
+    public FieldMeta setNecessity(FieldMetaInfo.eNecessity necessity) {
+      this.fmi.updateNecessity(necessity);
+      return this;
+    }
+
+    public FieldMeta addXmlElement(String name, Class type, boolean isTypeSubtypeIncluded, IElementParser parser) {
+      this.fmi.updateXmlElementMapping(name, type, isTypeSubtypeIncluded, parser);
+      return this;
+    }
+
+    public FieldMeta addXmlAttribute(String name, Class type, boolean isTypeSubtypeIncluded, IValueParser parser) {
+      this.fmi.updateXmlAttributeMapping(name, type, isTypeSubtypeIncluded, parser);
+      return this;
+    }
+
+    public FieldMeta addXmlItemElement(String name, Class type, boolean isTypeSubtypeIncluded, IElementParser parser) {
+      this.fmi.updateXmlItemElementMapping(name, type, isTypeSubtypeIncluded, parser);
+      return this;
+    }
+
+    public FieldMeta addXmlItemAttribute(String name, Class type, boolean isTypeSubtypeIncluded, IValueParser parser) {
+      this.fmi.updateXmlItemAttributeMapping(name, type, isTypeSubtypeIncluded, parser);
+      return this;
+    }
+
+    public FieldMeta addXmlMapKeyElement(String name, Class type, boolean isTypeSubtypeIncluded, IElementParser parser) {
+      this.fmi.updateXmlMapKeyElementMapping(name, type, isTypeSubtypeIncluded, parser);
+      return this;
+    }
+    public FieldMeta addXmlMapKeyAttribute(String name, Class type, boolean isTypeSubtypeIncluded, IValueParser parser) {
+      this.fmi.updateXmlMapKeyAttributeMapping(name, type, isTypeSubtypeIncluded, parser);
+      return this;
+    }
+    public FieldMeta addXmlMapValueElement(String name, Class type, boolean isTypeSubtypeIncluded, IElementParser parser) {
+      this.fmi.updateXmlMapValueElementMapping(name, type, isTypeSubtypeIncluded, parser);
+      return this;
+    }
+    public FieldMeta addXmlMapValueAttribute(String name, Class type, boolean isTypeSubtypeIncluded, IValueParser parser) {
+      this.fmi.updateXmlMapValueAttributeMapping(name, type, isTypeSubtypeIncluded, parser);
+      return this;
+    }
+
+  }
+
+  private Log.LogLevel logLevel = Log.LogLevel.warning;
+  private String nullString = "(null)";
+  private boolean useSimpleTypeNamesInReferences = true;
+  private final MetaManager preparedMetaManager = new MetaManager();
+
+  public TypeMeta forType(Class cls) {
+    TypeMetaInfo tmi = preparedMetaManager.getTypeMetaInfo(cls);
+    TypeMeta ret = new TypeMeta(tmi);
+    return ret;
+  }
+
+  public TypeMeta forType(String className) {
+    Class cls;
+
+    try {
+      cls = Class.forName(className);
+    } catch (ClassNotFoundException ex) {
+      throw new XmlSerializationException("Unable to find class named " + className, ex);
+    }
+
+    TypeMeta ret = forType(cls);
+    return ret;
+  }
+
+  public FieldMeta forField(Field field) {
+    FieldMeta ret = forType(field.getDeclaringClass()).forField(field);
+    return ret;
+  }
+
+  public FieldMeta forField(String className, String fieldName) {
+    TypeMeta tm = forType(className);
+    FieldMeta fm = tm.forField(fieldName);
+    return fm;
+  }
+
+  public FieldMeta forField(Class cls, String fieldName) {
+    TypeMeta tm = forType(cls);
+    FieldMeta fm = tm.forField(fieldName);
+    return fm;
+  }
+
+  public FieldMeta forField(String fullDotPath) {
+    int lastDotIndex = fullDotPath.lastIndexOf('.');
+    String className = fullDotPath.substring(0, lastDotIndex);
+    String fieldName = fullDotPath.substring(lastDotIndex + 1);
+    FieldMeta ret = forField(className, fieldName);
+    return ret;
   }
 
   MetaManager getMetaManager() {
@@ -402,9 +218,5 @@ public class XmlSettings {
 
   public void setLogLevel(Log.LogLevel logLevel) {
     this.logLevel = logLevel;
-  }
-
-  public MetaAcc getMeta() {
-    return metaAcc;
   }
 }
