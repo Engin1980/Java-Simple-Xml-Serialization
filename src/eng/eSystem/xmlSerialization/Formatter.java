@@ -4,7 +4,7 @@ import eng.eSystem.collections.*;
 import eng.eSystem.eXml.XElement;
 import eng.eSystem.exceptions.EXmlRuntimeException;
 import eng.eSystem.xmlSerialization.exceptions.XmlSerializationException;
-import eng.eSystem.xmlSerialization.meta.newe.Applicator;
+import eng.eSystem.xmlSerialization.meta.Applicator;
 import eng.eSystem.xmlSerialization.meta.FieldMetaInfo;
 import eng.eSystem.xmlSerialization.meta.MetaManager;
 import eng.eSystem.xmlSerialization.meta.TypeMetaInfo;

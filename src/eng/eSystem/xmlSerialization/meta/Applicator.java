@@ -1,4 +1,4 @@
-package eng.eSystem.xmlSerialization.meta.newe;
+package eng.eSystem.xmlSerialization.meta;
 
 import eng.eSystem.xmlSerialization.TypeMappingManager;
 import eng.eSystem.xmlSerialization.meta.TypeMetaInfo;

@@ -4,7 +4,7 @@ import eng.eSystem.collections.*;
 import eng.eSystem.eXml.XElement;
 import eng.eSystem.xmlSerialization.annotations.XmlConstructor;
 import eng.eSystem.xmlSerialization.exceptions.XmlSerializationException;
-import eng.eSystem.xmlSerialization.meta.newe.Applicator;
+import eng.eSystem.xmlSerialization.meta.Applicator;
 import eng.eSystem.xmlSerialization.meta.FieldMetaInfo;
 import eng.eSystem.xmlSerialization.meta.MetaManager;
 import eng.eSystem.xmlSerialization.meta.TypeMetaInfo;
@@ -199,6 +199,10 @@ class Parser {
 
 
     for (XElement entryElement : children) {
+      if (metaManager.isIgnoredItemElement(entryElement, relativeFmi, parentTmi, true)){
+        log.log(Log.LogLevel.verbose  ,"Element <%s> skipped as ignored item-element.", entryElement.getName());
+        continue;
+      }
 
       Object key;
       Object value;
@@ -262,6 +266,11 @@ class Parser {
     IList<String> elementsWithObjectWarningLogged = new EList<>();
     TypeMetaInfo parentTmi = metaManager.getTypeMetaInfo(parentApp.getNormalizedType());
     for (XElement itemElement : children) {
+      if (metaManager.isIgnoredItemElement(itemElement, relativeFmi, parentTmi, false)){
+        log.log(Log.LogLevel.verbose  ,"Element <%s> skipped as ignored item-element.", itemElement.getName());
+        continue;
+      }
+
       IList<String> elementNames = new EList();
       elementNames.add(itemElement.getName());
 

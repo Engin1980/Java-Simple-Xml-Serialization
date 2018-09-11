@@ -19,9 +19,14 @@ public class TypeMetaInfo {
   private IElementParser customElementParser;
   private IList<FieldMetaInfo> fields;
   private IFactory customFactory;
+  private ItemIgnoreList itemIgnores;
   private MappingList itemMappings;
   private MappingList keyMappings;
   private MappingList valueMappings;
+
+  public ItemIgnoreList getItemIgnores() {
+    return itemIgnores;
+  }
 
   public static TypeMetaInfo decode(Class type) {
 
@@ -51,10 +56,33 @@ public class TypeMetaInfo {
       valueMappings.add(getValueAttributeMappings(type));
       valueMappings.add(getValueElementMappings(type));
 
+      IList<ItemIgnore> itemIgnores = new EList<>();
+      itemIgnores.add(getItemIgnoreElements(type));
+      itemIgnores.add(getItemIgnoreTypes(type));
 
-      ret = new TypeMetaInfo(type, fieldMetaInfos, factoryBase, itemMappings, keyMappings, valueMappings);
+      ret = new TypeMetaInfo(type, fieldMetaInfos, factoryBase, itemMappings, itemIgnores, keyMappings, valueMappings);
     }
 
+    return ret;
+  }
+
+  private static IList<ItemIgnore> getItemIgnoreTypes(Class clz) {
+    IList<ItemIgnore> ret = new EList<>();
+    for (Annotation ann : clz.getDeclaredAnnotationsByType(XmlItemIgnoreType.class)) {
+      XmlItemIgnoreType item = (XmlItemIgnoreType) ann;
+      ItemIgnore ii = new ItemIgnoreType(item.type(), item.subClassIncluded());
+      ret.add(ii);
+    }
+    return ret;
+  }
+
+  private static IList<ItemIgnore> getItemIgnoreElements(Class clz) {
+    IList<ItemIgnore> ret = new EList<>();
+    for (Annotation ann : clz.getDeclaredAnnotationsByType(XmlItemIgnoreElement.class)) {
+      XmlItemIgnoreElement item = (XmlItemIgnoreElement) ann;
+      ItemIgnore ii = new ItemIgnoreElement(item.elementName());
+      ret.add(ii);
+    }
     return ret;
   }
 
@@ -112,7 +140,7 @@ public class TypeMetaInfo {
   }
 
   private static IFactory getXmlFactoryBase(Class type) {
-    Class<? extends IFactory> customFactoryType = null;
+    Class<? extends IFactory> customFactoryType;
     XmlFactory anFac = (XmlFactory) type.getDeclaredAnnotation(XmlFactory.class);
     customFactoryType = anFac == null ? null : anFac.value();
     IFactory factoryBase = null;
@@ -217,13 +245,14 @@ public class TypeMetaInfo {
     this.valueMappings = null;
   }
 
-  public TypeMetaInfo(Class type, IList<FieldMetaInfo> fields, IFactory customFactory, IList<Mapping> itemMappings, IList<Mapping> keyMappings, IList<Mapping> valueMappings) {
+  public TypeMetaInfo(Class type, IList<FieldMetaInfo> fields, IFactory customFactory, IList<Mapping> itemMappings, IList<ItemIgnore> itemIgnores, IList<Mapping> keyMappings, IList<Mapping> valueMappings) {
     this.type = type;
     this.fields = fields;
     this.customFactory = customFactory;
     this.itemMappings = new MappingList(itemMappings);
     this.keyMappings = new MappingList(keyMappings);
     this.valueMappings = new MappingList(valueMappings);
+    this.itemIgnores = new ItemIgnoreList(itemIgnores);
     this.customValueParser = null;
     this.customElementParser = null;
   }

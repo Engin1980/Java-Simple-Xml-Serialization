@@ -4,12 +4,9 @@ package eng.eSystem.xmlSerialization.meta;
 import eng.eSystem.collections.*;
 import eng.eSystem.eXml.XElement;
 import eng.eSystem.xmlSerialization.TypeMappingManager;
-import eng.eSystem.xmlSerialization.exceptions.XmlSerializationException;
-import eng.eSystem.xmlSerialization.meta.newe.Applicator;
 import eng.eSystem.xmlSerialization.supports.IParser;
 import eng.eSystem.xmlSerialization.supports.IValueParser;
 
-import static eng.eSystem.utilites.FunctionShortcuts.sf;
 import static eng.eSystem.utilites.FunctionShortcuts.coalesce;
 
 public class MetaManager {
@@ -160,6 +157,23 @@ public class MetaManager {
         relativeFmi == null ? null : relativeFmi.getMapValueMappings(),
         parentMapTmi == null ? null : parentMapTmi.getValueMappings());
     return ret;
+  }
+
+  public boolean isIgnoredItemElement(XElement itemElement, FieldMetaInfo relativeFmi, TypeMetaInfo parentTmi, boolean isMap) {
+    String name = itemElement.getName();
+    if (relativeFmi != null){
+      if (relativeFmi.getItemIgnores().getElements().isAny(q->q.getElementName().equals(name)))
+        return true;
+      if (!isMap)
+        if (relativeFmi.getItemMappings().isAny(q->q.getName().equals(name)) ||
+            relativeFmi.getItemMappings().isAny(q->q.getName() == null))
+          return false;
+    }
+    if (parentTmi != null){
+      if (parentTmi .getItemIgnores().getElements().isAny(q->q.getElementName().equals(name)))
+      return true;
+    }
+    return false;
   }
 
   private Applicator getComplexApplicator2(XElement element, IReadOnlyList<Mapping> fmiMappings, IReadOnlyList<Mapping> tmiMappings,

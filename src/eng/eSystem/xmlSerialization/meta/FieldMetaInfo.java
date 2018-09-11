@@ -21,51 +21,9 @@ public class FieldMetaInfo {
   private eNecessity necessity;
   private MappingList mappings;
   private MappingList itemMappings;
+  private ItemIgnoreList itemIgnores;
   private MappingList mapKeyMappings;
   private MappingList mapValueMappings;
-
-  public IReadOnlyList<Mapping> getMapKeyMappings() {
-    return mapKeyMappings;
-  }
-
-  public IReadOnlyList<Mapping> getMapValueMappings() {
-    return mapValueMappings;
-  }
-
-  public Field getField() {
-    return field;
-  }
-
-  public eNecessity getNecessity() {
-    return necessity;
-  }
-
-  public void updateNecessity(eNecessity necessity) {
-    this.necessity = necessity;
-  }
-
-  public FieldMetaInfo(Field field, eNecessity necessity, IList<Mapping> mappings, IList<Mapping> itemMappings, IList<Mapping> mapKeyMappings, IList<Mapping> mapValueMappings) {
-    this.field = field;
-    this.necessity = necessity;
-    this.mappings = new MappingList(mappings);
-    this.itemMappings = new MappingList(itemMappings);
-    this.mapKeyMappings = new MappingList(mapKeyMappings);
-    this.mapValueMappings = new MappingList(mapValueMappings);
-  }
-
-  public IReadOnlyList<Mapping> getMappings() {
-    return mappings;
-  }
-
-  public IReadOnlyList<Mapping> getItemMappings() {
-    return itemMappings;
-  }
-
-  public String getLocation(boolean useLong){
-    return
-        (useLong ? field.getDeclaringClass().getName() : field.getDeclaringClass().getSimpleName()) +
-            "." + field.getName();
-  }
 
   public static FieldMetaInfo decode(Field field) {
 
@@ -79,6 +37,9 @@ public class FieldMetaInfo {
     itemMaps.add(getItemAttributeMappings(field));
     itemMaps.add(getItemElementMappings(field));
 
+    IList<ItemIgnore> ignores = new EList<>();
+    ignores.add(getItemIgnoreTypes(field));
+    ignores.add(getItemIgnoreElements(field));
 
     IList<Mapping> keyMaps = new EList<>();
     keyMaps.add(getKeyAttributeMappings(field));
@@ -89,7 +50,25 @@ public class FieldMetaInfo {
     valMaps.add(getValueElementMappings(field));
 
 
-    FieldMetaInfo ret = new FieldMetaInfo(field, usability, maps, itemMaps, keyMaps, valMaps);
+    FieldMetaInfo ret = new FieldMetaInfo(field, usability, maps, itemMaps, ignores, keyMaps, valMaps);
+    return ret;
+  }
+
+  private static IList<ItemIgnore> getItemIgnoreTypes(Field field) {
+    IList<ItemIgnore> ret = new EList<>();
+    for (XmlItemIgnoreType item : field.getDeclaredAnnotationsByType(XmlItemIgnoreType.class)) {
+      ItemIgnore ii = new ItemIgnoreType(item.type(), item.subClassIncluded());
+      ret.add(ii);
+    }
+    return ret;
+  }
+
+  private static IList<ItemIgnore> getItemIgnoreElements(Field field) {
+    IList<ItemIgnore> ret = new EList<>();
+    for (XmlItemIgnoreElement item : field.getDeclaredAnnotationsByType(XmlItemIgnoreElement.class)) {
+      ItemIgnore ii = new ItemIgnoreElement(item.elementName());
+      ret.add(ii);
+    }
     return ret;
   }
 
@@ -101,6 +80,7 @@ public class FieldMetaInfo {
     }
     return mappings;
   }
+
   private static IList<Mapping> getAttributeMappings(Field field) {
     IList<Mapping> mappings = new EList<>();
     for (XmlAttribute item : field.getDeclaredAnnotationsByType(XmlAttribute.class)) {
@@ -118,6 +98,7 @@ public class FieldMetaInfo {
     }
     return mappings;
   }
+
   private static IList<Mapping> getItemAttributeMappings(Field field) {
     IList<Mapping> mappings = new EList<>();
     for (XmlItemAttribute item : field.getDeclaredAnnotationsByType(XmlItemAttribute.class)) {
@@ -135,6 +116,7 @@ public class FieldMetaInfo {
     }
     return mappings;
   }
+
   private static IList<Mapping> getKeyAttributeMappings(Field field) {
     IList<Mapping> mappings = new EList<>();
     for (XmlMapKeyAttribute item : field.getDeclaredAnnotationsByType(XmlMapKeyAttribute.class)) {
@@ -152,6 +134,7 @@ public class FieldMetaInfo {
     }
     return mappings;
   }
+
   private static IList<Mapping> getValueAttributeMappings(Field field) {
     IList<Mapping> mappings = new EList<>();
     for (XmlMapValueAttribute item : field.getDeclaredAnnotationsByType(XmlMapValueAttribute.class)) {
@@ -170,6 +153,54 @@ public class FieldMetaInfo {
     else
       usability = eNecessity.mandatory;
     return usability;
+  }
+
+  public FieldMetaInfo(Field field, eNecessity necessity, IList<Mapping> mappings, IList<Mapping> itemMappings, IList<ItemIgnore> itemIgnores, IList<Mapping> mapKeyMappings, IList<Mapping> mapValueMappings) {
+    this.field = field;
+    this.necessity = necessity;
+    this.mappings = new MappingList(mappings);
+    this.itemMappings = new MappingList(itemMappings);
+    this.mapKeyMappings = new MappingList(mapKeyMappings);
+    this.mapValueMappings = new MappingList(mapValueMappings);
+    this.itemIgnores = new ItemIgnoreList(itemIgnores);
+  }
+
+  public IReadOnlyList<Mapping> getMapKeyMappings() {
+    return mapKeyMappings;
+  }
+
+  public IReadOnlyList<Mapping> getMapValueMappings() {
+    return mapValueMappings;
+  }
+
+  public ItemIgnoreList getItemIgnores() {
+    return itemIgnores;
+  }
+
+  public Field getField() {
+    return field;
+  }
+
+  public eNecessity getNecessity() {
+    return necessity;
+  }
+
+  public void updateNecessity(eNecessity necessity) {
+    this.necessity = necessity;
+  }
+
+  public IReadOnlyList<Mapping> getMappings() {
+    return mappings;
+  }
+
+  public IReadOnlyList<Mapping> getItemMappings() {
+    return itemMappings;
+  }
+
+  public String getLocation(boolean useLong) {
+    return
+        (useLong ? field.getDeclaringClass().getName() : field.getDeclaringClass().getSimpleName()) +
+            "." + field.getName();
   }
 
   @Override
@@ -203,10 +234,6 @@ public class FieldMetaInfo {
   }
 
 
-
-
-
-
   public void updateXmlMapKeyElementMapping(String name, Class type, boolean isTypeSubtypeIncluded, IElementParser parser) {
     mapKeyMappings.removeOverlying(false, name, type);
     Mapping m = Mapping.createCustom(name, type, isTypeSubtypeIncluded, false, parser);
@@ -218,10 +245,6 @@ public class FieldMetaInfo {
     Mapping m = Mapping.createCustom(name, type, isTypeSubtypeIncluded, true, parser);
     mapKeyMappings.add(m);
   }
-
-
-
-
 
 
   public void updateXmlMapValueElementMapping(String name, Class type, boolean isTypeSubtypeIncluded, IElementParser parser) {

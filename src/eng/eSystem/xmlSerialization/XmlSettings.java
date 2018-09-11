@@ -4,6 +4,7 @@ import eng.eSystem.collections.EList;
 import eng.eSystem.collections.IList;
 import eng.eSystem.xmlSerialization.exceptions.XmlSerializationException;
 import eng.eSystem.xmlSerialization.meta.FieldMetaInfo;
+import eng.eSystem.xmlSerialization.meta.ItemIgnoreElement;
 import eng.eSystem.xmlSerialization.meta.MetaManager;
 import eng.eSystem.xmlSerialization.meta.TypeMetaInfo;
 import eng.eSystem.xmlSerialization.supports.IElementParser;
@@ -363,6 +364,11 @@ public class XmlSettings {
       assert parser != null;
       TypeMetaInfo tmi = _getType(type);
       tmi.updateCustomElementParser(parser, applyOnSubclasses);
+    }
+
+    public void registerXmlItemIgnoredElement(Class parentType, String itemElementName){
+      TypeMetaInfo tmi = _getType(parentType);
+      tmi.getItemIgnores().add(new ItemIgnoreElement(itemElementName));
     }
   }
 

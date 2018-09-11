@@ -95,7 +95,6 @@ public class CustomParser {
     root.addElement(tmp);
 
     XmlSettings settings = new XmlSettings();
-    settings.setLogLevel(Log.LogLevel.verbose);
     settings.getMeta().registerCustomParser(int.class, false, new AltitudeValueParser());
     XmlSerializer serializer = new XmlSerializer(settings);
 
