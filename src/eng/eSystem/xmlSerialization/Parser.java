@@ -45,11 +45,17 @@ class Parser {
 
     Applicator app = metaManager.getEmptyElementApplicator(root.getName(), objectType);
 
-    Class cls = objectType;
     T ret;
     ret = (T) yReadInstanceFromElement(root, app, null);
 
     return ret;
+  }
+
+  public void deserializeContent(XElement sourceElement, Object targetObject) {
+    if (targetObject != null) {
+      TypeMetaInfo tmi = metaManager.getTypeMetaInfo(targetObject.getClass());
+      yReadClassField(sourceElement, targetObject, tmi);
+    }
   }
 
   private Object yReadInstanceFromAttribute(XElement element, Applicator app) {
@@ -343,6 +349,10 @@ class Parser {
   private void yReadClassField(XElement el, Object trg, TypeMetaInfo tmi) {
 
     for (FieldMetaInfo fmi : tmi.getFields()) {
+      if (fmi.getField().getName().equals("this$0")){
+        log.log(Log.LogLevel.info, "'%s' field skipped as is inner class parent object.", fmi.getLocation(false));
+        continue;
+      }
       if (fmi.getNecessity() == FieldMetaInfo.eNecessity.ignore) {
         log.log(Log.LogLevel.info, "'%s' field skipped due to @XmlIgnore annotation.", fmi.getLocation(false));
         continue;

@@ -7,6 +7,8 @@ import eng.eSystem.xmlSerialization.exceptions.XmlSerializationException;
 
 import java.io.*;
 
+import static eng.eSystem.utilites.FunctionShortcuts.sf;
+
 public class XmlSerializer {
 
   public class Serializer {
@@ -92,6 +94,16 @@ public class XmlSerializer {
           ex);
     }
     return ret;
+  }
+
+  public void deserializeContent(XElement sourceElement, Object targetObject){
+    try {
+      this.parser.deserializeContent(sourceElement, targetObject);
+    } catch (XmlSerializationException e) {
+      throw new XmlSerializationException(
+          sf("Failed to deserialize the content of '%s' from element %s.", targetObject.toString(), Shared.getElementInfoString(sourceElement)),
+          e);
+    }
   }
 
   public void serialize(String xmlFileName, Object sourceObject) {
