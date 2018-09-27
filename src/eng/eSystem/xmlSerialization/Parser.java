@@ -478,10 +478,12 @@ class Parser {
       throw new NoSuchMethodException();
     }
     Constructor constructor = constructors.getRandom();
-    if (constructor.getParameterCount() == 0
-        && Modifier.isPrivate(constructor.getModifiers())
+    if (Modifier.isPrivate(constructor.getModifiers())
         && constructor.getAnnotation(XmlConstructor.class) == null) {
-      System.out.println("REP:: Private parameter-less constructor used for " + type.getName());
+      log.log(
+          Log.LogLevel.warning ,
+          "Private constructor without @XmlConstructor annotation used to create an instance of the type %s.",
+          type.getName() );
     }
     Object[] params = new Object[constructor.getParameterCount()];
     for (int i = 0; i < constructor.getParameterCount(); i++) {
